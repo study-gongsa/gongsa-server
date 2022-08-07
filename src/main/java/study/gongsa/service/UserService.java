@@ -32,17 +32,15 @@ public class UserService {
     public Number join(User user){
         //이메일 중복 체크
         Optional<User> userByEmail = userRepository.findByEmail(user.getEmail());
-        if(userByEmail.isPresent()){
-            return -1;
-            //추후 수정 (에러 핸들링)
-            //throw new EmailDuplicateException("email duplicated",ErrorCode.EMAIL_DUPLICATION);
-        }
+        userByEmail.ifPresent(m -> {
+            throw new IllegalStateExceptionWithLocation("email","중복된 이메일입니다.");
+        });
 
         //닉네임 중복 체크
         Optional<User> userByNickname = userRepository.findByNickname(user.getNickname());
-        if(userByNickname.isPresent()){
-            return -2;
-        }
+        userByNickname.ifPresent(m -> {
+            throw new IllegalStateExceptionWithLocation("nickname","중복된 닉네임입니다.");
+        });
 
         //비밀번호 암호화
         String encryptedPassword = passwordEncoder.encode(user.getPasswd());

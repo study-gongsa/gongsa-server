@@ -25,26 +25,10 @@ public class UserController {
 
     @PostMapping("")
     public ResponseEntity join(@RequestBody @Valid JoinRequest req){
-
         int createdUID = userService.join(new User(req.getEmail(), req.getPasswd(), req.getNickname())).intValue();
 
-        // 추후 수정 (에러 핸들링)
-        //추후 수정 (에러 핸들링)
-        DefaultResponse response;
-
-        //정상 종료
-        if(createdUID > 0){
-            response = new DefaultResponse(new JoinResponse(createdUID));
-            return new ResponseEntity(response, HttpStatus.CREATED);
-        }
-        
-        //에러
-        if(createdUID==-1){ //이메일 중복
-            response = new DefaultResponse("email","중복된 이메일입니다.");
-        }else{//닉네임 중복
-            response = new DefaultResponse("nickname", "중복된 닉네임입니다.");
-        }
-        return new ResponseEntity(response, HttpStatus.BAD_REQUEST);
+        DefaultResponse response = new DefaultResponse(new JoinResponse(createdUID));
+        return new ResponseEntity(response, HttpStatus.CREATED);
     }
     
 }
