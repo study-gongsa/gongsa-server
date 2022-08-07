@@ -6,8 +6,8 @@ import lombok.Getter;
 public class IllegalStateExceptionWithLocation extends IllegalStateException{
     String location;
 
-    public IllegalStateExceptionWithLocation(String s, String location) {
-        super(s);
+    public IllegalStateExceptionWithLocation(String location, String message) {
+        super(message);
         this.location = location;
     }
 }
