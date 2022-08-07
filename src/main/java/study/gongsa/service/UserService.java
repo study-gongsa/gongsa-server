@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import study.gongsa.domain.User;
 import study.gongsa.dto.MailDto;
 import study.gongsa.repository.UserRepository;
-import study.gongsa.support.GenerateAuthCode;
+import study.gongsa.support.CodeGeneratorService;
 import study.gongsa.support.mail.MailService;
 
 import java.util.Date;
@@ -46,7 +46,7 @@ public class UserService {
         user.setPasswd(encryptedPassword);
 
         //인증번호 생성
-        String authCode = new GenerateAuthCode().excuteGenerate();
+        String authCode = new CodeGeneratorService().generateRandomNumber(6);
         user.setAuthCode(authCode);
 
         //이메일 전송
