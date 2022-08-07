@@ -2,9 +2,11 @@ package study.gongsa.support;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.stereotype.Service;
 
 import java.util.Random;
 
+@Service
 @Getter
 @Setter
 public class CodeGeneratorService {
@@ -23,4 +25,3 @@ public class CodeGeneratorService {
     }
 
 }
-

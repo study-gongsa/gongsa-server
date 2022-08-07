@@ -7,6 +7,7 @@ import study.gongsa.domain.User;
 import study.gongsa.dto.MailDto;
 import study.gongsa.repository.UserRepository;
 import study.gongsa.support.CodeGeneratorService;
+import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
 import study.gongsa.support.mail.MailService;
 
 import java.util.Date;
@@ -18,12 +19,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
+    private final CodeGeneratorService codeGeneratorService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, MailService mailService){
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, MailService mailService, CodeGeneratorService codeGeneratorService){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.mailService = mailService;
+        this.codeGeneratorService = codeGeneratorService;
     }
 
     public Number join(User user){
@@ -46,7 +49,7 @@ public class UserService {
         user.setPasswd(encryptedPassword);
 
         //인증번호 생성
-        String authCode = new CodeGeneratorService().generateRandomNumber(6);
+        String authCode = codeGeneratorService.generateRandomNumber(6);
         user.setAuthCode(authCode);
 
         //이메일 전송
