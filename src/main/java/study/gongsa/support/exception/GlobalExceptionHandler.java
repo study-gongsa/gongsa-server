@@ -26,13 +26,22 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
     }
 
-    // 403 location, message
+    // 401 location, message
     @ExceptionHandler(value = IllegalStateExceptionWithAuth.class)
     public ResponseEntity illegalStateExepcion(IllegalStateExceptionWithAuth error){
         System.out.println(error);
         DefaultResponse responseBody = new DefaultResponse(error.getLocation(),error.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseBody);
     }
+
+    // 403 location, message
+    @ExceptionHandler(value = IllegalStateExceptionWithForbid.class)
+    public ResponseEntity illegalStateExepcion(IllegalStateExceptionWithForbid error){
+        System.out.println(error);
+        DefaultResponse responseBody = new DefaultResponse(error.getLocation(),error.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(responseBody);
+    }
+
 
     // request validation error
     @ExceptionHandler(value = MethodArgumentNotValidException.class)

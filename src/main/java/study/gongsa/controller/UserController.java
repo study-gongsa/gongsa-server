@@ -28,7 +28,7 @@ public class UserController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    @PostMapping("")
+    @PostMapping("/join")
     public ResponseEntity join(@RequestBody @Valid JoinRequest req){
         int createdUID = userService.join(new User(req.getEmail(), req.getPasswd(), req.getNickname())).intValue();
 
@@ -44,7 +44,7 @@ public class UserController {
 
         UserAuth userAuth = new UserAuth(userUID, refreshToken);
         userAuthService.save(userAuth);
-        DefaultResponse response = new DefaultResponse(new LoginResponse(userUID, accessToken, refreshToken));
+        DefaultResponse response = new DefaultResponse(new LoginResponse(accessToken, refreshToken));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 }
