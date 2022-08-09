@@ -1,14 +1,13 @@
 package study.gongsa.support.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import study.gongsa.support.exception.IllegalStateExceptionWithAuth;
 
 import java.time.Duration;
 import java.util.Date;
+import java.util.Map;
 
 @Component
 public class JwtTokenProvider {
@@ -45,13 +44,10 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public Claims parsingToken(String authorizationHeader) {
+    public Claims checkValid(String authorizationHeader) {
         validationAuthorizationHeader(authorizationHeader);
         String token = extractToken(authorizationHeader);
-        return Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody();
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
     }
 
     private void validationAuthorizationHeader(String header) {
