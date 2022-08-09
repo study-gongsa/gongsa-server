@@ -4,11 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import study.gongsa.dto.DefaultResponse;
-import study.gongsa.dto.JoinRequest;
-import study.gongsa.dto.JoinResponse;
+import study.gongsa.dto.*;
 import study.gongsa.domain.User;
 import study.gongsa.service.UserService;
+import study.gongsa.support.jwt.JwtTokenProvider;
 
 import javax.validation.Valid;
 
@@ -17,10 +16,12 @@ import javax.validation.Valid;
 public class UserController {
 
     private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    public UserController(UserService userService){
+    public UserController(UserService userService, JwtTokenProvider jwtTokenProvider){
         this.userService = userService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @PostMapping("")
@@ -30,5 +31,13 @@ public class UserController {
         DefaultResponse response = new DefaultResponse(new JoinResponse(createdUID));
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
-    
+
+    @PostMapping("/login")
+    public ResponseEntity login(@RequestBody @Valid LoginRequest req){
+        int userUID = userService.login(new User(req.getEmail(), req.getPasswd())).intValue();
+        String accessToken = jwtTokenProvider.makeAccessToken(userUID);
+        String refreshToken = jwtTokenProvider.makeRefreshToken(userUID);
+        DefaultResponse response = new DefaultResponse(new LoginResponse(userUID, accessToken, refreshToken));
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
 }
