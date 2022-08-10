@@ -11,6 +11,7 @@ import study.gongsa.domain.User;
 import study.gongsa.service.UserService;
 
 import javax.validation.Valid;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
@@ -25,10 +26,25 @@ public class UserController {
 
     @PostMapping("")
     public ResponseEntity join(@RequestBody @Valid JoinRequest req){
-        int createdUID = userService.join(new User(req.getEmail(), req.getPasswd(), req.getNickname())).intValue();
+        userService.join(new User(req.getEmail(), req.getPasswd(), req.getNickname())).intValue();
 
-        DefaultResponse response = new DefaultResponse(new JoinResponse(createdUID));
+        DefaultResponse response = new DefaultResponse();
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
+
+    @PatchMapping("/mail")
+    public ResponseEntity sendMail(@RequestBody Map<String, Object> req){
+        userService.sendMail(req.get("email").toString());
+        DefaultResponse response = new DefaultResponse();
+        return new ResponseEntity(response, HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/code")
+    public ResponseEntity verifyAuthCode(@RequestBody Map<String, Object> req){
+        userService.verifyAuthCode(req.get("email").toString(), req.get("authCode").toString());
+        DefaultResponse response = new DefaultResponse();
+        return new ResponseEntity(response, HttpStatus.CREATED);
+    }
+
     
 }
