@@ -25,6 +25,14 @@ public class User {
         this.updatedAt = this.createdAt;
     }
 
+    public User(String email, String passwd) {
+        this.email = email;
+        this.passwd = passwd;
+
+        this.createdAt = new Date();
+        this.updatedAt = this.createdAt;
+    }
+
     private int UID;
     private String email;
     private String passwd;

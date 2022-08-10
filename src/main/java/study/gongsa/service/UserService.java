@@ -1,12 +1,14 @@
 package study.gongsa.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import study.gongsa.domain.User;
 import study.gongsa.dto.MailDto;
 import study.gongsa.repository.UserRepository;
 import study.gongsa.support.CodeGeneratorService;
+import study.gongsa.support.exception.IllegalStateExceptionWithAuth;
 import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
 import study.gongsa.support.mail.MailService;
 
@@ -101,4 +103,14 @@ public class UserService {
         userRepository.updateIsAuth(true, currentTime, user.getUID());
     }
 
+    public Number login(User user){
+        Optional<User> userByEmail = userRepository.findByEmail(user.getEmail());
+        if(userByEmail.isEmpty())
+            throw new IllegalStateExceptionWithAuth("email","가입되지 않은 이메일입니다.");
+        if (!passwordEncoder.matches(user.getPasswd(), userByEmail.get().getPasswd()))
+            throw new IllegalStateExceptionWithAuth("passwd","올바르지 않은 비밀번호입니다.");
+
+        System.out.println(userByEmail.get().getUID());
+        return userByEmail.get().getUID();
+    }
 }

@@ -92,5 +92,4 @@ public class JdbcTemplateUserRepository implements UserRepository {
         hashMap.put("updatedAt",user.getUpdatedAt());
         return hashMap;
     }
-
 }
