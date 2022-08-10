@@ -2,12 +2,12 @@ package study.gongsa.support.mail;
 
 import lombok.AllArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import study.gongsa.dto.MailDto;
 
-@Service
+@Component
 @AllArgsConstructor
-public class MailService {
+public class GmailSender {
 
     private JavaMailSender javaMailSender;
 

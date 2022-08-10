@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 import study.gongsa.domain.User;
 import study.gongsa.dto.MailDto;
 import study.gongsa.repository.UserRepository;
-import study.gongsa.support.CodeGeneratorService;
+import study.gongsa.support.CodeGenerator;
 import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
-import study.gongsa.support.mail.MailService;
+import study.gongsa.support.mail.GmailSender;
 
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -21,15 +21,15 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final MailService mailService;
-    private final CodeGeneratorService codeGeneratorService;
+    private final GmailSender gmailSender;
+    private final CodeGenerator codeGenerator;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, MailService mailService, CodeGeneratorService codeGeneratorService){
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, GmailSender gmailSender, CodeGenerator codeGenerator){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.mailService = mailService;
-        this.codeGeneratorService = codeGeneratorService;
+        this.gmailSender = gmailSender;
+        this.codeGenerator = codeGenerator;
     }
 
     public Number join(User user){
@@ -64,12 +64,12 @@ public class UserService {
         }
 
         //인증번호 생성
-        String authCode = codeGeneratorService.generateRandomNumber(6);
+        String authCode = codeGenerator.generateRandomNumber(6);
 
         //이메일 전송
         MailDto mailDto = new MailDto();
         mailDto.setRegisterMailForm(user.getEmail(),user.getNickname(),authCode);
-        mailService.sendMail(mailDto);
+        gmailSender.sendMail(mailDto);
 
         //user 정보 업데이트
         userRepository.updateAuthCode(authCode, new Timestamp(new Date().getTime()), user.getUID());
