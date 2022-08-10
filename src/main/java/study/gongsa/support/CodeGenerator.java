@@ -9,7 +9,7 @@ import java.util.Random;
 @Service
 @Getter
 @Setter
-public class CodeGeneratorService {
+public class CodeGenerator {
     public String generateRandomNumber(int numberLength) {
         Random random = new Random(System.currentTimeMillis());
 
