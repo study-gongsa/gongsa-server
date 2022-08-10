@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 import study.gongsa.domain.User;
 
 import javax.sql.DataSource;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,18 @@ public class JdbcTemplateUserRepository implements UserRepository {
     public Number save(User user) {
         final Map<String, Object> parameters = setParameter(user);
         return insertIntoUser.executeAndReturnKey(parameters);
+    }
+
+    @Override
+    public void updateAuthCode(String authCode, Timestamp updatedAt, int uid) {
+        String sql = "update User set authCode=?, updatedAt=? " + " where UID=?";
+        jdbcTemplate.update(sql, authCode, updatedAt, uid);
+    }
+
+    @Override
+    public void updateIsAuth(Boolean isAuth, Timestamp updatedAt, int uid){
+        String sql = "update User set isAuth=?, updatedAt=? " + " where UID=?";
+        jdbcTemplate.update(sql, isAuth, updatedAt, uid);
     }
 
     @Override
@@ -57,6 +71,9 @@ public class JdbcTemplateUserRepository implements UserRepository {
             user.setLevel(rs.getInt("level"));
             user.setImgPath(rs.getString("imgPath"));
             user.setAuthCode(rs.getString("authCode"));
+            user.setIsAuth(rs.getBoolean("isAuth"));
+            user.setCreatedAt(rs.getTimestamp("createdAt"));
+            user.setUpdatedAt(rs.getTimestamp("updatedAt"));
 
             return user;
         };
