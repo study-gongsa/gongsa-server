@@ -29,7 +29,7 @@ public class User {
         this.email = email;
         this.passwd = passwd;
 
-        this.createdAt = new Date();
+        this.createdAt = new Timestamp(new Date().getTime());
         this.updatedAt = this.createdAt;
     }
 
