@@ -16,8 +16,10 @@ import study.gongsa.service.UserService;
 import study.gongsa.support.jwt.JwtTokenProvider;
 
 import javax.validation.Valid;
+import java.util.Map;
 
 @RestController
+@CrossOrigin("*")
 @Api(value="User")
 @RequestMapping("/api/user")
 public class UserController {
@@ -36,13 +38,37 @@ public class UserController {
     @ApiOperation(value="회원가입")
     @ApiResponses({
             @ApiResponse(code=201, message="회원가입 완료"),
-            @ApiResponse(code=400, message="request parameter 에러, 알 수 없는 에러(서버 에러)")
+            @ApiResponse(code=400, message="이메일 혹은 닉네임이 중복된 경우")
     })
     @PostMapping("/join")
     public ResponseEntity join(@RequestBody @Valid JoinRequest req){
-        int createdUID = userService.join(new User(req.getEmail(), req.getPasswd(), req.getNickname())).intValue();
+        userService.join(new User(req.getEmail(), req.getPasswd(), req.getNickname())).intValue();
 
-        DefaultResponse response = new DefaultResponse(new JoinResponse(createdUID));
+        DefaultResponse response = new DefaultResponse();
+        return new ResponseEntity(response, HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value="인증번호 생성 및 메일 전송")
+    @ApiResponses({
+            @ApiResponse(code=201, message="인증번호 생성 및 메일 전송 완료"),
+            @ApiResponse(code=400, message="이미 인증된 사용자인 경우, 가입되지 않은 이메일인 경우")
+    })
+    @PatchMapping("/mail")
+    public ResponseEntity sendMail(@RequestBody Map<String, Object> req){
+        userService.sendMail(req.get("email").toString());
+        DefaultResponse response = new DefaultResponse();
+        return new ResponseEntity(response, HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value="인증코드 검증")
+    @ApiResponses({
+            @ApiResponse(code=201, message="인증번호 검증 완료"),
+            @ApiResponse(code=400, message="가입되지 않은 이메일인 경우, 잘못되거나 만료된 인증코드인 경우")
+    })
+    @PatchMapping("/code")
+    public ResponseEntity verifyAuthCode(@RequestBody Map<String, Object> req){
+        userService.verifyAuthCode(req.get("email").toString(), req.get("authCode").toString());
+        DefaultResponse response = new DefaultResponse();
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 

@@ -3,11 +3,9 @@ package study.gongsa.support.jwt;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import study.gongsa.support.exception.IllegalStateExceptionWithAuth;
 
 import java.time.Duration;
 import java.util.Date;
-import java.util.Map;
 
 @Component
 public class JwtTokenProvider {
