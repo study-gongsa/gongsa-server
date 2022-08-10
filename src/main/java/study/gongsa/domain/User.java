@@ -2,6 +2,8 @@ package study.gongsa.domain;
 
 import lombok.*;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -19,7 +21,7 @@ public class User {
         //기본값
         this.level = 1;
         this.isAuth = false;
-        this.createdAt = new Date();
+        this.createdAt = new Timestamp(new Date().getTime());
         this.updatedAt = this.createdAt;
     }
 
@@ -31,8 +33,8 @@ public class User {
     private int level;
     private String authCode;
     private Boolean isAuth;
-    private Date createdAt;
-    private Date updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     @Override
     public String toString() {
