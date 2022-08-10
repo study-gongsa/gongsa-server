@@ -54,8 +54,8 @@ public class UserController {
             @ApiResponse(code=400, message="이미 인증된 사용자인 경우, 가입되지 않은 이메일인 경우")
     })
     @PatchMapping("/mail")
-    public ResponseEntity sendMail(@RequestBody Map<String, Object> req){
-        userService.sendMail(req.get("email").toString());
+    public ResponseEntity sendMail(@RequestBody @Valid MailRequest req){
+        userService.sendMail(req.getEmail());
         DefaultResponse response = new DefaultResponse();
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
@@ -66,8 +66,8 @@ public class UserController {
             @ApiResponse(code=400, message="가입되지 않은 이메일인 경우, 잘못되거나 만료된 인증코드인 경우")
     })
     @PatchMapping("/code")
-    public ResponseEntity verifyAuthCode(@RequestBody Map<String, Object> req){
-        userService.verifyAuthCode(req.get("email").toString(), req.get("authCode").toString());
+    public ResponseEntity verifyAuthCode(@RequestBody @Valid CodeRequest req){
+        userService.verifyAuthCode(req.getEmail(), req.getAuthCode());
         DefaultResponse response = new DefaultResponse();
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
