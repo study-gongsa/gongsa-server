@@ -2,12 +2,11 @@ package study.gongsa.support.interceptor;
 
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import study.gongsa.service.UserAuthService;
-import study.gongsa.service.UserService;
-import study.gongsa.support.exception.IllegalStateExceptionWithAuth;
-import study.gongsa.support.exception.IllegalStateExceptionWithForbid;
+import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
 import study.gongsa.support.jwt.JwtTokenProvider;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,9 +32,9 @@ public class JwtInterceptor implements HandlerInterceptor {
             request.setAttribute("userUID", data.get("userUID"));
             return true;
         } catch(IllegalArgumentException e){
-            throw new IllegalStateExceptionWithAuth("auth", "로그인 후 이용해주세요.");
+            throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED,"auth", "로그인 후 이용해주세요.");
         } catch (Exception e){
-            throw new IllegalStateExceptionWithAuth("auth", "유효하지 않은 토큰입니다.");
+            throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED,"auth", "유효하지 않은 토큰입니다.");
         }
     }
 }

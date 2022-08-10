@@ -1,14 +1,13 @@
 package study.gongsa.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import study.gongsa.domain.User;
 import study.gongsa.dto.MailDto;
 import study.gongsa.repository.UserRepository;
 import study.gongsa.support.CodeGeneratorService;
-import study.gongsa.support.exception.IllegalStateExceptionWithAuth;
 import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
 import study.gongsa.support.mail.MailService;
 
@@ -37,13 +36,13 @@ public class UserService {
         //이메일 중복 체크
         Optional<User> userByEmail = userRepository.findByEmail(user.getEmail());
         userByEmail.ifPresent(m -> {
-            throw new IllegalStateExceptionWithLocation("email","중복된 이메일입니다.");
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST,"email","중복된 이메일입니다.");
         });
 
         //닉네임 중복 체크
         Optional<User> userByNickname = userRepository.findByNickname(user.getNickname());
         userByNickname.ifPresent(m -> {
-            throw new IllegalStateExceptionWithLocation("nickname","중복된 닉네임입니다.");
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST,"nickname","중복된 닉네임입니다.");
         });
 
         //비밀번호 암호화
@@ -57,11 +56,11 @@ public class UserService {
         //이메일 이미 인증된 사용자인 경우, 존재하지 않는 이메일인 경우
         Optional<User> userByEmail = userRepository.findByEmail(email);
         if (userByEmail.isEmpty()){
-            throw new IllegalStateException("미가입자입니다.");
+            throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED, null,"가입되지 않은 이메일입니다.");
         }
         User user = userByEmail.get();
         if (user.getIsAuth()){
-            throw new IllegalStateException("이미 인증된 사용자입니다.");
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, null, "이미 인증된 사용자입니다.");
         }
 
         //인증번호 생성
@@ -80,13 +79,13 @@ public class UserService {
         //미가입자
         Optional<User> userByEmail = userRepository.findByEmail(email);
         if (userByEmail.isEmpty()){
-            throw new IllegalStateException("미가입자입니다.");
+            throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED, "email","가입되지 않은 이메일입니다.");
         }
 
         //인증코드 불일치
         User user = userByEmail.get();
         if (!user.getAuthCode().equals(authCode)){
-            throw new IllegalStateExceptionWithLocation("incorrect", "잘못된 인증코드입니다.");
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST,"incorrect", "잘못된 인증코드입니다.");
         }
 
         //만료된 인증코드
@@ -97,7 +96,7 @@ public class UserService {
         Timestamp currentTime = new Timestamp(new Date().getTime());
 
         if(currentTime.after(expiredTime)){
-            throw new IllegalStateExceptionWithLocation("expiration", "만료된 인증코드입니다.");
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST,"expiration", "만료된 인증코드입니다.");
         }
 
         userRepository.updateIsAuth(true, currentTime, user.getUID());
@@ -106,9 +105,9 @@ public class UserService {
     public Number login(User user){
         Optional<User> userByEmail = userRepository.findByEmail(user.getEmail());
         if(userByEmail.isEmpty())
-            throw new IllegalStateExceptionWithAuth("email","가입되지 않은 이메일입니다.");
+            throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED, "email","가입되지 않은 이메일입니다.");
         if (!passwordEncoder.matches(user.getPasswd(), userByEmail.get().getPasswd()))
-            throw new IllegalStateExceptionWithAuth("passwd","올바르지 않은 비밀번호입니다.");
+            throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED, "passwd","올바르지 않은 비밀번호입니다.");
 
         System.out.println(userByEmail.get().getUID());
         return userByEmail.get().getUID();
