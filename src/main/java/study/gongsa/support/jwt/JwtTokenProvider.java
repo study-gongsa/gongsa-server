@@ -49,7 +49,7 @@ public class JwtTokenProvider {
     }
 
     private void validationAuthorizationHeader(String header) {
-        if (header == null || !header.startsWith(tokenPrefix)) {
+        if (!header.startsWith(tokenPrefix)) {
             throw new IllegalArgumentException();
         }
     }
