@@ -13,4 +13,5 @@ public interface UserRepository {
     Optional<User> findByUID(int uid);
     Optional<User> findByEmail(String email);
     Optional<User> findByNickname(String nickname);
+    boolean isAuth(int uid);
 }
