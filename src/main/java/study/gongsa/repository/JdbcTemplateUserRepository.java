@@ -61,6 +61,11 @@ public class JdbcTemplateUserRepository implements UserRepository {
         return result.stream().findAny();
     }
 
+    @Override
+    public boolean isAuth(int uid) {
+        return jdbcTemplate.queryForObject("select isAuth from User where UID = ?", Boolean.class, uid);
+    }
+
     private RowMapper<User> userRowMapper() {
         return (rs, rowNum) -> {
             User user = new User();

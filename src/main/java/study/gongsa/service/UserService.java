@@ -112,4 +112,8 @@ public class UserService {
         System.out.println(userByEmail.get().getUID());
         return userByEmail.get().getUID();
     }
+
+    public boolean isAuth(int uid){
+        return userRepository.isAuth(uid);
+    }
 }
