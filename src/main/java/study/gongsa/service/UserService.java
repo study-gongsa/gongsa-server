@@ -52,7 +52,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void sendMail(String email){
+    public void sendJoinMail(String email){
         //이메일 이미 인증된 사용자인 경우, 존재하지 않는 이메일인 경우
         Optional<User> userByEmail = userRepository.findByEmail(email);
         if (userByEmail.isEmpty()){
@@ -74,6 +74,28 @@ public class UserService {
         //user 정보 업데이트
         userRepository.updateAuthCode(authCode, new Timestamp(new Date().getTime()), user.getUID());
     }
+
+    public void sendChangePasswdMail(String email){
+        //존재하지 않는 이메일인 경우
+        Optional<User> userByEmail = userRepository.findByEmail(email);
+        if (userByEmail.isEmpty()){
+            throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED, null,"가입되지 않은 이메일입니다.");
+        }
+        User user = userByEmail.get();
+
+        //임시 비밀번호 생성
+        String passwdCode = codeGenerator.generateRandomString(8);
+        String encryptedPassword = passwordEncoder.encode(passwdCode);
+
+        //user 정보 업데이트
+        userRepository.updatePasswd(encryptedPassword, new Timestamp(new Date().getTime()), user.getUID());
+
+        //이메일 전송
+        MailDto mailDto = new MailDto();
+        mailDto.setChangePasswdMailForm(user.getEmail(),user.getNickname(),passwdCode);
+        gmailSender.sendMail(mailDto);
+    }
+
 
     public void verifyAuthCode(String email, String authCode){
         //미가입자

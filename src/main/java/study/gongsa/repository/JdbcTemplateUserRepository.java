@@ -45,6 +45,12 @@ public class JdbcTemplateUserRepository implements UserRepository {
     }
 
     @Override
+    public void updatePasswd(String passwd, Timestamp updatedAt, int uid) {
+        String sql = "update User set passwd=?, updatedAt=? " + " where UID=?";
+        jdbcTemplate.update(sql, passwd, updatedAt, uid);
+    }
+
+    @Override
     public Optional<User> findByUID(int uid){
         List<User> result = jdbcTemplate.query("select * from User where UID = ?", userRowMapper(), uid);
         return result.stream().findAny();
