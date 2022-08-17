@@ -24,4 +24,14 @@ public class MailDto {
                 + "<p><b>인증코드 : " + authCode + "</b></p><br>"
                 + "이 이메일을 요청하지 않았다면, 이메일을 무시하세요.";
     }
+
+    public void setChangePasswdMailForm(String address, String nickName, String passwdCode){
+        this.address = address;
+        this.title = "[공부하는 사람들] 비밀번호 변경 안내";
+        this.message = "안녕하세요. 공부하는 사람들 <strong>공사</strong> 입니다. <br>"
+                + nickName + "님의 비밀번호를 알려드립니다. <br>"
+                + "<p><b>비밀번호 : " + passwdCode + "</b></p><br>"
+                + "비밀번호 변경을 원하신다면, 마이페이지에서 변경해주세요.<br>"
+                + "이 이메일을 요청하지 않았다면, 이메일을 무시하세요.";
+    }
 }

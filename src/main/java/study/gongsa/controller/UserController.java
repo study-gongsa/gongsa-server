@@ -55,7 +55,7 @@ public class UserController {
     })
     @PatchMapping("/mail")
     public ResponseEntity sendMail(@RequestBody @Valid MailRequest req){
-        userService.sendMail(req.getEmail());
+        userService.sendJoinMail(req.getEmail());
         DefaultResponse response = new DefaultResponse();
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
@@ -72,10 +72,21 @@ public class UserController {
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
+    @ApiOperation(value="비밀번호 변경")
+    @ApiResponses({
+            @ApiResponse(code=200, message="비밀번호 변경 완료"),
+            @ApiResponse(code=400, message="가입되지 않은 이메일인 경우")
+    })
+    @PatchMapping("/passwd")
+    public ResponseEntity changePasswd(@RequestBody @Valid MailRequest req){
+        userService.sendChangePasswdMail(req.getEmail());
+        DefaultResponse response = new DefaultResponse();
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
     @ApiOperation(value="로그인")
     @ApiResponses({
             @ApiResponse(code=200, message="로그인 완료"),
-            @ApiResponse(code=400, message="request parameter 에러, 알 수 없는 에러(서버 에러)"),
             @ApiResponse(code=401, message="로그인 정보 불일치 에러"),
     })
     @PostMapping("/login")

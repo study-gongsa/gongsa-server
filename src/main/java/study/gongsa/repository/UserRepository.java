@@ -10,6 +10,7 @@ public interface UserRepository {
     Number save(User user);
     void updateAuthCode(String authCode, Timestamp updatedAt, int uid);
     void updateIsAuth(Boolean isAuth, Timestamp updatedAt, int uid);
+    void updatePasswd(String passwd, Timestamp updatedAt, int uid);
     Optional<User> findByUID(int uid);
     Optional<User> findByEmail(String email);
     Optional<User> findByNickname(String nickname);
