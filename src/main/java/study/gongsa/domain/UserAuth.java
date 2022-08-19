@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Getter
@@ -15,14 +16,14 @@ public class UserAuth {
         this.refreshToken = refreshToken;
 
         //기본값값
-       this.createdAt = new Date();
+        this.createdAt = new Timestamp(new Date().getTime());
         this.updatedAt = this.createdAt;
     }
 
     private int userUID;
     private String refreshToken;
-    private Date createdAt;
-    private Date updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     @Override
     public String toString() {
