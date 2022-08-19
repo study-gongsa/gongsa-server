@@ -51,32 +51,32 @@ public class UserController {
 
     @ApiOperation(value="인증번호 생성 및 메일 전송")
     @ApiResponses({
-            @ApiResponse(code=201, message="인증번호 생성 및 메일 전송 완료"),
+            @ApiResponse(code=200, message="인증번호 생성 및 메일 전송 완료"),
             @ApiResponse(code=400, message="이미 인증된 사용자인 경우, 가입되지 않은 이메일인 경우")
     })
     @PatchMapping("/mail")
     public ResponseEntity sendMail(@RequestBody @Valid MailRequest req){
         userService.sendJoinMail(req.getEmail());
         DefaultResponse response = new DefaultResponse();
-        return new ResponseEntity(response, HttpStatus.CREATED);
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
     @ApiOperation(value="인증코드 검증")
     @ApiResponses({
-            @ApiResponse(code=201, message="인증번호 검증 완료"),
+            @ApiResponse(code=200, message="인증번호 검증 완료"),
             @ApiResponse(code=400, message="가입되지 않은 이메일인 경우, 잘못되거나 만료된 인증코드인 경우")
     })
     @PatchMapping("/code")
     public ResponseEntity verifyAuthCode(@RequestBody @Valid CodeRequest req){
         userService.verifyAuthCode(req.getEmail(), req.getAuthCode());
         DefaultResponse response = new DefaultResponse();
-        return new ResponseEntity(response, HttpStatus.CREATED);
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
     @ApiOperation(value="비밀번호 찾기 - 이메일 전송")
     @ApiResponses({
             @ApiResponse(code=200, message="비밀번호 변경 완료"),
-            @ApiResponse(code=400, message="가입되지 않은 이메일인 경우")
+            @ApiResponse(code=401, message="가입되지 않은 이메일인 경우")
     })
     @PatchMapping("/mail/passwd")
     public ResponseEntity changePasswd(@RequestBody @Valid MailRequest req){
@@ -88,7 +88,9 @@ public class UserController {
     @ApiOperation(value="비밀번호 변경")
     @ApiResponses({
             @ApiResponse(code=200, message="비밀번호 변경 완료"),
-            @ApiResponse(code=400, message="가입되지 않은 회원일 경우, 비밀번호가 올바르지 않을 경우, 비밀번호가 이전과 동일할 경우")
+            @ApiResponse(code=400, message="비밀번호가 올바르지 않을 경우, 비밀번호가 이전과 동일할 경우"),
+            @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
+            @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등)")
     })
     @PatchMapping("/passwd")
     public ResponseEntity changePasswd(@RequestBody @Valid ChangePasswdRequest req, HttpServletRequest request){
