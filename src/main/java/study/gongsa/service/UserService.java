@@ -96,6 +96,25 @@ public class UserService {
         gmailSender.sendMail(mailDto);
     }
 
+    public void changePasswd(int uid, String currentPasswd, String nextPasswd){
+        // 존재하지 않는 회원일 경우, 비밀번호가 올바르지 않을 경우, 비밀번호가 이전과 동일할 경우
+        Optional<User> userByUID = userRepository.findByUID(uid);
+        if (userByUID.isEmpty()){
+            throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED, null,"가입되지 않은 회원입니다.");
+        }
+
+        User user = userByUID.get();
+        if (!passwordEncoder.matches(currentPasswd, user.getPasswd())) {
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "currentPasswd", "현재 비밀번호가 일치하지 않습니다.");
+        } else if (currentPasswd.equals(nextPasswd)) {
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "nextPasswd", "비밀번호가 이전과 동일해요.");
+        }
+
+        String encryptedPassword = passwordEncoder.encode(nextPasswd);
+        //user 정보 업데이트
+        userRepository.updatePasswd(encryptedPassword, new Timestamp(new Date().getTime()), uid);
+    }
+
 
     public void verifyAuthCode(String email, String authCode){
         //미가입자
