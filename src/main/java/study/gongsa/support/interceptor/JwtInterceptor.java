@@ -38,6 +38,8 @@ public class JwtInterceptor implements HandlerInterceptor {
             if(!userService.isAuth(userUID))
                 throw new IllegalArgumentException("notAuth");
 
+            request.setAttribute("userUID", userUID);
+
             return true;
         } catch(IllegalArgumentException e){
             System.out.println(e.getMessage());

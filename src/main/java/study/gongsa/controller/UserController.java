@@ -15,6 +15,7 @@ import study.gongsa.service.UserAuthService;
 import study.gongsa.service.UserService;
 import study.gongsa.support.jwt.JwtTokenProvider;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Map;
 
@@ -72,14 +73,28 @@ public class UserController {
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
-    @ApiOperation(value="비밀번호 변경")
+    @ApiOperation(value="비밀번호 찾기 - 이메일 전송")
     @ApiResponses({
             @ApiResponse(code=200, message="비밀번호 변경 완료"),
             @ApiResponse(code=400, message="가입되지 않은 이메일인 경우")
     })
-    @PatchMapping("/passwd")
+    @PatchMapping("/mail/passwd")
     public ResponseEntity changePasswd(@RequestBody @Valid MailRequest req){
         userService.sendChangePasswdMail(req.getEmail());
+        DefaultResponse response = new DefaultResponse();
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    @ApiOperation(value="비밀번호 변경")
+    @ApiResponses({
+            @ApiResponse(code=200, message="비밀번호 변경 완료"),
+            @ApiResponse(code=400, message="가입되지 않은 회원일 경우, 비밀번호가 올바르지 않을 경우, 비밀번호가 이전과 동일할 경우")
+    })
+    @PatchMapping("/passwd")
+    public ResponseEntity changePasswd(@RequestBody @Valid ChangePasswdRequest req, HttpServletRequest request){
+        int userUID = (int) request.getAttribute("userUID");
+        System.out.println("userUID: " + userUID);
+        userService.changePasswd(userUID, req.getCurrentPasswd(), req.getNextPasswd());
         DefaultResponse response = new DefaultResponse();
         return new ResponseEntity(response, HttpStatus.OK);
     }
