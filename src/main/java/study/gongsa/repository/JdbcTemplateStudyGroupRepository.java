@@ -55,7 +55,9 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
                     +"from StudyGroup a "
                     +"join GroupCategory b on a.UID = b.groupUID "
                     +"where categoryUID in (select categoryUID from GroupCategory where groupUID = ?) "
-                    +"group by b.groupUID";
+                    +"group by b.groupUID "
+                    +"order by rand()";
+        System.out.println(sql);
         return jdbcTemplate.query(sql, studyGroupRowMapper(), uid);
     }
 
@@ -65,7 +67,9 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
                 +"from StudyGroup a "
                 +"join GroupCategory b on a.UID = b.groupUID "
                 +"where categoryUID in (select categoryUID from UserCategory where userUID = ?) "
-                +"group by b.groupUID";
+                +"group by b.groupUID "
+                +"order by rand()";
+        System.out.println(sql);
         return jdbcTemplate.query(sql, studyGroupRowMapper(), userUID);
     }
 
