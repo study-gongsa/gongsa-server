@@ -131,7 +131,7 @@ public class UserController {
         String refreshToken = req.getRefreshToken();
 
         try{
-            jwtTokenProvider.validToken(refreshToken); //refresh token 검증 위치 논의
+            jwtTokenProvider.verifyToken(refreshToken); //refresh token 검증 위치 논의
         }catch(Exception e){
             throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST,"refreshToken","올바르지 않은 refresh token입니다");
         }
