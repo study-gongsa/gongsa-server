@@ -2,6 +2,7 @@ package study.gongsa.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Timestamp;
@@ -9,6 +10,7 @@ import java.util.Date;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class UserAuth {
     public UserAuth(int userUID, String refreshToken) {
@@ -20,6 +22,7 @@ public class UserAuth {
         this.updatedAt = this.createdAt;
     }
 
+    private int UID;
     private int userUID;
     private String refreshToken;
     private Timestamp createdAt;
