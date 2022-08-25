@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.Base64;
 import java.util.Date;
 
 @Component
@@ -45,7 +46,7 @@ public class JwtTokenProvider {
     public Claims checkValid(String authorizationHeader) {
         validationAuthorizationHeader(authorizationHeader);
         String token = extractToken(authorizationHeader);
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        return verifyToken(token);
     }
 
     private void validationAuthorizationHeader(String header) {
@@ -58,4 +59,20 @@ public class JwtTokenProvider {
         return authorizationHeader.substring(tokenPrefix.length());
     }
 
+    public Claims verifyToken(String token) {
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+    }
+
+    public int decode(String authorizationHeader) {
+        validationAuthorizationHeader(authorizationHeader);
+        String token = extractToken(authorizationHeader);
+        Claims claims = null;
+
+        try{
+            claims = verifyToken(token);
+        }catch(ExpiredJwtException e){
+            claims = e.getClaims();
+        }
+        return (int) claims.get("userUID");
+    }
 }
