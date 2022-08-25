@@ -1,5 +1,6 @@
 package study.gongsa.controller;
 
+import io.jsonwebtoken.Claims;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -13,6 +14,7 @@ import study.gongsa.dto.*;
 import study.gongsa.domain.User;
 import study.gongsa.service.UserAuthService;
 import study.gongsa.service.UserService;
+import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
 import study.gongsa.support.jwt.JwtTokenProvider;
 
 import javax.servlet.http.HttpServletRequest;
@@ -117,4 +119,31 @@ public class UserController {
         DefaultResponse response = new DefaultResponse(new LoginResponse(accessToken, refreshToken));
         return new ResponseEntity(response, HttpStatus.OK);
     }
+
+    @ApiOperation(value="access token 갱신")
+    @ApiResponses({
+            @ApiResponse(code=201, message="access token 재발급 완료"),
+            @ApiResponse(code=401, message="token 검증 실패"),
+    })
+    @PostMapping("/login/refresh")
+    public ResponseEntity refresh(@RequestBody @Valid RefreshRequest req, HttpServletRequest request){
+        int userUID = (int) request.getAttribute("userUID"); //token에 userUID, userAuthUIDㄴ
+        String refreshToken = req.getRefreshToken();
+
+        try{
+            jwtTokenProvider.validToken(refreshToken); //refresh token 검증 위치 논의
+        }catch(Exception e){
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST,"refreshToken","올바르지 않은 refresh token입니다");
+        }
+
+        userAuthService.checkRefreshToken(userUID, refreshToken);
+        String accessToken = jwtTokenProvider.makeAccessToken(userUID);
+
+        DefaultResponse response = new DefaultResponse(new RefreshResponse(accessToken));
+        return new ResponseEntity(response, HttpStatus.CREATED);
+    }
+
+
+
+
 }
