@@ -27,7 +27,8 @@ public class StudyGroupMakeRequest {
     boolean isCam;
 
     @ApiModelProperty(value="최대 인원 수")
-    @Max(value=7, message="최대 인원 수는 7명까지 입니다.")
+    @Min(value=4, message="최대 인원 수는 4명부터 입니다.")
+    @Max(value=6, message="최대 인원 수는 6명까지 입니다.")
     @NotNull(message = "최대 인원 수는 필수값 입니다.")
     int maxMember;
 

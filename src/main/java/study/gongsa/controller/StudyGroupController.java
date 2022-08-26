@@ -78,6 +78,12 @@ public class StudyGroupController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
+    @ApiOperation(value="스터디 그룹 생성")
+    @ApiResponses({
+            @ApiResponse(code=201, message="스터디 그룹 생성"),
+            @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
+            @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등)")
+    })
     @PostMapping("")
     public ResponseEntity makeStudyGroup(@RequestBody @Valid StudyGroupMakeRequest req, HttpServletRequest request){
         int userUID = (int) request.getAttribute("userUID");
