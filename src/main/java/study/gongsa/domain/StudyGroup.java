@@ -39,7 +39,9 @@ public class StudyGroup {
         this.maxPenalty = makeRequest.getMaxPenalty();
         this.expiredAt = makeRequest.getExpiredAt();
 
-        this.minStudyHour = new Time(makeRequest.getMinStudyHour()*60l*60l*1000l); // time bug 존재
+        this.minStudyHour = new Time(makeRequest.getMinStudyHour(),0,0); // time bug 존재
+        System.out.println(minStudyHour);
+        this.minStudyHour = new Time();
     }
 
     @Override
