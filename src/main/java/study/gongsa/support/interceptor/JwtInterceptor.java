@@ -37,17 +37,19 @@ public class JwtInterceptor implements HandlerInterceptor {
 
             Claims data = jwtTokenProvider.checkValid(headerToken);
             int userUID = (int)data.get("userUID");
+            int userAuthUID = (int)data.get("userAuthUID");
             if(!userService.isAuth(userUID))
                 throw new IllegalArgumentException("notAuth");
             request.setAttribute("userUID", userUID);
+            request.setAttribute("userAuthUID", userAuthUID);
 
             return true;
         } catch(ExpiredJwtException e){
             Boolean isRefresh = ("POST".equals(request.getMethod())) && ("/api/user/login/refresh".equals(request.getRequestURI()));
             if(isRefresh){
                 // decode
-                int userUID = jwtTokenProvider.decode(headerToken);
-                request.setAttribute("userUID", userUID);
+                request.setAttribute("userUID", e.getClaims().get("userUID"));
+                request.setAttribute("userAuthUID", e.getClaims().get("userAuthUID"));
                 return true;
             }
             throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED,"auth", "로그인 후 이용해주세요.");

@@ -127,17 +127,17 @@ public class UserController {
     })
     @PostMapping("/login/refresh")
     public ResponseEntity refresh(@RequestBody @Valid RefreshRequest req, HttpServletRequest request){
-        int userAuthUID = 0; // header에서 추출하기
-        int userUID = (int) request.getAttribute("userUID"); //token에 userUID, userAuthUIDㄴ
+        int userUID = (int) request.getAttribute("userUID");
+        int userAuthUID = (int) request.getAttribute("userAuthUID");
         String refreshToken = req.getRefreshToken();
 
         try{
-            jwtTokenProvider.verifyToken(refreshToken); //refresh token 검증 위치 논의
+            jwtTokenProvider.verifyToken(refreshToken);
         }catch(Exception e){
             throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST,"refreshToken","올바르지 않은 refresh token입니다");
         }
 
-        userAuthService.checkRefreshToken(userUID, refreshToken);
+        userAuthService.checkRefreshToken(userAuthUID, refreshToken);
         String accessToken = jwtTokenProvider.makeAccessToken(userUID, userAuthUID);
 
         DefaultResponse response = new DefaultResponse(new RefreshResponse(accessToken));
