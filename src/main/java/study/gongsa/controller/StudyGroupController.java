@@ -7,12 +7,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import study.gongsa.domain.StudyGroup;
 import study.gongsa.dto.DefaultResponse;
+import study.gongsa.dto.StudyGroupMakeRequest;
 import study.gongsa.dto.StudyGroupSearchReponse;
+import study.gongsa.dto.UserCategoryRequest;
 import study.gongsa.service.StudyGroupService;
 import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.sql.Time;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin("*")
@@ -74,4 +80,27 @@ public class StudyGroupController {
         DefaultResponse response = new DefaultResponse(new StudyGroupSearchReponse(studyGroupList));
         return new ResponseEntity(response, HttpStatus.OK);
     }
+
+    @PostMapping("")
+    public ResponseEntity makeStudyGroup(@RequestBody @Valid StudyGroupMakeRequest req, HttpServletRequest request){
+        int userUID = (int) request.getAttribute("userUID");
+
+        //userUID가 가입 가능한 최대 시간 구하기, 비교
+        studyGroupService.checkPossibleMinStudyHourByUsersUID(userUID, req.getMinStudyHour());
+
+        //그룹, 카테고리 생성
+        StudyGroup studyGroup = new StudyGroup();
+        int groupUID = studyGroupService.makeStudyGroup(studyGroup, req.getGroupCategories());
+
+        //방장 생성
+        studyGroupService.makeStudyGroupMember(groupUID, userUID, true);
+
+        //그룹 UID return
+        HashMap<String, Integer> makeStudyGroupResponse = new HashMap<>();
+        makeStudyGroupResponse.put("groupUID", groupUID);
+        DefaultResponse response = new DefaultResponse(makeStudyGroupResponse);
+        return new ResponseEntity(response, HttpStatus.CREATED);
+    }
+
+    
 }
