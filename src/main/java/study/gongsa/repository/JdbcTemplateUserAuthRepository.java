@@ -26,9 +26,9 @@ public class JdbcTemplateUserAuthRepository implements UserAuthRepository{
     }
 
     @Override
-    public void save(UserAuth userAuth) {
+    public Number save(UserAuth userAuth) {
         final Map<String, Object> parameters = setParameter(userAuth);
-        insertIntoUserAuth.execute(parameters);
+        return insertIntoUserAuth.executeAndReturnKey(parameters);
     }
 
     @Override

@@ -20,8 +20,8 @@ public class UserAuthService {
         this.userAuthRepository = userAuthRepository;
     }
 
-    public void save(UserAuth userAuth){
-        userAuthRepository.save(userAuth);
+    public Number save(UserAuth userAuth){
+        return userAuthRepository.save(userAuth);
     }
 
     public void checkRefreshToken(int userUID, String refreshToken){
