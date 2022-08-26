@@ -9,7 +9,6 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.*;
-import java.sql.Time;
 import java.sql.Timestamp;
 
 @ApiModel(value="StudyGroupMakeRequest", description = "스터디 그룹 생성 리퀘스트")
@@ -17,7 +16,7 @@ import java.sql.Timestamp;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudyGroupMakeRequest {
+public class MakeStudyGroupRequest {
     @ApiModelProperty(value="그룹명")
     @NotBlank(message = "그룹명은 필수값 입니다")
     String name;
@@ -27,7 +26,8 @@ public class StudyGroupMakeRequest {
     boolean isCam;
 
     @ApiModelProperty(value="최대 인원 수")
-    @Max(value=7, message="최대 인원 수는 7명까지 입니다.")
+    @Min(value=4, message="최대 인원 수는 4명부터 입니다.")
+    @Max(value=6, message="최대 인원 수는 6명까지 입니다.")
     @NotNull(message = "최대 인원 수는 필수값 입니다.")
     int maxMember;
 

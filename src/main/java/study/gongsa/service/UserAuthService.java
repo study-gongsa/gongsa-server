@@ -27,7 +27,7 @@ public class UserAuthService {
     public void checkRefreshToken(int userAuthUID, String refreshToken){
         Optional<UserAuth> userAuthByUserUID = userAuthRepository.findByUID(userAuthUID);
         if(userAuthByUserUID.isEmpty())
-            throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED, "email","가입되지 않은 회원입니다.");
+            throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED, "auth","로그인 후 이용해주세요.");
         if(!refreshToken.equals(userAuthByUserUID.get().getRefreshToken())){ //일치X
             throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "refreshToken", "올바르지 않은 refresh token입니다.");
         }

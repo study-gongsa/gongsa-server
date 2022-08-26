@@ -1,6 +1,6 @@
 package study.gongsa.domain;
 import lombok.*;
-import study.gongsa.dto.StudyGroupMakeRequest;
+import study.gongsa.dto.MakeStudyGroupRequest;
 
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -27,7 +27,7 @@ public class StudyGroup {
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
-    public StudyGroup(StudyGroupMakeRequest makeRequest){
+    public StudyGroup(MakeStudyGroupRequest makeRequest){
         this.name = makeRequest.getName();
         this.isCam = makeRequest.isCam();
         this.isPrivate = makeRequest.isPrivate();
@@ -38,10 +38,7 @@ public class StudyGroup {
         this.isPenalty = makeRequest.isPenalty();
         this.maxPenalty = makeRequest.getMaxPenalty();
         this.expiredAt = makeRequest.getExpiredAt();
-
-        this.minStudyHour = new Time(makeRequest.getMinStudyHour(),0,0); // time bug 존재
-        System.out.println(minStudyHour);
-        this.minStudyHour = new Time();
+        this.minStudyHour = new Time(makeRequest.getMinStudyHour(),0,0);
     }
 
     @Override
