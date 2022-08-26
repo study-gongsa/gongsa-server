@@ -111,11 +111,11 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid LoginRequest req){
         int userUID = userService.login(new User(req.getEmail(), req.getPasswd())).intValue();
-        String accessToken = jwtTokenProvider.makeAccessToken(userUID);
         String refreshToken = jwtTokenProvider.makeRefreshToken(userUID);
 
         UserAuth userAuth = new UserAuth(userUID, refreshToken);
-        userAuthService.save(userAuth);
+        int userAuthUID = userAuthService.save(userAuth).intValue();
+        String accessToken = jwtTokenProvider.makeAccessToken(userUID, userAuthUID);
         DefaultResponse response = new DefaultResponse(new LoginResponse(accessToken, refreshToken));
         return new ResponseEntity(response, HttpStatus.OK);
     }
@@ -127,6 +127,7 @@ public class UserController {
     })
     @PostMapping("/login/refresh")
     public ResponseEntity refresh(@RequestBody @Valid RefreshRequest req, HttpServletRequest request){
+        int userAuthUID = 0; // header에서 추출하기
         int userUID = (int) request.getAttribute("userUID"); //token에 userUID, userAuthUIDㄴ
         String refreshToken = req.getRefreshToken();
 
@@ -137,7 +138,7 @@ public class UserController {
         }
 
         userAuthService.checkRefreshToken(userUID, refreshToken);
-        String accessToken = jwtTokenProvider.makeAccessToken(userUID);
+        String accessToken = jwtTokenProvider.makeAccessToken(userUID, userAuthUID);
 
         DefaultResponse response = new DefaultResponse(new RefreshResponse(accessToken));
         return new ResponseEntity(response, HttpStatus.CREATED);
