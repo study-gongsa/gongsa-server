@@ -6,10 +6,13 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import study.gongsa.domain.StudyGroup;
+import study.gongsa.domain.User;
 import study.gongsa.domain.UserCategory;
 
 import javax.sql.DataSource;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -21,6 +24,12 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
     public JdbcTemplateStudyGroupRepository(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         insertIntoStudyGroupAuth = new SimpleJdbcInsert(jdbcTemplate).withTableName("StudyGroup").usingGeneratedKeyColumns("UID");
+    }
+
+    @Override
+    public Number save(StudyGroup studyGroup) {
+        final Map<String, Object> parameters = setParameter(studyGroup);
+        return insertIntoStudyGroupAuth.executeAndReturnKey(parameters);
     }
 
     @Override
@@ -97,10 +106,32 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
             studyGroup.setCam(rs.getBoolean("isCam"));
             studyGroup.setRest(rs.getBoolean("isRest"));
             studyGroup.setPenalty(rs.getBoolean("isPenalty"));
+            studyGroup.setMinStudyHour(rs.getTime("minStudyHour"));
+            studyGroup.setExpiredAt(rs.getTimestamp("expiredAt"));
             studyGroup.setCreatedAt(rs.getTimestamp("createdAt"));
             studyGroup.setExpiredAt(rs.getTimestamp("expiredAt"));
 
             return studyGroup;
         };
+    }
+
+    private HashMap<String, Object> setParameter(StudyGroup studyGroup) {
+        HashMap<String, Object> hashMap = new HashMap<String, Object>();
+        hashMap.put("UID",studyGroup.getUID());
+        hashMap.put("name",studyGroup.getName());
+        hashMap.put("code",studyGroup.getCode());
+        hashMap.put("maxTodayStudy",studyGroup.getMaxTodayStudy());
+        hashMap.put("maxMember",studyGroup.getMaxMember());
+        hashMap.put("maxPenalty",studyGroup.getMaxPenalty());
+        hashMap.put("maxRest",studyGroup.getMaxRest());
+        hashMap.put("isPrivate",studyGroup.isPrivate());
+        hashMap.put("isCam",studyGroup.isCam());
+        hashMap.put("isRest",studyGroup.isRest());
+        hashMap.put("isPenalty",studyGroup.isPenalty());
+        hashMap.put("minStudyHour", studyGroup.getMinStudyHour());
+        hashMap.put("expiredAt", studyGroup.getExpiredAt());
+        hashMap.put("createdAt",studyGroup.getCreatedAt());
+        hashMap.put("updatedAt",studyGroup.getUpdatedAt());
+        return hashMap;
     }
 }
