@@ -7,15 +7,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import study.gongsa.domain.StudyGroup;
 import study.gongsa.dto.*;
+import study.gongsa.service.GroupMemberService;
 import study.gongsa.service.StudyGroupService;
 import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.sql.Time;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @CrossOrigin("*")
@@ -23,10 +22,12 @@ import java.util.Map;
 @RequestMapping("/api/study-group")
 public class StudyGroupController {
     private final StudyGroupService studyGroupService;
+    private final GroupMemberService groupMemberService;
 
     @Autowired
-    public StudyGroupController(StudyGroupService studyGroupService) {
+    public StudyGroupController(StudyGroupService studyGroupService, GroupMemberService groupMemberService) {
         this.studyGroupService = studyGroupService;
+        this.groupMemberService = groupMemberService;
     }
 
     @ApiOperation(value="스터디룸 조회")
@@ -81,11 +82,12 @@ public class StudyGroupController {
     @ApiOperation(value="스터디 그룹 생성")
     @ApiResponses({
             @ApiResponse(code=201, message="스터디 그룹 생성"),
+            @ApiResponse(code=400, message="하루 최대 공부시간 초과 / 이미 가입된 그룹 / 존재하지 않는 그룹"),
             @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
             @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등)")
     })
     @PostMapping("")
-    public ResponseEntity makeStudyGroup(@RequestBody @Valid StudyGroupMakeRequest req, HttpServletRequest request){
+    public ResponseEntity makeStudyGroup(@RequestBody @Valid MakeStudyGroupRequest req, HttpServletRequest request){
         int userUID = (int) request.getAttribute("userUID");
         //userUID가 가입 가능한 최대 시간 구하기, 비교
         studyGroupService.checkPossibleMinStudyHourByUsersUID(userUID, req.getMinStudyHour());
@@ -95,31 +97,12 @@ public class StudyGroupController {
         int groupUID = studyGroupService.makeStudyGroup(studyGroup, req.getGroupCategories());
 
         //방장 생성
-        studyGroupService.makeStudyGroupMember(groupUID, userUID, true);
+        groupMemberService.makeStudyGroupMember(groupUID, userUID, true);
 
         //그룹 UID return
         HashMap<String, Integer> makeStudyGroupResponse = new HashMap<>();
         makeStudyGroupResponse.put("groupUID", groupUID);
         DefaultResponse response = new DefaultResponse(makeStudyGroupResponse);
-        return new ResponseEntity(response, HttpStatus.CREATED);
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity registerStudyGroup(@RequestBody @Valid StudyGroupRegisterRequest req, HttpServletRequest request){
-        int userUID = (int) request.getAttribute("userUID");
-
-        //groupUID로 가입되어 있는 그룹인지, 공부 시간 가져오기
-        int groupUID = req.getGroupUID();
-        studyGroupService.checkAlreadyRegister(groupUID, userUID);
-        int minStudyHour = studyGroupService.getMinStudyHourByGroupUID(groupUID);
-
-        //userUID가 가입 가능한 최대 시간 구하기, 비교
-        studyGroupService.checkPossibleMinStudyHourByUsersUID(userUID, minStudyHour);
-
-        //그룹 멤버 생성
-        studyGroupService.makeStudyGroupMember(groupUID, userUID, false);
-
-        DefaultResponse response = new DefaultResponse();
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 }
