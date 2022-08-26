@@ -11,4 +11,6 @@ public interface  StudyGroupRepository {
     List<StudyGroup> findSameCategoryAllByUID(int UID);
     List<StudyGroup> findSameCategoryAllByUserUID(int userUID);
     Optional<Integer> findSumMinStudyHourByUserUID(int userUID);
+    Optional<Integer> findMinStudyHourByGroupUID(int groupUID);
+
 }

@@ -86,4 +86,17 @@ public class StudyGroupService {
 
         groupMemberRepository.save(groupMember);
     }
+
+    public int getMinStudyHourByGroupUID(int groupUID) {
+        Optional<Integer> minStudyHour = studyGroupRepository.findMinStudyHourByGroupUID(groupUID);
+        if(minStudyHour.isEmpty()) throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "groupUID", "groupUID가 올바르지 않습니다.");
+        return minStudyHour.get();
+    }
+
+    public void checkAlreadyRegister(int groupUID, int userUID) {
+        Optional<GroupMember> groupMember = groupMemberRepository.findByGroupUIDUserUID(groupUID, userUID);
+        if (groupMember.isPresent()){
+            throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED, "groupUID","이미 가입된 그룹입니다.");
+        }
+    }
 }

@@ -6,10 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import study.gongsa.domain.StudyGroup;
-import study.gongsa.dto.DefaultResponse;
-import study.gongsa.dto.StudyGroupMakeRequest;
-import study.gongsa.dto.StudyGroupSearchReponse;
-import study.gongsa.dto.UserCategoryRequest;
+import study.gongsa.dto.*;
 import study.gongsa.service.StudyGroupService;
 import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
 
@@ -101,5 +98,22 @@ public class StudyGroupController {
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
+    @PostMapping("/register")
+    public ResponseEntity registerStudyGroup(@RequestBody @Valid StudyGroupRegisterRequest req, HttpServletRequest request){
+        int userUID = (int) request.getAttribute("userUID");
 
+        //groupUID로 가입되어 있는 그룹인지, 공부 시간 가져오기
+        int groupUID = req.getGroupUID();
+        studyGroupService.checkAlreadyRegister(groupUID, userUID);
+        int minStudyHour = studyGroupService.getMinStudyHourByGroupUID(groupUID);
+
+        //userUID가 가입 가능한 최대 시간 구하기, 비교
+        studyGroupService.checkPossibleMinStudyHourByUsersUID(userUID, minStudyHour);
+
+        //그룹 멤버 생성
+        studyGroupService.makeStudyGroupMember(groupUID, userUID, false);
+
+        DefaultResponse response = new DefaultResponse();
+        return new ResponseEntity(response, HttpStatus.CREATED);
+    }
 }
