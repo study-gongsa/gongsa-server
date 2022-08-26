@@ -14,7 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CategoryResponse {
     @ApiModelProperty(value="카테고리 UID")
-    String UID;
+    String categoryUID;
     @ApiModelProperty(value="카테고리 명")
     String name;
 }

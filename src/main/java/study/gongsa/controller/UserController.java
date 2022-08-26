@@ -56,7 +56,7 @@ public class UserController {
             @ApiResponse(code=200, message="인증번호 생성 및 메일 전송 완료"),
             @ApiResponse(code=400, message="이미 인증된 사용자인 경우, 가입되지 않은 이메일인 경우")
     })
-    @PatchMapping("/mail")
+    @PatchMapping("/mail/join")
     public ResponseEntity sendMail(@RequestBody @Valid MailRequest req){
         userService.sendJoinMail(req.getEmail());
         DefaultResponse response = new DefaultResponse();
@@ -122,10 +122,12 @@ public class UserController {
 
     @ApiOperation(value="access token 갱신")
     @ApiResponses({
-            @ApiResponse(code=201, message="access token 재발급 완료"),
-            @ApiResponse(code=401, message="token 검증 실패"),
+            @ApiResponse(code=200, message="access token 재발급 완료"),
+            @ApiResponse(code=400, message="올바르지 않은 refreshToken"),
+            @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
+            @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등)")
     })
-    @PostMapping("/login/refresh")
+    @GetMapping("/login/refresh")
     public ResponseEntity refresh(@RequestBody @Valid RefreshRequest req, HttpServletRequest request){
         int userUID = (int) request.getAttribute("userUID");
         int userAuthUID = (int) request.getAttribute("userAuthUID");
@@ -134,7 +136,7 @@ public class UserController {
         try{
             jwtTokenProvider.verifyToken(refreshToken);
         }catch(Exception e){
-            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST,"refreshToken","올바르지 않은 refresh token입니다");
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST,"refreshToken","올바르지 않은 refresh token입니다.");
         }
 
         userAuthService.checkRefreshToken(userAuthUID, refreshToken);
@@ -143,8 +145,6 @@ public class UserController {
         DefaultResponse response = new DefaultResponse(new RefreshResponse(accessToken));
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
-
-
 
 
 }
