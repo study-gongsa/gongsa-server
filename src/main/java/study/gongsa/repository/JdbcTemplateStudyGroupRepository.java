@@ -10,6 +10,7 @@ import study.gongsa.domain.UserCategory;
 
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
@@ -21,7 +22,6 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         insertIntoStudyGroupAuth = new SimpleJdbcInsert(jdbcTemplate).withTableName("StudyGroup").usingGeneratedKeyColumns("UID");
     }
-
 
     @Override
     public List<StudyGroup> findAll(List<Integer> categoryUIDs, String word, Boolean isCam, String align) {
@@ -73,6 +73,16 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
         return jdbcTemplate.query(sql, studyGroupRowMapper(), userUID);
     }
 
+    @Override
+    public Optional<Integer> findSumMinStudyHourByUserUID(int userUID){
+        String sql = "SELECT sum(hour(minStudyHour)) as minStudyHour FROM StudyGroup a "
+                + "INNER JOIN GroupMember b "
+                + "ON a.UID = b.groupUID "
+                + "WHERE b.userUID = ?";
+        Integer sumMinStudyHour = jdbcTemplate.queryForObject(sql, Integer.class, userUID);
+        return Optional.ofNullable(sumMinStudyHour);
+    }
+
     private RowMapper<StudyGroup> studyGroupRowMapper() {
         return (rs, rowNum) -> {
             StudyGroup studyGroup = new StudyGroup();
@@ -88,7 +98,7 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
             studyGroup.setRest(rs.getBoolean("isRest"));
             studyGroup.setPenalty(rs.getBoolean("isPenalty"));
             studyGroup.setCreatedAt(rs.getTimestamp("createdAt"));
-            studyGroup.setExpireDate(rs.getTimestamp("expireDate"));
+            studyGroup.setExpiredAt(rs.getTimestamp("expiredAt"));
 
             return studyGroup;
         };

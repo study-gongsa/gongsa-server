@@ -22,7 +22,9 @@ public class StudyGroup {
     private int maxTodayStudy;
     private boolean isPenalty;
     private int maxPenalty;
-    private Timestamp expireDate;
+    private Timestamp expiredAt;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+
+
 }
