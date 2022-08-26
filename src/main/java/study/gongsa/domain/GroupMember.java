@@ -18,4 +18,13 @@ public class GroupMember {
     private Boolean isLeader;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+
+    public GroupMember(int userUID, int groupUID, Boolean isLeader){
+        this.userUID = userUID;
+        this.groupUID = groupUID;
+        this.isLeader = isLeader;
+
+        this.reportCnt = 0;
+        this.penaltyCnt = 0;
+    }
 }

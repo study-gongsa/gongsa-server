@@ -15,4 +15,8 @@ public class GroupCategory {
     private int categoryUID;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+
+    public GroupCategory(int groupUID){
+        this.groupUID = groupUID;
+    }
 }

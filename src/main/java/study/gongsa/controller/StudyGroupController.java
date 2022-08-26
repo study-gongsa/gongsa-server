@@ -84,12 +84,11 @@ public class StudyGroupController {
     @PostMapping("")
     public ResponseEntity makeStudyGroup(@RequestBody @Valid StudyGroupMakeRequest req, HttpServletRequest request){
         int userUID = (int) request.getAttribute("userUID");
-
         //userUID가 가입 가능한 최대 시간 구하기, 비교
         studyGroupService.checkPossibleMinStudyHourByUsersUID(userUID, req.getMinStudyHour());
 
         //그룹, 카테고리 생성
-        StudyGroup studyGroup = new StudyGroup();
+        StudyGroup studyGroup = new StudyGroup(req);
         int groupUID = studyGroupService.makeStudyGroup(studyGroup, req.getGroupCategories());
 
         //방장 생성
@@ -102,5 +101,5 @@ public class StudyGroupController {
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
-    
+
 }
