@@ -79,7 +79,7 @@ public class UserService {
         //존재하지 않는 이메일인 경우
         Optional<User> userByEmail = userRepository.findByEmail(email);
         if (userByEmail.isEmpty()){
-            throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED, null,"가입되지 않은 이메일입니다.");
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "email","등록되지 않은 이메일입니다.");
         }
         User user = userByEmail.get();
 
@@ -100,7 +100,7 @@ public class UserService {
         // 존재하지 않는 회원일 경우, 비밀번호가 올바르지 않을 경우, 비밀번호가 이전과 동일할 경우
         Optional<User> userByUID = userRepository.findByUID(uid);
         if (userByUID.isEmpty()){
-            throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED, null,"가입되지 않은 회원입니다.");
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, null,"등록되지 않은 회원입니다.");
         }
 
         User user = userByUID.get();

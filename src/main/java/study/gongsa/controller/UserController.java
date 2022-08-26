@@ -78,7 +78,7 @@ public class UserController {
     @ApiOperation(value="비밀번호 찾기 - 이메일 전송")
     @ApiResponses({
             @ApiResponse(code=200, message="비밀번호 변경 완료"),
-            @ApiResponse(code=401, message="가입되지 않은 이메일인 경우")
+            @ApiResponse(code=400, message="가입되지 않은 이메일인 경우")
     })
     @PatchMapping("/mail/passwd")
     public ResponseEntity changePasswd(@RequestBody @Valid MailRequest req){
