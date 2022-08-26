@@ -63,17 +63,4 @@ public class JwtTokenProvider {
     public Claims verifyToken(String token) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
     }
-
-    public int decode(String authorizationHeader) {
-        validationAuthorizationHeader(authorizationHeader);
-        String token = extractToken(authorizationHeader);
-        Claims claims = null;
-
-        try{
-            claims = verifyToken(token);
-        }catch(ExpiredJwtException e){
-            claims = e.getClaims();
-        }
-        return (int) claims.get("userUID");
-    }
 }

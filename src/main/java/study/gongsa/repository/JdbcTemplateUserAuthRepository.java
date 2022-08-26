@@ -32,8 +32,8 @@ public class JdbcTemplateUserAuthRepository implements UserAuthRepository{
     }
 
     @Override
-    public Optional<UserAuth> findByUserUID(int userUID){
-        List<UserAuth> result = jdbcTemplate.query("select * from UserAuth where userUID = ?", userAuthRowMapper(), userUID);
+    public Optional<UserAuth> findByUID(int UID){
+        List<UserAuth> result = jdbcTemplate.query("select * from UserAuth where UID = ?", userAuthRowMapper(), UID);
         return result.stream().findAny();
     };
 

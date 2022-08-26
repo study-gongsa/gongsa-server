@@ -24,14 +24,12 @@ public class UserAuthService {
         return userAuthRepository.save(userAuth);
     }
 
-    public void checkRefreshToken(int userUID, String refreshToken){
-        Optional<UserAuth> userAuthByUserUID = userAuthRepository.findByUserUID(userUID);
+    public void checkRefreshToken(int userAuthUID, String refreshToken){
+        Optional<UserAuth> userAuthByUserUID = userAuthRepository.findByUID(userAuthUID);
         if(userAuthByUserUID.isEmpty())
             throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED, "email","가입되지 않은 회원입니다.");
-        System.out.println("1."+ userAuthByUserUID.get().getRefreshToken());
-        System.out.println("2."+ refreshToken);
         if(!refreshToken.equals(userAuthByUserUID.get().getRefreshToken())){ //일치X
-            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "", "올바르지 않은 refresh token입니다.");
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "refreshToken", "올바르지 않은 refresh token입니다.");
         }
     }
 }
