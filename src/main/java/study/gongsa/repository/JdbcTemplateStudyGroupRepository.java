@@ -6,8 +6,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import study.gongsa.domain.StudyGroup;
-import study.gongsa.domain.User;
-import study.gongsa.domain.UserCategory;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -84,19 +82,35 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
 
     @Override
     public Optional<Integer> findSumMinStudyHourByUserUID(int userUID){
-        String sql = "SELECT sum(hour(minStudyHour)) as minStudyHour FROM StudyGroup a "
+        String sql = "SELECT sum(hour(minStudyHour)) as sumMinStudyHour FROM StudyGroup a "
                 + "INNER JOIN GroupMember b "
                 + "ON a.UID = b.groupUID "
                 + "WHERE b.userUID = ?";
-        Integer sumMinStudyHour = jdbcTemplate.queryForObject(sql, Integer.class, userUID);
-        return Optional.ofNullable(sumMinStudyHour);
+
+        List<Integer> result = jdbcTemplate.query(sql, (rs, rowNum) -> Integer.valueOf(rs.getInt("sumMinStudyHour")), userUID);
+        return result.stream().findAny();
     }
 
     @Override
     public Optional<Integer> findMinStudyHourByGroupUID(int UID){
-        String sql = "SELECT hour(minStudyHour) FROM StudyGroup WHERE UID= ?";
-        Integer minStudyHour = jdbcTemplate.queryForObject(sql, Integer.class, UID);
-        return Optional.ofNullable(minStudyHour);
+        String sql = "SELECT hour(minStudyHour) as minStudyHour FROM StudyGroup WHERE UID= ?";
+        List<Integer> result = jdbcTemplate.query(sql, (rs, rowNum) -> Integer.valueOf(rs.getInt("minStudyHour")), UID);
+        return result.stream().findAny();
+    }
+
+    @Override
+    public Optional<Map<String, Integer>> findMemberCntInfoByGroupUID(int UID){
+        String sql = "SELECT a.maxMember as maxMember, count(*) as memberCnt " +
+                "FROM StudyGroup a " +
+                "INNER JOIN GroupMember b ON a.UID = b.groupUID " +
+                "WHERE a.UID = ? " +
+                "GROUP BY a.UID";
+
+        Optional<Map<String, Integer>> memberCntInfo = jdbcTemplate.query(sql, (rs, rowNum) -> Map.of(
+                "maxMember", rs.getInt("maxMember"),"memberCnt", rs.getInt("memberCnt")
+        ), UID).stream().findAny();
+
+        return memberCntInfo;
     }
 
     private RowMapper<StudyGroup> studyGroupRowMapper() {
