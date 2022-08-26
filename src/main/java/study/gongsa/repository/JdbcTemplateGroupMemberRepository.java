@@ -7,10 +7,13 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import study.gongsa.domain.GroupCategory;
 import study.gongsa.domain.GroupMember;
+import study.gongsa.domain.StudyGroup;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
@@ -30,7 +33,12 @@ public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
         return insertIntoGroupMember.executeAndReturnKey(parameters);
     }
 
-    private RowMapper<GroupMember> groupCategoryRowMapper() {
+    @Override
+    public Optional<GroupMember> findByGroupUIDUserUID(int groupUID, int userUID){
+        List<GroupMember> result = jdbcTemplate.query("select * from GroupMember where groupUID = ? and userUID = ?", groupMemberRowMapper(), groupUID, userUID);
+        return result.stream().findAny();
+    }
+    private RowMapper<GroupMember> groupMemberRowMapper() {
         return (rs, rowNum) -> {
             GroupMember groupMember = new GroupMember();
             groupMember.setUID(rs.getInt("UID"));
