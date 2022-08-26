@@ -17,7 +17,7 @@ public class JwtTokenProvider {
     private String secretKey;
     private String tokenPrefix = "Bearer ";
 
-    public String makeAccessToken(int userUID) {
+    public String makeAccessToken(int userUID, int userAuthUID) {
         Date now = new Date();
 
         return Jwts.builder()
@@ -26,6 +26,7 @@ public class JwtTokenProvider {
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + Duration.ofHours(1).toMillis()))
                 .claim("userUID", userUID)
+                .claim("userAuthUID", userAuthUID)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
