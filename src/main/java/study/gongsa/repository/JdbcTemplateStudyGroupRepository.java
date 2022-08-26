@@ -92,6 +92,13 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
         return Optional.ofNullable(sumMinStudyHour);
     }
 
+    @Override
+    public Optional<Integer> findMinStudyHourByGroupUID(int UID){
+        String sql = "SELECT hour(minStudyHour) FROM StudyGroup WHERE UID= ?";
+        Integer minStudyHour = jdbcTemplate.queryForObject(sql, Integer.class, UID);
+        return Optional.ofNullable(minStudyHour);
+    }
+
     private RowMapper<StudyGroup> studyGroupRowMapper() {
         return (rs, rowNum) -> {
             StudyGroup studyGroup = new StudyGroup();
