@@ -22,16 +22,12 @@ import java.util.Optional;
 public class StudyGroupService {
     private final StudyGroupRepository studyGroupRepository;
     private final GroupCategoryRepository groupCategoryRepository;
-    private final GroupMemberRepository groupMemberRepository;
-    private final UserCategoryRepository userCategoryRepository;
     private final CodeGenerator codeGenerator;
 
     @Autowired
-    public StudyGroupService(StudyGroupRepository studyGroupRepository, GroupCategoryRepository groupCategoryRepository, GroupMemberRepository groupMemberRepository, UserCategoryRepository userCategoryRepository, CodeGenerator codeGenerator){
+    public StudyGroupService(StudyGroupRepository studyGroupRepository, GroupCategoryRepository groupCategoryRepository, CodeGenerator codeGenerator){
         this.studyGroupRepository = studyGroupRepository;
         this.groupCategoryRepository = groupCategoryRepository;
-        this.groupMemberRepository = groupMemberRepository;
-        this.userCategoryRepository = userCategoryRepository;
         this.codeGenerator = codeGenerator;
     }
 
@@ -79,24 +75,9 @@ public class StudyGroupService {
         return groupUID;
     }
 
-    public void makeStudyGroupMember(int groupUID, int userUID, boolean isLeader) {
-        GroupMember groupMember = new GroupMember(userUID, groupUID, isLeader);
-        groupMember.setCreatedAt(new Timestamp(new Date().getTime()));
-        groupMember.setUpdatedAt(groupMember.getCreatedAt());
-
-        groupMemberRepository.save(groupMember);
-    }
-
     public int getMinStudyHourByGroupUID(int groupUID) {
         Optional<Integer> minStudyHour = studyGroupRepository.findMinStudyHourByGroupUID(groupUID);
         if(minStudyHour.isEmpty()) throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "groupUID", "존재하지 않는 그룹입니다.");
         return minStudyHour.get();
-    }
-
-    public void checkAlreadyRegister(int groupUID, int userUID) {
-        Optional<GroupMember> groupMember = groupMemberRepository.findByGroupUIDUserUID(groupUID, userUID);
-        if (groupMember.isPresent()){
-            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "groupUID","이미 가입된 그룹입니다.");
-        }
     }
 }
