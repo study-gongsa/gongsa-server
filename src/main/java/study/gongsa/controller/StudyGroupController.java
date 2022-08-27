@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import study.gongsa.domain.StudyGroup;
 import study.gongsa.dto.*;
+import study.gongsa.service.CategoryService;
 import study.gongsa.service.GroupMemberService;
 import study.gongsa.service.StudyGroupService;
 import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
@@ -23,11 +24,13 @@ import java.util.List;
 public class StudyGroupController {
     private final StudyGroupService studyGroupService;
     private final GroupMemberService groupMemberService;
+    private final CategoryService categoryService;
 
     @Autowired
-    public StudyGroupController(StudyGroupService studyGroupService, GroupMemberService groupMemberService) {
+    public StudyGroupController(StudyGroupService studyGroupService, GroupMemberService groupMemberService, CategoryService categoryService) {
         this.studyGroupService = studyGroupService;
         this.groupMemberService = groupMemberService;
+        this.categoryService = categoryService;
     }
 
     @ApiOperation(value="스터디룸 조회")
@@ -91,10 +94,12 @@ public class StudyGroupController {
         int userUID = (int) request.getAttribute("userUID");
         //userUID가 가입 가능한 최대 시간 구하기, 비교
         studyGroupService.checkPossibleMinStudyHourByUsersUID(userUID, req.getMinStudyHour());
+        //카테고리UID가 올바른지 체크
+        categoryService.checkValidCategoryUID(req.getCategoryUIDs());
 
         //그룹, 카테고리 생성
         StudyGroup studyGroup = new StudyGroup(req);
-        int groupUID = studyGroupService.makeStudyGroup(studyGroup, req.getGroupCategories());
+        int groupUID = studyGroupService.makeStudyGroup(studyGroup, req.getCategoryUIDs());
 
         //방장 생성
         groupMemberService.makeStudyGroupMember(groupUID, userUID, true);

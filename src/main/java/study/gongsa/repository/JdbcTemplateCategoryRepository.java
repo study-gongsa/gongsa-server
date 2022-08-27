@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import study.gongsa.domain.Category;
+import study.gongsa.domain.User;
 import study.gongsa.domain.UserAuth;
 
 import javax.sql.DataSource;
@@ -28,6 +29,12 @@ public class JdbcTemplateCategoryRepository implements CategoryRepository{
     public List<Category> findAll(){
         List<Category> result = jdbcTemplate.query("select * from Category", categoryRowMapper());
         return result;
+    };
+
+    @Override
+    public Optional<Category> findByUID(int uid){
+        List<Category> result = jdbcTemplate.query("select * from Category where UID = ?", categoryRowMapper(), uid);
+        return result.stream().findAny();
     };
 
     private RowMapper<Category> categoryRowMapper() {
