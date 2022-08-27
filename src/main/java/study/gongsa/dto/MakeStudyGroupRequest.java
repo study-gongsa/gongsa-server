@@ -38,7 +38,7 @@ public class MakeStudyGroupRequest {
 
     @ApiModelProperty(value="그룹 카테고리")
     @NotNull(message = "그룹 카테고리는 필수값 입니다")
-    int[] groupCategories;
+    int[] categoryUIDs;
 
     @ApiModelProperty(value="벌점 유무")
     @NotNull(message = "벌점 유무는 필수값 입니다.")
