@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import study.gongsa.domain.Category;
+import study.gongsa.domain.User;
 import study.gongsa.domain.UserAuth;
 
 import javax.sql.DataSource;
@@ -30,10 +31,16 @@ public class JdbcTemplateCategoryRepository implements CategoryRepository{
         return result;
     };
 
+    @Override
+    public Optional<Category> findByUID(int uid){
+        List<Category> result = jdbcTemplate.query("select * from Category where UID = ?", categoryRowMapper(), uid);
+        return result.stream().findAny();
+    };
+
     private RowMapper<Category> categoryRowMapper() {
         return (rs, rowNum) -> {
             Category category = new Category();
-            category.setUID(rs.getInt("UID"));
+            category.setCategoryUID(rs.getInt("UID"));
             category.setName(rs.getString("name"));
             return category;
         };
@@ -41,7 +48,7 @@ public class JdbcTemplateCategoryRepository implements CategoryRepository{
 
     private HashMap<String, Object> setParameter(Category category) {
         HashMap<String, Object> hashMap = new HashMap<String, Object>();
-        hashMap.put("UID", category.getUID());
+        hashMap.put("UID", category.getCategoryUID());
         hashMap.put("name",category.getName());
         return hashMap;
     }

@@ -127,7 +127,7 @@ public class UserController {
             @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
             @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등)")
     })
-    @GetMapping("/login/refresh")
+    @PostMapping("/login/refresh")
     public ResponseEntity refresh(@RequestBody @Valid RefreshRequest req, HttpServletRequest request){
         int userUID = (int) request.getAttribute("userUID");
         int userAuthUID = (int) request.getAttribute("userAuthUID");

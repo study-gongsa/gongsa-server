@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.*;
+import java.sql.Date;
 import java.sql.Timestamp;
 
 @ApiModel(value="StudyGroupMakeRequest", description = "스터디 그룹 생성 리퀘스트")
@@ -37,7 +38,7 @@ public class MakeStudyGroupRequest {
 
     @ApiModelProperty(value="그룹 카테고리")
     @NotNull(message = "그룹 카테고리는 필수값 입니다")
-    int[] groupCategories;
+    int[] categoryUIDs;
 
     @ApiModelProperty(value="벌점 유무")
     @NotNull(message = "벌점 유무는 필수값 입니다.")
@@ -66,5 +67,5 @@ public class MakeStudyGroupRequest {
     @ApiModelProperty(value="만료 날짜")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "만료 날짜는 필수값 입니다.")
-    Timestamp expiredAt;
+    Date expiredAt;
 }

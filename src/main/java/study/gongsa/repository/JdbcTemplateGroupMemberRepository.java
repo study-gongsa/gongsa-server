@@ -41,7 +41,7 @@ public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
     private RowMapper<GroupMember> groupMemberRowMapper() {
         return (rs, rowNum) -> {
             GroupMember groupMember = new GroupMember();
-            groupMember.setUID(rs.getInt("UID"));
+            groupMember.setGroupMemberUID(rs.getInt("UID"));
             groupMember.setGroupUID(rs.getInt("groupUID"));
             groupMember.setUserUID(rs.getInt("userUID"));
             groupMember.setPenaltyCnt(rs.getInt("penaltyCnt"));
@@ -55,7 +55,7 @@ public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
 
     private HashMap<String, Object> setParameter(GroupMember groupMember) {
         HashMap<String, Object> hashMap = new HashMap<String, Object>();
-        hashMap.put("UID", groupMember.getUID());
+        hashMap.put("UID", groupMember.getGroupMemberUID());
         hashMap.put("groupUID",groupMember.getGroupUID());
         hashMap.put("userUID",groupMember.getUserUID());
         hashMap.put("penaltyCnt",groupMember.getPenaltyCnt());

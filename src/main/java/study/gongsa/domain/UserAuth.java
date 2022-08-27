@@ -22,7 +22,7 @@ public class UserAuth {
         this.updatedAt = this.createdAt;
     }
 
-    private int UID;
+    private int userAuthUID;
     private int userUID;
     private String refreshToken;
     private Timestamp createdAt;
