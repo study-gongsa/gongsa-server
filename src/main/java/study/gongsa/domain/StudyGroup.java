@@ -2,6 +2,7 @@ package study.gongsa.domain;
 import lombok.*;
 import study.gongsa.dto.MakeStudyGroupRequest;
 
+import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 
@@ -11,19 +12,19 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Builder
 public class StudyGroup {
-    private int UID;
+    private int studyGroupUID;
     private String name;
     private String code;
-    private boolean isCam;
-    private boolean isPrivate;
-    private boolean isRest;
+    private Boolean isCam;
+    private Boolean isPrivate;
+    private Boolean isRest;
     private int maxRest;
     private Time minStudyHour;
     private int maxMember;
     private int maxTodayStudy;
-    private boolean isPenalty;
+    private Boolean isPenalty;
     private int maxPenalty;
-    private Timestamp expiredAt;
+    private Date expiredAt;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
@@ -44,7 +45,7 @@ public class StudyGroup {
     @Override
     public String toString() {
         return "StudyGroup{" +
-                "UID=" + UID +
+                "UID=" + studyGroupUID +
                 ", name='" + name + '\'' +
                 ", code='" + code + '\'' +
                 ", isCam=" + isCam +

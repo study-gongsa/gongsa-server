@@ -33,7 +33,7 @@ public class JdbcTemplateCategoryRepository implements CategoryRepository{
     private RowMapper<Category> categoryRowMapper() {
         return (rs, rowNum) -> {
             Category category = new Category();
-            category.setUID(rs.getInt("UID"));
+            category.setCategoryUID(rs.getInt("UID"));
             category.setName(rs.getString("name"));
             return category;
         };
@@ -41,7 +41,7 @@ public class JdbcTemplateCategoryRepository implements CategoryRepository{
 
     private HashMap<String, Object> setParameter(Category category) {
         HashMap<String, Object> hashMap = new HashMap<String, Object>();
-        hashMap.put("UID", category.getUID());
+        hashMap.put("UID", category.getCategoryUID());
         hashMap.put("name",category.getName());
         return hashMap;
     }

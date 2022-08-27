@@ -75,7 +75,7 @@ public class JdbcTemplateUserRepository implements UserRepository {
     private RowMapper<User> userRowMapper() {
         return (rs, rowNum) -> {
             User user = new User();
-            user.setUID(rs.getInt("UID"));
+            user.setUserUID(rs.getInt("UID"));
             user.setEmail(rs.getString("email"));
             user.setPasswd(rs.getString("passwd"));
             user.setNickname(rs.getString("nickname"));
@@ -91,7 +91,7 @@ public class JdbcTemplateUserRepository implements UserRepository {
     }
     private HashMap<String, Object> setParameter(User user) {
         HashMap<String, Object> hashMap = new HashMap<String, Object>();
-        hashMap.put("UID",user.getUID());
+        hashMap.put("UID",user.getUserUID());
         hashMap.put("email",user.getEmail());
         hashMap.put("passwd",user.getPasswd());
         hashMap.put("nickname",user.getNickname());

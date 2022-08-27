@@ -33,7 +33,7 @@ public class User {
         this.updatedAt = this.createdAt;
     }
 
-    private int UID;
+    private int userUID;
     private String email;
     private String passwd;
     private String nickname;
@@ -47,7 +47,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "UID=" + UID +
+                "UID=" + userUID +
                 ", email='" + email + '\'' +
                 ", passwd='" + passwd + '\'' +
                 ", nickname='" + nickname + '\'' +
