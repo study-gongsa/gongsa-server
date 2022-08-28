@@ -22,7 +22,7 @@ public class SearchStudyGroupReponse {
 
         for(int i=0; i<studyGroupList.size(); i++){
             StudyGroup studyGroup = studyGroupList.get(i);
-            map.put("groupUID", studyGroup.getStudyGroupUID());
+            map.put("groupUID", studyGroup.getUID());
             map.put("name", studyGroup.getName());
             map.put("isCam", studyGroup.getIsCam());
             map.put("createdAt", studyGroup.getCreatedAt());

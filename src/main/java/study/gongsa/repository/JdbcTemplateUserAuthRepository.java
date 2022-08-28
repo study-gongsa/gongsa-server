@@ -40,7 +40,7 @@ public class JdbcTemplateUserAuthRepository implements UserAuthRepository{
     private RowMapper<UserAuth> userAuthRowMapper() {
         return (rs, rowNum) -> {
             UserAuth userAuth = new UserAuth();
-            userAuth.setUserAuthUID(rs.getInt("UID"));
+            userAuth.setUID(rs.getInt("UID"));
             userAuth.setUserUID(rs.getInt("userUID"));
             userAuth.setRefreshToken(rs.getString("refreshToken"));
             userAuth.setCreatedAt(rs.getTimestamp("createdAt"));
@@ -51,7 +51,7 @@ public class JdbcTemplateUserAuthRepository implements UserAuthRepository{
 
     private HashMap<String, Object> setParameter(UserAuth userAuth) {
         HashMap<String, Object> hashMap = new HashMap<String, Object>();
-        hashMap.put("UID", userAuth.getUserAuthUID());
+        hashMap.put("UID", userAuth.getUID());
         hashMap.put("userUID",userAuth.getUserUID());
         hashMap.put("refreshToken",userAuth.getRefreshToken());
         hashMap.put("createdAt",userAuth.getCreatedAt());

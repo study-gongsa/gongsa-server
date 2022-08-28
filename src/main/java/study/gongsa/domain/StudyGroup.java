@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Builder
 public class StudyGroup {
-    private int studyGroupUID;
+    private int UID;
     private String name;
     private String code;
     private Boolean isCam;
@@ -28,24 +28,10 @@ public class StudyGroup {
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
-    public StudyGroup(MakeStudyGroupRequest makeRequest){
-        this.name = makeRequest.getName();
-        this.isCam = makeRequest.isCam();
-        this.isPrivate = makeRequest.isPrivate();
-        this.isRest = makeRequest.isRest();
-        this.maxRest = makeRequest.getMaxRest();
-        this.maxMember = makeRequest.getMaxMember();
-        this.maxTodayStudy = makeRequest.getMaxTodayStudy();
-        this.isPenalty = makeRequest.isPenalty();
-        this.maxPenalty = makeRequest.getMaxPenalty();
-        this.expiredAt = makeRequest.getExpiredAt();
-        this.minStudyHour = new Time(makeRequest.getMinStudyHour(),0,0);
-    }
-
     @Override
     public String toString() {
         return "StudyGroup{" +
-                "UID=" + studyGroupUID +
+                "UID=" + UID +
                 ", name='" + name + '\'' +
                 ", code='" + code + '\'' +
                 ", isCam=" + isCam +

@@ -43,7 +43,7 @@ public class JdbcTemplateUserCategoryRepository implements UserCategoryRepositor
 
     private HashMap<String, Object> setParameter(UserCategory userCategory) {
         HashMap<String, Object> hashMap = new HashMap<String, Object>();
-        hashMap.put("UID", userCategory.getUserCategoryUID());
+        hashMap.put("UID", userCategory.getUID());
         hashMap.put("userUID",userCategory.getUserUID());
         hashMap.put("categoryUID",userCategory.getCategoryUID());
         hashMap.put("createdAt",userCategory.getCreatedAt());
@@ -54,7 +54,7 @@ public class JdbcTemplateUserCategoryRepository implements UserCategoryRepositor
     private RowMapper<UserCategory> userCategoryRowMapper() {
         return (rs, rowNum) -> {
             UserCategory userCategory = new UserCategory();
-            userCategory.setUserCategoryUID(rs.getInt("UID"));
+            userCategory.setUID(rs.getInt("UID"));
             userCategory.setUserUID(rs.getInt("userUID"));
             userCategory.setCategoryUID(rs.getInt("categoryUID"));
             userCategory.setCreatedAt(rs.getTimestamp("createdAt"));

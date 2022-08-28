@@ -20,7 +20,7 @@ public class UserCategory {
         this.createdAt = new Timestamp(new Date().getTime());
         this.updatedAt = this.createdAt;
     }
-    private int userCategoryUID;
+    private int UID;
     private int userUID;
     private Integer categoryUID;
     private Timestamp createdAt;

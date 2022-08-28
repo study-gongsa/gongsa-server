@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Builder
 public class GroupMember {
-    private int groupMemberUID;
+    private int UID;
     private int userUID;
     private int groupUID;
     private int reportCnt;
