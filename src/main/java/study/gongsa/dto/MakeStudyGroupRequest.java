@@ -7,9 +7,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
+import study.gongsa.domain.StudyGroup;
 
 import javax.validation.constraints.*;
 import java.sql.Date;
+import java.sql.Time;
 import java.sql.Timestamp;
 
 @ApiModel(value="StudyGroupMakeRequest", description = "스터디 그룹 생성 리퀘스트")
@@ -24,7 +26,7 @@ public class MakeStudyGroupRequest {
 
     @ApiModelProperty(value="캠 필수 여부")
     @NotNull(message = "캠 필수 여부는 필수값 입니다.")
-    boolean isCam;
+    Boolean isCam;
 
     @ApiModelProperty(value="최대 인원 수")
     @Min(value=4, message="최대 인원 수는 4명부터 입니다.")
@@ -34,7 +36,7 @@ public class MakeStudyGroupRequest {
 
     @ApiModelProperty(value="방 공개 여부")
     @NotNull(message = "방 공개 여부는 필수값 입니다.")
-    boolean isPrivate;
+    Boolean isPrivate;
 
     @ApiModelProperty(value="그룹 카테고리")
     @NotNull(message = "그룹 카테고리는 필수값 입니다")
@@ -42,14 +44,14 @@ public class MakeStudyGroupRequest {
 
     @ApiModelProperty(value="벌점 유무")
     @NotNull(message = "벌점 유무는 필수값 입니다.")
-    boolean isPenalty;
+    Boolean isPenalty;
 
     @ApiModelProperty(value="최대 가능 벌점 횟수")
     int maxPenalty;
 
     @ApiModelProperty(value="휴가 유무")
     @NotNull(message = "휴가 유무는 필수값 입니다.")
-    boolean isRest;
+    Boolean isRest;
 
     @ApiModelProperty(value="최대 휴가 횟수")
     int maxRest;
@@ -68,4 +70,22 @@ public class MakeStudyGroupRequest {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "만료 날짜는 필수값 입니다.")
     Date expiredAt;
+
+    public static StudyGroup toConvert(MakeStudyGroupRequest req){
+        StudyGroup studyGroup = new StudyGroup();
+
+        studyGroup.setName(req.getName());
+        studyGroup.setIsCam(req.getIsCam());
+        studyGroup.setIsPrivate(req.getIsPrivate());
+        studyGroup.setIsRest(req.getIsRest());
+        studyGroup.setMaxRest(req.getMaxRest());
+        studyGroup.setMaxMember(req.getMaxMember());
+        studyGroup.setMaxTodayStudy(req.getMaxTodayStudy());
+        studyGroup.setIsPenalty(req.getIsPenalty());
+        studyGroup.setMaxPenalty(req.getMaxPenalty());
+        studyGroup.setExpiredAt(req.getExpiredAt());
+        studyGroup.setMinStudyHour(new Time(req.getMinStudyHour(),0,0));
+
+        return studyGroup;
+    }
 }

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import study.gongsa.domain.Category;
 import study.gongsa.domain.UserCategory;
+import study.gongsa.dto.CategoryResponse;
 import study.gongsa.dto.DefaultResponse;
 import study.gongsa.dto.UserCategoryRequest;
 import study.gongsa.service.CategoryService;
@@ -40,7 +41,7 @@ public class CategoryController {
     })
     @GetMapping("")
     public ResponseEntity get(){
-        List<Category> categories = categoryService.getAllCategory();
+        List<CategoryResponse> categories = categoryService.getAllCategory();
 
         DefaultResponse response = new DefaultResponse(categories);
         return new ResponseEntity(response, HttpStatus.OK);

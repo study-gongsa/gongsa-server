@@ -9,6 +9,6 @@ import lombok.*;
 @Builder
 public class Category {
 
-    private int categoryUID;
+    private int UID;
     private String name;
 }

@@ -10,7 +10,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Builder
 public class GroupCategory {
-    private int groupCategoryUID;
+    private int UID;
     private int groupUID;
     private int categoryUID;
     private Timestamp createdAt;

@@ -72,7 +72,7 @@ public class UserService {
         gmailSender.sendMail(mailDto);
 
         //user 정보 업데이트
-        userRepository.updateAuthCode(authCode, new Timestamp(new Date().getTime()), user.getUserUID());
+        userRepository.updateAuthCode(authCode, new Timestamp(new Date().getTime()), user.getUID());
     }
 
     public void sendChangePasswdMail(String email){
@@ -88,7 +88,7 @@ public class UserService {
         String encryptedPassword = passwordEncoder.encode(passwdCode);
 
         //user 정보 업데이트
-        userRepository.updatePasswd(encryptedPassword, new Timestamp(new Date().getTime()), user.getUserUID());
+        userRepository.updatePasswd(encryptedPassword, new Timestamp(new Date().getTime()), user.getUID());
 
         //이메일 전송
         MailDto mailDto = new MailDto();
@@ -140,7 +140,7 @@ public class UserService {
             throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST,"expiration", "만료된 인증코드입니다.");
         }
 
-        userRepository.updateIsAuth(true, currentTime, user.getUserUID());
+        userRepository.updateIsAuth(true, currentTime, user.getUID());
     }
 
     public Number login(User user){
@@ -150,8 +150,8 @@ public class UserService {
         if (!passwordEncoder.matches(user.getPasswd(), userByEmail.get().getPasswd()))
             throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED, "passwd","올바르지 않은 비밀번호입니다.");
 
-        System.out.println(userByEmail.get().getUserUID());
-        return userByEmail.get().getUserUID();
+        System.out.println(userByEmail.get().getUID());
+        return userByEmail.get().getUID();
     }
 
     public boolean isAuth(int uid){

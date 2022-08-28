@@ -28,6 +28,6 @@ public class UserCategoryService {
         List<UserCategory> userCategoryByUserUID = userCategoryRepository.findByUserUID(userUID);
         // 이미 카테고리가 있으면 삭제하고 다시 추가
         for(int i=0; i<userCategoryByUserUID.size(); i++)
-            userCategoryRepository.remove(userCategoryByUserUID.get(i).getUserCategoryUID());
+            userCategoryRepository.remove(userCategoryByUserUID.get(i).getUID());
     }
 }

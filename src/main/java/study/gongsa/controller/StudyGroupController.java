@@ -98,7 +98,8 @@ public class StudyGroupController {
         categoryService.checkValidCategoryUID(req.getCategoryUIDs());
 
         //그룹, 카테고리 생성
-        StudyGroup studyGroup = new StudyGroup(req);
+        StudyGroup studyGroup = MakeStudyGroupRequest.toConvert(req);
+
         int groupUID = studyGroupService.makeStudyGroup(studyGroup, req.getCategoryUIDs());
 
         //방장 생성

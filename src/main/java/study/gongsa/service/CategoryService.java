@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import study.gongsa.domain.Category;
+import study.gongsa.dto.CategoryResponse;
 import study.gongsa.repository.CategoryRepository;
 import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,9 +21,15 @@ public class CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    public List<Category> getAllCategory(){
+    public List<CategoryResponse> getAllCategory(){
         List<Category> categories = categoryRepository.findAll();
-        return categories;
+        List<CategoryResponse> categoryResponses = new ArrayList<CategoryResponse>();
+
+        for (Category category : categories){
+            categoryResponses.add(new CategoryResponse(category));
+        }
+
+        return categoryResponses;
     }
 
     public void checkValidCategoryUID(int[] groupCategories) {

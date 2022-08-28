@@ -116,7 +116,7 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
     private RowMapper<StudyGroup> studyGroupRowMapper() {
         return (rs, rowNum) -> {
             StudyGroup studyGroup = new StudyGroup();
-            studyGroup.setStudyGroupUID(rs.getInt("UID"));
+            studyGroup.setUID(rs.getInt("UID"));
             studyGroup.setName(rs.getString("name"));
             studyGroup.setCode(rs.getString("code"));
             studyGroup.setMaxTodayStudy(rs.getInt("maxTodayStudy"));
@@ -137,7 +137,7 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
 
     private HashMap<String, Object> setParameter(StudyGroup studyGroup) {
         HashMap<String, Object> hashMap = new HashMap<String, Object>();
-        hashMap.put("UID",studyGroup.getStudyGroupUID());
+        hashMap.put("UID",studyGroup.getUID());
         hashMap.put("name",studyGroup.getName());
         hashMap.put("code",studyGroup.getCode());
         hashMap.put("maxTodayStudy",studyGroup.getMaxTodayStudy());

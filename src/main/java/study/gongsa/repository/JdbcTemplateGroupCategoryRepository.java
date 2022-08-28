@@ -33,7 +33,7 @@ public class JdbcTemplateGroupCategoryRepository implements GroupCategoryReposit
     private RowMapper<GroupCategory> groupCategoryRowMapper() {
         return (rs, rowNum) -> {
             GroupCategory groupCategory = new GroupCategory();
-            groupCategory.setGroupCategoryUID(rs.getInt("UID"));
+            groupCategory.setUID(rs.getInt("UID"));
             groupCategory.setGroupUID(rs.getInt("groupUID"));
             groupCategory.setCategoryUID(rs.getInt("categoryUID"));
             groupCategory.setCreatedAt(rs.getTimestamp("createdAt"));
@@ -44,7 +44,7 @@ public class JdbcTemplateGroupCategoryRepository implements GroupCategoryReposit
 
     private HashMap<String, Object> setParameter(GroupCategory groupCategory) {
         HashMap<String, Object> hashMap = new HashMap<String, Object>();
-        hashMap.put("UID", groupCategory.getGroupCategoryUID());
+        hashMap.put("UID", groupCategory.getUID());
         hashMap.put("groupUID",groupCategory.getGroupUID());
         hashMap.put("categoryUID",groupCategory.getCategoryUID());
         hashMap.put("createdAt",groupCategory.getCreatedAt());
