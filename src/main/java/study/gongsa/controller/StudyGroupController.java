@@ -51,7 +51,7 @@ public class StudyGroupController {
                                   @RequestParam(required = false) Boolean isCam,
                                   @RequestParam(required = false, defaultValue = "") String align){
         List<StudyGroup> studyGroupList = studyGroupService.findAll(categoryUIDs, word, isCam, align);
-        DefaultResponse response = new DefaultResponse(new StudyGroupSearchReponse(studyGroupList));
+        DefaultResponse response = new DefaultResponse(new SearchStudyGroupReponse(studyGroupList));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
@@ -78,7 +78,7 @@ public class StudyGroupController {
                 throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, null,"groupUID 파라미터를 입력해주세요");
             studyGroupList = studyGroupService.findSameCategoryAllByUID(groupUID);
         }
-        DefaultResponse response = new DefaultResponse(new StudyGroupSearchReponse(studyGroupList));
+        DefaultResponse response = new DefaultResponse(new SearchStudyGroupReponse(studyGroupList));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
