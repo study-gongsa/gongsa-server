@@ -17,8 +17,6 @@ public class StudyGroup {
     private String code;
     private Boolean isCam;
     private Boolean isPrivate;
-    private Boolean isRest;
-    private int maxRest;
     private Time minStudyHour;
     private int maxMember;
     private int maxTodayStudy;
@@ -36,8 +34,6 @@ public class StudyGroup {
                 ", code='" + code + '\'' +
                 ", isCam=" + isCam +
                 ", isPrivate=" + isPrivate +
-                ", isRest=" + isRest +
-                ", maxRest=" + maxRest +
                 ", minStudyHour=" + minStudyHour +
                 ", maxMember=" + maxMember +
                 ", maxTodayStudy=" + maxTodayStudy +

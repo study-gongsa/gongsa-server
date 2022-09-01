@@ -122,10 +122,8 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
             studyGroup.setMaxTodayStudy(rs.getInt("maxTodayStudy"));
             studyGroup.setMaxMember(rs.getInt("maxMember"));
             studyGroup.setMaxPenalty(rs.getInt("maxPenalty"));
-            studyGroup.setMaxRest(rs.getInt("maxRest"));
             studyGroup.setIsPrivate(rs.getBoolean("isPrivate"));
             studyGroup.setIsCam(rs.getBoolean("isCam"));
-            studyGroup.setIsRest(rs.getBoolean("isRest"));
             studyGroup.setIsPenalty(rs.getBoolean("isPenalty"));
             studyGroup.setMinStudyHour(rs.getTime("minStudyHour"));
             studyGroup.setExpiredAt(rs.getDate("expiredAt"));
@@ -143,10 +141,8 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
         hashMap.put("maxTodayStudy",studyGroup.getMaxTodayStudy());
         hashMap.put("maxMember",studyGroup.getMaxMember());
         hashMap.put("maxPenalty",studyGroup.getMaxPenalty());
-        hashMap.put("maxRest",studyGroup.getMaxRest());
         hashMap.put("isPrivate",studyGroup.getIsPrivate());
         hashMap.put("isCam",studyGroup.getIsCam());
-        hashMap.put("isRest",studyGroup.getIsRest());
         hashMap.put("isPenalty",studyGroup.getIsPenalty());
         hashMap.put("minStudyHour", studyGroup.getMinStudyHour());
         hashMap.put("expiredAt", studyGroup.getExpiredAt());

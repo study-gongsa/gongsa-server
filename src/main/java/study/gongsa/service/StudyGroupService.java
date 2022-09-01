@@ -47,8 +47,8 @@ public class StudyGroupService {
         Optional<Integer> userSumMinStudyHour = studyGroupRepository.findSumMinStudyHourByUserUID(userUID);
         int currentUserSumMinStudyHour = 0;
         if(userSumMinStudyHour.isPresent()) currentUserSumMinStudyHour = userSumMinStudyHour.get();
-        if(currentUserSumMinStudyHour+addedMinStudyHour > 24){
-            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST,"minStudyHour","하루 최소 공부시간 합이 24시간을 초과합니다.");
+        if(currentUserSumMinStudyHour+addedMinStudyHour > 80){
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST,"minStudyHour","가입할 수 있는 최소 공부 시간(80시간)을 초과했습니다.");
         }
     }
 

@@ -49,20 +49,13 @@ public class MakeStudyGroupRequest {
     @ApiModelProperty(value="최대 가능 벌점 횟수")
     int maxPenalty;
 
-    @ApiModelProperty(value="휴가 유무")
-    @NotNull(message = "휴가 유무는 필수값 입니다.")
-    Boolean isRest;
-
-    @ApiModelProperty(value="최대 휴가 횟수")
-    int maxRest;
-
     @ApiModelProperty(value="스터디 재진입 횟수")
     @NotNull(message = "스터디 재진입 횟수는 필수값 입니다.")
     int maxTodayStudy;
 
-    @ApiModelProperty(value="하루 목표 공부 시간")
-    @Min(value=0, message="하루 목표 공부 시간은 최소 0시간입니다.")
-    @Max(value=24, message="하루 목표 공부 시간은 최대 24시간입니다.")
+    @ApiModelProperty(value="주 목표 공부 시간")
+    @Min(value=0, message="주 목표 공부 시간은 최소 0시간입니다.")
+    @Max(value=80, message="주 목표 공부 시간은 최대 80시간입니다.")
     @NotNull(message = "하루 목표 공부 시간는 필수값 입니다.")
     int minStudyHour;
 
@@ -77,8 +70,6 @@ public class MakeStudyGroupRequest {
         studyGroup.setName(req.getName());
         studyGroup.setIsCam(req.getIsCam());
         studyGroup.setIsPrivate(req.getIsPrivate());
-        studyGroup.setIsRest(req.getIsRest());
-        studyGroup.setMaxRest(req.getMaxRest());
         studyGroup.setMaxMember(req.getMaxMember());
         studyGroup.setMaxTodayStudy(req.getMaxTodayStudy());
         studyGroup.setIsPenalty(req.getIsPenalty());
