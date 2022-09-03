@@ -24,7 +24,7 @@ public class JwtTokenProvider {
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .setIssuer(issuer)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + Duration.ofHours(1).toMillis()))
+                .setExpiration(new Date(now.getTime() + Duration.ofDays(30).toMillis()))
                 .claim("userUID", userUID)
                 .claim("userAuthUID", userAuthUID)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
