@@ -16,23 +16,21 @@ import java.util.*;
 @NoArgsConstructor
 public class SearchStudyGroupReponse {
     public SearchStudyGroupReponse(List<StudyGroup> studyGroupList){
-        List<Object> list = new ArrayList<Object>();
+        List<StudyGroupDTO.Search> list = new ArrayList<StudyGroupDTO.Search>();
 
-        Map<String, Object> map = new HashMap<String, Object>();
-
-        for(int i=0; i<studyGroupList.size(); i++){
-            StudyGroup studyGroup = studyGroupList.get(i);
-            map.put("groupUID", studyGroup.getUID());
-            map.put("name", studyGroup.getName());
-            map.put("isCam", studyGroup.getIsCam());
-            map.put("createdAt", studyGroup.getCreatedAt());
-            map.put("expiredAt", studyGroup.getExpiredAt());
-            list.add(map);
+        for(StudyGroup studyGroup: studyGroupList){
+            StudyGroupDTO.Search studyGroupDTO = new StudyGroupDTO.Search();
+            studyGroupDTO.setStudyGroupUID(studyGroup.getUID());
+            studyGroupDTO.setName(studyGroup.getName());
+            studyGroupDTO.setIsCam(studyGroup.getIsCam());
+            studyGroupDTO.setCreatedAt(studyGroup.getCreatedAt());
+            studyGroupDTO.setExpiredAt(studyGroup.getExpiredAt());
+            list.add(studyGroupDTO);
         }
 
         this.studyGroupList = list;
     }
 
     @ApiModelProperty(value="스터디그룹 배열")
-    List<Object> studyGroupList;
+    List<StudyGroupDTO.Search> studyGroupList;
 }

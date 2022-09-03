@@ -38,6 +38,7 @@ public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
         List<GroupMember> result = jdbcTemplate.query("select * from GroupMember where groupUID = ? and userUID = ?", groupMemberRowMapper(), groupUID, userUID);
         return result.stream().findAny();
     }
+
     private RowMapper<GroupMember> groupMemberRowMapper() {
         return (rs, rowNum) -> {
             GroupMember groupMember = new GroupMember();

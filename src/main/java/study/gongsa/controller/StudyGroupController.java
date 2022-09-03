@@ -43,13 +43,13 @@ public class StudyGroupController {
             @ApiImplicitParam(name = "categoryUIDs", value = "카테고리 UID 배열", required = false, dataType = "array", paramType = "query", defaultValue = ""),
             @ApiImplicitParam(name = "word", value = "검색어/코드", required = false, dataType = "string", paramType = "query", defaultValue = ""),
             @ApiImplicitParam(name = "isCam", value = "캠 유무", required = false, dataType = "boolean", paramType = "query", defaultValue = ""),
-            @ApiImplicitParam(name = "align", value = "정렬 기준", required = false, dataType = "string", paramType = "query", defaultValue = ""),
+            @ApiImplicitParam(name = "align", value = "정렬 기준", required = false, dataType = "string", paramType = "query", defaultValue = "latest"),
     })
     @GetMapping("/search")
     public ResponseEntity findAll(@RequestParam(required = false) List<Integer> categoryUIDs,
                                   @RequestParam(required = false, defaultValue = "") String word,
                                   @RequestParam(required = false) Boolean isCam,
-                                  @RequestParam(required = false, defaultValue = "") String align){
+                                  @RequestParam(required = false, defaultValue = "latest") String align){
         List<StudyGroup> studyGroupList = studyGroupService.findAll(categoryUIDs, word, isCam, align);
         DefaultResponse response = new DefaultResponse(new SearchStudyGroupReponse(studyGroupList));
         return new ResponseEntity(response, HttpStatus.OK);
@@ -59,7 +59,7 @@ public class StudyGroupController {
     @ApiResponses({
             @ApiResponse(code=200, message="추천 리스트 조회 성공"),
             @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
-            @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등)")
+            @ApiResponse(code=403, message="가입되지 않은 그룹일 경우, 토큰 에러(토큰이 만료되었을 경우 등)")
     })
     @ApiImplicitParams({
             @ApiImplicitParam(name = "groupUID", value = "스터디룸 UID(type이 expire일 때만 입력)", required = false, dataType = "int", paramType = "query", example = "0"),
@@ -74,8 +74,10 @@ public class StudyGroupController {
         if(type.equals("main"))
             studyGroupList = studyGroupService.findSameCategoryAllByUserUID(userUID);
         else {
-            if(groupUID == null)
-                throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, null,"groupUID 파라미터를 입력해주세요");
+            if(groupUID == null || !(type.equals("main") || type.equals("expire")))
+                throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, null,"파라미터(groupUID, type)를 다시 확인해주세요.");
+
+            groupMemberService.checkRegister(groupUID, userUID);
             studyGroupList = studyGroupService.findSameCategoryAllByUID(groupUID);
         }
         DefaultResponse response = new DefaultResponse(new SearchStudyGroupReponse(studyGroupList));

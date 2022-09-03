@@ -4,12 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import study.gongsa.domain.GroupCategory;
-import study.gongsa.domain.GroupMember;
 import study.gongsa.domain.StudyGroup;
 import study.gongsa.repository.GroupCategoryRepository;
-import study.gongsa.repository.GroupMemberRepository;
 import study.gongsa.repository.StudyGroupRepository;
-import study.gongsa.repository.UserCategoryRepository;
 import study.gongsa.support.CodeGenerator;
 import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
 
@@ -36,11 +33,19 @@ public class StudyGroupService {
     }
 
     public List<StudyGroup> findSameCategoryAllByUID(int uid){
-        return studyGroupRepository.findSameCategoryAllByUID(uid);
+        List<StudyGroup> studyGroupList = studyGroupRepository.findSameCategoryAllByUID(uid);
+        if (studyGroupList.isEmpty())
+            return studyGroupRepository.findAll(null, "", null, "random");
+        else
+            return studyGroupList;
     }
 
     public List<StudyGroup> findSameCategoryAllByUserUID(int userUID){
-        return studyGroupRepository.findSameCategoryAllByUserUID(userUID);
+        List<StudyGroup> studyGroupList = studyGroupRepository.findSameCategoryAllByUserUID(userUID);
+        if (studyGroupList.isEmpty())
+            return studyGroupRepository.findAll(null, "", null, "random");
+        else
+            return studyGroupList;
     }
 
     public void checkPossibleMinStudyHourByUsersUID(int userUID, int addedMinStudyHour){
