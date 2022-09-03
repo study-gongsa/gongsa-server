@@ -35,7 +35,7 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
         String sql = "select * "
                     +"from StudyGroup a "
                     +"join GroupCategory b on a.UID = b.groupUID "
-                    +"where a.UID >= 1 ";
+                    +"where a.UID >= 1 and a.isPrivate = false ";
         if(isCam != null)
             sql += "and isCam = " + isCam + " ";
         if(word.length() != 0)
@@ -50,7 +50,18 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
             sql += ")";
         }
 
-        sql += "group by b.groupUID";
+        sql += "group by b.groupUID ";
+
+        switch(align){
+            case "latest":
+                sql += "order by a.createdAt desc";
+                break;
+            case "expire":
+                sql += "order by a.expiredAt";
+                break;
+            case "random":
+                sql += "order by rand()";
+        }
         System.out.println(sql);
 
         return jdbcTemplate.query(sql, studyGroupRowMapper());
@@ -61,7 +72,7 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
         String sql = "select * "
                     +"from StudyGroup a "
                     +"join GroupCategory b on a.UID = b.groupUID "
-                    +"where categoryUID in (select categoryUID from GroupCategory where groupUID = ?) "
+                    +"where categoryUID in (select categoryUID from GroupCategory where groupUID = ?) and a.isPrivate = false "
                     +"group by b.groupUID "
                     +"order by rand()";
         System.out.println(sql);
@@ -73,7 +84,7 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
         String sql = "select * "
                 +"from StudyGroup a "
                 +"join GroupCategory b on a.UID = b.groupUID "
-                +"where categoryUID in (select categoryUID from UserCategory where userUID = ?) "
+                +"where categoryUID in (select categoryUID from UserCategory where userUID = ?) and a.isPrivate = false "
                 +"group by b.groupUID "
                 +"order by rand()";
         System.out.println(sql);
