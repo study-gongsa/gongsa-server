@@ -38,6 +38,30 @@ public class GroupMemberService {
         }
     }
 
+    public GroupMember findOne(int groupUID, int userUID) {
+        Optional<GroupMember> groupMember = groupMemberRepository.findByGroupUIDUserUID(groupUID, userUID);
+        if (groupMember.isEmpty()){
+            throw new IllegalStateExceptionWithLocation(HttpStatus.FORBIDDEN, "groupUID","가입되지 않은 그룹입니다.");
+        }
+
+        return groupMember.get();
+    }
+
+    public void remove(GroupMember groupMember){
+        int groupUID = groupMember.getGroupUID();
+        int groupMemberUID = groupMember.getUID();
+        boolean isLeader = groupMember.getIsLeader();
+
+        groupMemberRepository.remove(groupMemberUID);
+
+        if (isLeader) {
+            Optional<GroupMember> randomGroupMember = groupMemberRepository.findRandUID(groupUID);
+            if (!randomGroupMember.isEmpty()){
+                groupMemberRepository.updateNewReader(randomGroupMember.get().getUID());
+            }
+        }
+    }
+
     public void makeStudyGroupMember(int groupUID, int userUID, boolean isLeader) {
         GroupMember groupMember = new GroupMember(userUID, groupUID, isLeader);
         groupMember.setCreatedAt(new Timestamp(new Date().getTime()));

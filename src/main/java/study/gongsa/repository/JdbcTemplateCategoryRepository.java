@@ -37,6 +37,17 @@ public class JdbcTemplateCategoryRepository implements CategoryRepository{
         return result.stream().findAny();
     };
 
+    @Override
+    public List<Category> findByGroupUID(int groupUID) {
+        String sql = "SELECT c.UID, c.name "
+                + "FROM GroupCategory a "
+                + "JOIN StudyGroup b ON a.groupUID = b.UID "
+                + "JOIN Category c ON a.categoryUID = c.UID "
+                + "WHERE groupUID = ?";
+        System.out.println(sql);
+        return jdbcTemplate.query(sql, categoryRowMapper(), groupUID);
+    }
+
     private RowMapper<Category> categoryRowMapper() {
         return (rs, rowNum) -> {
             Category category = new Category();

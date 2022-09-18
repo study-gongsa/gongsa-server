@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import study.gongsa.domain.StudyGroup;
+import study.gongsa.domain.User;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -122,6 +123,12 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
         ), UID).stream().findAny();
 
         return memberCntInfo;
+    }
+
+    @Override
+    public Optional<StudyGroup> findByUID(int uid) {
+        List<StudyGroup> result = jdbcTemplate.query("select * from StudyGroup where UID = ?", studyGroupRowMapper(), uid);
+        return result.stream().findAny();
     }
 
     private RowMapper<StudyGroup> studyGroupRowMapper() {

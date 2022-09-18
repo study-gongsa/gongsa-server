@@ -1,6 +1,7 @@
 package study.gongsa.repository;
 
 import study.gongsa.domain.StudyGroup;
+import study.gongsa.domain.User;
 
 import java.util.List;
 import java.util.Map;
@@ -14,4 +15,5 @@ public interface  StudyGroupRepository {
     Optional<Integer> findSumMinStudyHourByUserUID(int userUID);
     Optional<Integer> findMinStudyHourByGroupUID(int groupUID);
     Optional<Map<String, Integer>> findMemberCntInfoByGroupUID(int groupUID);
+    Optional<StudyGroup> findByUID(int uid);
 }

@@ -39,6 +39,29 @@ public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
         return result.stream().findAny();
     }
 
+    @Override
+    public void remove(int uid) {
+        String sql = "delete from GroupMember where UID = ?";
+        jdbcTemplate.update(sql, uid);
+    }
+
+    @Override
+    public Optional<GroupMember> findRandUID(int groupUID){
+        String sql = "SELECT * "
+                    + "FROM GroupMember "
+                    + "WHERE groupUID = ? "
+                    + "ORDER BY RAND() "
+                    + "LIMIT 1";
+        List<GroupMember> result = jdbcTemplate.query(sql, groupMemberRowMapper(), groupUID);
+        return result.stream().findAny();
+    }
+
+    @Override
+    public void updateNewReader(int uid){
+        String sql = "UPDATE GroupMember SET isLeader = 1 WHERE UID = ?";
+        jdbcTemplate.update(sql, uid);
+    }
+
     private RowMapper<GroupMember> groupMemberRowMapper() {
         return (rs, rowNum) -> {
             GroupMember groupMember = new GroupMember();

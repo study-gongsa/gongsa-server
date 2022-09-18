@@ -48,6 +48,14 @@ public class StudyGroupService {
             return studyGroupList;
     }
 
+    public StudyGroup findOne(int groupUID){
+        Optional<StudyGroup> studyGroup = studyGroupRepository.findByUID(groupUID);
+        if (studyGroup.isEmpty()){
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, null,"존재하지 않은 그룹입니다.");
+        }
+        return studyGroup.get();
+    }
+
     public void checkPossibleMinStudyHourByUsersUID(int userUID, int addedMinStudyHour){
         Optional<Integer> userSumMinStudyHour = studyGroupRepository.findSumMinStudyHourByUserUID(userUID);
         int currentUserSumMinStudyHour = 0;
