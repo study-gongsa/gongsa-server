@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface CategoryRepository {
     List<Category> findAll();
     Optional<Category> findByUID(int uid);
+    public List<Category> findByGroupUID(int groupUID);
 }

@@ -32,6 +32,10 @@ public class CategoryService {
         return categoryResponses;
     }
 
+    public List<Category> getStudyGroupCategory(int groupUID){
+        return categoryRepository.findByGroupUID(groupUID);
+    }
+
     public void checkValidCategoryUID(int[] groupCategories) {
         for(int categoryUID : groupCategories){
             Optional<Category> categoryByUID = categoryRepository.findByUID(categoryUID);
