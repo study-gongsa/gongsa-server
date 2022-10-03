@@ -131,6 +131,12 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
         return result.stream().findAny();
     }
 
+    @Override
+    public Optional<StudyGroup> findByCode(String code) {
+        List<StudyGroup> result = jdbcTemplate.query("select * from StudyGroup where code = ?", studyGroupRowMapper(), code);
+        return result.stream().findAny();
+    }
+
     private RowMapper<StudyGroup> studyGroupRowMapper() {
         return (rs, rowNum) -> {
             StudyGroup studyGroup = new StudyGroup();

@@ -38,7 +38,7 @@ public class GetStudyGroupInfoResponse {
         this.categories = list;
     }
 
-    @ApiModelProperty(value="스터디그룹 배열")
+    @ApiModelProperty(value="스터디그룹 UID")
     private int groupUID;
 
     @ApiModelProperty(value="스터디 그룹명")
