@@ -16,4 +16,5 @@ public interface  StudyGroupRepository {
     Optional<Integer> findMinStudyHourByGroupUID(int groupUID);
     Optional<Map<String, Integer>> findMemberCntInfoByGroupUID(int groupUID);
     Optional<StudyGroup> findByUID(int uid);
+    Optional<StudyGroup> findByCode(String code);
 }

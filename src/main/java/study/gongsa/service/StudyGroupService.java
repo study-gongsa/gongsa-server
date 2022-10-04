@@ -48,8 +48,16 @@ public class StudyGroupService {
             return studyGroupList;
     }
 
-    public StudyGroup findOne(int groupUID){
+    public StudyGroup findOneByUID(int groupUID){
         Optional<StudyGroup> studyGroup = studyGroupRepository.findByUID(groupUID);
+        if (studyGroup.isEmpty()){
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, null,"존재하지 않은 그룹입니다.");
+        }
+        return studyGroup.get();
+    }
+
+    public StudyGroup findOneByCode(String code){
+        Optional<StudyGroup> studyGroup = studyGroupRepository.findByCode(code);
         if (studyGroup.isEmpty()){
             throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, null,"존재하지 않은 그룹입니다.");
         }

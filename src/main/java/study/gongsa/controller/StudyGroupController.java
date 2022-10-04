@@ -36,7 +36,7 @@ public class StudyGroupController {
         this.categoryService = categoryService;
     }
 
-    @ApiOperation(value="스터디룸 조회")
+    @ApiOperation(value="스터디룸 정보 조회 (UID로 조회)")
     @ApiResponses({
             @ApiResponse(code=200, message="조회 성공"),
             @ApiResponse(code=400, message="존재하지 않는 그룹일 경우"),
@@ -47,9 +47,27 @@ public class StudyGroupController {
             @ApiImplicitParam(name = "groupUID", value = "스터디그룹 UID", required = true, dataType = "int", paramType = "path", defaultValue = ""),
     })
     @GetMapping("/{groupUID}")
-    public ResponseEntity findOne(@PathVariable("groupUID") int groupUID){
-        StudyGroup studyGroupInfo = studyGroupService.findOne(groupUID);
+    public ResponseEntity findOneByUID(@PathVariable("groupUID") int groupUID){
+        StudyGroup studyGroupInfo = studyGroupService.findOneByUID(groupUID);
         List<Category> categories = categoryService.getStudyGroupCategory(groupUID);
+        DefaultResponse response = new DefaultResponse(new GetStudyGroupInfoResponse(studyGroupInfo, categories));
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    @ApiOperation(value="스터디룸 정보 조회 (UID로 조회)")
+    @ApiResponses({
+            @ApiResponse(code=200, message="조회 성공"),
+            @ApiResponse(code=400, message="존재하지 않는 그룹일 경우"),
+            @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
+            @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등)")
+    })
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", value = "스터디그룹 코드", required = true, dataType = "Striing", paramType = "path", defaultValue = ""),
+    })
+    @GetMapping("/code/{code}")
+    public ResponseEntity findOneByUID(@PathVariable("code") String code){
+        StudyGroup studyGroupInfo = studyGroupService.findOneByCode(code);
+        List<Category> categories = categoryService.getStudyGroupCategory(studyGroupInfo.getUID());
         DefaultResponse response = new DefaultResponse(new GetStudyGroupInfoResponse(studyGroupInfo, categories));
         return new ResponseEntity(response, HttpStatus.OK);
     }
