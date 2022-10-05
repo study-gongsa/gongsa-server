@@ -110,4 +110,10 @@ public class StudyGroupService {
         imageService.save(image, fileName);
         studyGroupRepository.updateImgPath(groupUID, fileName);
     }
+
+    public int getMaxMember(int groupUID){
+        Optional<Integer> maxMember = studyGroupRepository.findMaxMember(groupUID);
+        if(maxMember.isEmpty()) throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "groupUID", "존재하지 않는 그룹입니다.");
+        return maxMember.get();
+    }
 }
