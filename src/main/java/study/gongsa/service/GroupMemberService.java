@@ -4,14 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import study.gongsa.domain.GroupMember;
+import study.gongsa.domain.GroupMemberUserInfo;
+import study.gongsa.dto.GroupMemberResponse;
 import study.gongsa.repository.GroupMemberRepository;
 import study.gongsa.repository.StudyGroupRepository;
 import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
 
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class GroupMemberService {
@@ -78,5 +78,15 @@ public class GroupMemberService {
         if(memberCntInfo.get().get("memberCnt").equals(memberCntInfo.get().get("maxMember"))){
             throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "groupMember", "그룹 인원이 다 찼습니다.");
         }
+    }
+
+    public List<GroupMemberResponse.Member> getMembers(int groupUID){
+        List<GroupMemberUserInfo> memberInfoList = groupMemberRepository.findMemberInfo(groupUID);
+
+        List<GroupMemberResponse.Member> members = new ArrayList<>();
+        for(GroupMemberUserInfo memberInfo : memberInfoList){
+            members.add(GroupMemberResponse.Member.convertTo(memberInfo));
+        }
+        return members;
     }
 }

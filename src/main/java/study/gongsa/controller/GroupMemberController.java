@@ -1,22 +1,22 @@
 package study.gongsa.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import study.gongsa.domain.GroupMember;
 import study.gongsa.dto.DefaultResponse;
+import study.gongsa.dto.GroupMemberResponse;
 import study.gongsa.dto.RegisterGroupMemberRequest;
+import study.gongsa.dto.SearchStudyGroupReponse;
 import study.gongsa.service.GroupMemberService;
 import study.gongsa.service.StudyGroupService;
 import study.gongsa.service.StudyMemberService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @CrossOrigin("*")
@@ -76,6 +76,26 @@ public class GroupMemberController {
         studyMemberService.remove(groupMember);
         groupMemberService.remove(groupMember);
         DefaultResponse response = new DefaultResponse();
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    @ApiOperation(value="스터디 그룹 멤버 조회")
+    @ApiResponses({
+            @ApiResponse(code=200, message="스터디 그룹에 가입된 멤버 정보, 공부 시간, 현재 공부 여부 조회"),
+            @ApiResponse(code=400, message="알 수 없는 에러가 발생하였습니다."),
+            @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
+            @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등)")
+    })
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "groupUID", value = "스터디룸 UID(type이 expire일 때만 입력)", required = true, dataType = "int", paramType = "query", example = "0"),
+    })
+    @GetMapping("/{groupUID}")
+    public ResponseEntity getGroupMember(@PathVariable("groupUID") int groupUID, HttpServletRequest request){
+
+        List<GroupMemberResponse.Member> memberList = groupMemberService.getMembers(groupUID);
+        int maxMember = studyGroupService.getMaxMember(groupUID);
+
+        DefaultResponse response = new DefaultResponse(new GroupMemberResponse(maxMember, memberList));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 }
