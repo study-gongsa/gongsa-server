@@ -22,6 +22,7 @@ public class StudyGroup {
     private int maxTodayStudy;
     private Boolean isPenalty;
     private int maxPenalty;
+    private String imgPath;
     private Date expiredAt;
     private Timestamp createdAt;
     private Timestamp updatedAt;

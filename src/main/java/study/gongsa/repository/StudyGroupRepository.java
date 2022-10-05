@@ -17,4 +17,5 @@ public interface  StudyGroupRepository {
     Optional<Map<String, Integer>> findMemberCntInfoByGroupUID(int groupUID);
     Optional<StudyGroup> findByUID(int uid);
     Optional<StudyGroup> findByCode(String code);
+    void updateImgPath(int UID, String fileName);
 }
