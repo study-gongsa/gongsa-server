@@ -7,13 +7,16 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import study.gongsa.domain.GroupCategory;
 import study.gongsa.domain.GroupMember;
+import study.gongsa.domain.GroupMemberUserInfo;
 import study.gongsa.domain.StudyGroup;
 
 import javax.sql.DataSource;
+import java.sql.Time;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
@@ -62,6 +65,31 @@ public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
         jdbcTemplate.update(sql, uid);
     }
 
+    @Override
+    public List<GroupMemberUserInfo> findMemberInfo(int groupUID){
+        String with = "WITH MemberInfo AS ( " +
+                "SELECT gm.UID AS groupMemberUID, u.UID AS userUID, u.nickname AS nickname, u.imgPath AS imgPath " +
+                "FROM GroupMember gm " +
+                "INNER JOIN User u ON gm.userUID = u.UID " +
+                "WHERE gm.groupUID = ?) ";
+        String subQuery1 = "SELECT DENSE_RANK() OVER (ORDER BY IFNULL(SUM(sm.studyTime),0) DESC) AS ranking, " +
+                "IFNULL(TIME(SUM(sm.studyTime)),TIME(0)) AS totalStudyTime, mi.userUID " +
+                "FROM MemberInfo mi " +
+                "LEFT JOIN StudyMember sm ON sm.groupMemberUID = mi.groupMemberUID " +
+                "GROUP BY mi.groupMemberUID " +
+                "ORDER BY totalStudyTime desc ";
+        String subQuery2 = "SELECT IFNULL(sm.studyStatus, 'stop') AS studyStatus, MAX(sm.updatedAt) AS updatedAt, " +
+                "mi.userUID, mi.nickname, mi.imgPath " +
+                "FROM MemberInfo mi " +
+                "LEFT JOIN StudyMember sm ON sm.groupMemberUID = mi.groupMemberUID ";
+
+        String query = with + "SELECT * FROM ( " + subQuery1 + ") AS studyTimeTable  " +
+                "INNER JOIN ( "+ subQuery2 +") AS studyStatusTable ON studyTimeTable.userUID = studyStatusTable.userUID";
+
+        List<GroupMemberUserInfo> result = jdbcTemplate.query(query, groupMemberUserInfoRowMapper(), groupUID);
+        return result.stream().collect(Collectors.toList());
+    }
+
     private RowMapper<GroupMember> groupMemberRowMapper() {
         return (rs, rowNum) -> {
             GroupMember groupMember = new GroupMember();
@@ -74,6 +102,20 @@ public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
             groupMember.setCreatedAt(rs.getTimestamp("createdAt"));
             groupMember.setUpdatedAt(rs.getTimestamp("updatedAt"));
             return groupMember;
+        };
+    }
+
+    private RowMapper<GroupMemberUserInfo> groupMemberUserInfoRowMapper() {
+        return (rs, rowNum) -> {
+            GroupMemberUserInfo groupMemberUserInfo = new GroupMemberUserInfo();
+            groupMemberUserInfo.setUserUID(rs.getInt("userUID"));
+            groupMemberUserInfo.setImgPath(rs.getString("imgPath"));
+            groupMemberUserInfo.setNickname(rs.getString("nickname"));
+            groupMemberUserInfo.setRanking(rs.getInt("ranking"));
+            groupMemberUserInfo.setStudyStatus(rs.getString("studyStatus"));
+            groupMemberUserInfo.setTotalStudyTime(rs.getTime("totalStudyTime"));
+
+            return groupMemberUserInfo;
         };
     }
 
