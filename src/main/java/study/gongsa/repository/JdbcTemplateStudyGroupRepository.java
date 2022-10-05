@@ -143,6 +143,13 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
         jdbcTemplate.update(sql, imgPath, UID);
     }
 
+    @Override
+    public Optional<Integer> findMaxMember(int UID){
+        String sql = "SELECT maxMember FROM StudyGroup WHERE UID = ? ";
+        List<Integer> result = jdbcTemplate.query(sql, (rs, rowNum) -> Integer.valueOf(rs.getInt("maxMember")), UID);
+        return result.stream().findAny();
+    }
+
     private RowMapper<StudyGroup> studyGroupRowMapper() {
         return (rs, rowNum) -> {
             StudyGroup studyGroup = new StudyGroup();

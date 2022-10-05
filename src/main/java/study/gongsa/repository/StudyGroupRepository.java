@@ -18,4 +18,5 @@ public interface  StudyGroupRepository {
     Optional<StudyGroup> findByUID(int uid);
     Optional<StudyGroup> findByCode(String code);
     void updateImgPath(int UID, String fileName);
+    Optional<Integer> findMaxMember(int UID);
 }
