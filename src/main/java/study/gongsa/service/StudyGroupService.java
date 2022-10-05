@@ -3,6 +3,7 @@ package study.gongsa.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import study.gongsa.domain.GroupCategory;
 import study.gongsa.domain.StudyGroup;
 import study.gongsa.repository.GroupCategoryRepository;
@@ -20,12 +21,14 @@ public class StudyGroupService {
     private final StudyGroupRepository studyGroupRepository;
     private final GroupCategoryRepository groupCategoryRepository;
     private final CodeGenerator codeGenerator;
+    private final ImageService imageService;
 
     @Autowired
-    public StudyGroupService(StudyGroupRepository studyGroupRepository, GroupCategoryRepository groupCategoryRepository, CodeGenerator codeGenerator){
+    public StudyGroupService(StudyGroupRepository studyGroupRepository, GroupCategoryRepository groupCategoryRepository, CodeGenerator codeGenerator, ImageService imageService){
         this.studyGroupRepository = studyGroupRepository;
         this.groupCategoryRepository = groupCategoryRepository;
         this.codeGenerator = codeGenerator;
+        this.imageService = imageService;
     }
 
     public List<StudyGroup> findAll(List<Integer> categoryUIDs, String word, Boolean isCam, String align){
@@ -100,5 +103,11 @@ public class StudyGroupService {
         Optional<Integer> minStudyHour = studyGroupRepository.findMinStudyHourByGroupUID(groupUID);
         if(minStudyHour.isEmpty()) throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "groupUID", "존재하지 않는 그룹입니다.");
         return minStudyHour.get();
+    }
+
+    public void saveGroupImage (int groupUID, MultipartFile image){
+        String fileName = "g" + groupUID + ".jpg"; //groupImage rename
+        imageService.save(image, fileName);
+        studyGroupRepository.updateImgPath(groupUID, fileName);
     }
 }

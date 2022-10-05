@@ -1,24 +1,28 @@
 package study.gongsa.controller;
 
+import com.mysql.cj.util.StringUtils;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import study.gongsa.domain.Category;
 import study.gongsa.domain.StudyGroup;
 import study.gongsa.dto.*;
 import study.gongsa.service.CategoryService;
 import study.gongsa.service.GroupMemberService;
+import study.gongsa.service.ImageService;
 import study.gongsa.service.StudyGroupService;
 import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.lang.management.OperatingSystemMXBean;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+
+import static java.util.Objects.isNull;
 
 @RestController
 @CrossOrigin("*")
@@ -130,8 +134,10 @@ public class StudyGroupController {
             @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
             @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등)")
     })
+    @Transactional
     @PostMapping("")
-    public ResponseEntity makeStudyGroup(@RequestBody @Valid MakeStudyGroupRequest req, HttpServletRequest request){
+    public ResponseEntity makeStudyGroup(@RequestPart("json") @Valid MakeStudyGroupRequest req,
+                                         @RequestPart(value = "image", required = false) MultipartFile image, HttpServletRequest request){
         int userUID = (int) request.getAttribute("userUID");
         //userUID가 가입 가능한 최대 시간 구하기, 비교
         studyGroupService.checkPossibleMinStudyHourByUsersUID(userUID, req.getMinStudyHour());
@@ -145,6 +151,11 @@ public class StudyGroupController {
 
         //방장 생성
         groupMemberService.makeStudyGroupMember(groupUID, userUID, true);
+
+        //이미지 저장
+        if(!isNull(image)) { // image null일 때 기본 이미지로 설정 추가 필요
+            studyGroupService.saveGroupImage(groupUID, image);
+        }
 
         //그룹 UID return
         HashMap<String, Integer> makeStudyGroupResponse = new HashMap<>();
