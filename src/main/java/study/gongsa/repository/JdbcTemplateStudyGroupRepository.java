@@ -137,6 +137,12 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
         return result.stream().findAny();
     }
 
+    @Override
+    public void updateImgPath(int UID, String imgPath){
+        String sql = "UPDATE StudyGroup SET imgPath = ? WHERE UID = ?";
+        jdbcTemplate.update(sql, imgPath, UID);
+    }
+
     private RowMapper<StudyGroup> studyGroupRowMapper() {
         return (rs, rowNum) -> {
             StudyGroup studyGroup = new StudyGroup();
@@ -150,6 +156,7 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
             studyGroup.setIsCam(rs.getBoolean("isCam"));
             studyGroup.setIsPenalty(rs.getBoolean("isPenalty"));
             studyGroup.setMinStudyHour(rs.getTime("minStudyHour"));
+            studyGroup.setImgPath(rs.getString("imgPath"));
             studyGroup.setExpiredAt(rs.getDate("expiredAt"));
             studyGroup.setCreatedAt(rs.getTimestamp("createdAt"));
 
@@ -169,6 +176,7 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
         hashMap.put("isCam",studyGroup.getIsCam());
         hashMap.put("isPenalty",studyGroup.getIsPenalty());
         hashMap.put("minStudyHour", studyGroup.getMinStudyHour());
+        hashMap.put("imgPath", studyGroup.getImgPath());
         hashMap.put("expiredAt", studyGroup.getExpiredAt());
         hashMap.put("createdAt",studyGroup.getCreatedAt());
         hashMap.put("updatedAt",studyGroup.getUpdatedAt());
