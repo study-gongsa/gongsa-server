@@ -79,7 +79,7 @@ public class StudyGroupService {
     public int makeStudyGroup(StudyGroup studyGroup, int[] groupCategories) {
         // StudyGroup
         // make code
-        String studyGroupCode = codeGenerator.generateRandomString(6);
+        String studyGroupCode = codeGenerator.generateRandomString(12);
         studyGroup.setCode(studyGroupCode);
 
         // createdAt, updatedAt
