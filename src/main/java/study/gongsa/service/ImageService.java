@@ -20,11 +20,15 @@ import java.util.stream.Stream;
 public class ImageService {
     private final Path root = Paths.get("image"); // controller, service 폴더 있는 곳
 
+    public ImageService(){
+        init();
+    }
+
     public void init() { //서버 최초 실행 때만
         try {
             Files.createDirectory(root);
         } catch (IOException e) {
-            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "image", e.getMessage());
+            System.out.println("image init() "+e.getMessage());
         }
     }
 
