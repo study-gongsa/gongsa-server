@@ -12,6 +12,7 @@ public class StudyGroupDTO {
     @AllArgsConstructor
     public static class Search{
         private int studyGroupUID;
+        private String imgPath;
         private String name;
         private Boolean isCam;
         private Date createdAt;
@@ -28,6 +29,8 @@ public class StudyGroupDTO {
         private String name;
         private Boolean isCam;
         private int minStudyHour;
+        private int maxMember;
+        private int currentMember;
         private Date createdAt;
         private Date expiredAt;
         private ArrayList<CategoryDTO> categories;
