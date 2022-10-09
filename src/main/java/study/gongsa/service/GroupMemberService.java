@@ -80,6 +80,11 @@ public class GroupMemberService {
         }
     }
 
+    public int findCurrentGroupMemberCnt(int groupUID) {
+        Optional<Map<String, Integer>> memberCntInfo = studyGroupRepository.findMemberCntInfoByGroupUID(groupUID);
+        return memberCntInfo.get().get("memberCnt");
+    }
+
     public List<GroupMemberResponse.Member> getMembers(int groupUID){
         List<GroupMemberUserInfo> memberInfoList = groupMemberRepository.findMemberInfo(groupUID);
 
