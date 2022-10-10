@@ -87,7 +87,7 @@ public class GroupMemberController {
             @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등)")
     })
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "groupUID", value = "스터디 그룹 UID", required = true, dataType = "int", paramType = "query", example = "0"),
+            @ApiImplicitParam(name = "groupUID", value = "스터디 그룹 UID", required = true, dataType = "int", paramType = "path", example = "0"),
     })
     @GetMapping("/{groupUID}")
     public ResponseEntity getGroupMember(@PathVariable("groupUID") int groupUID, HttpServletRequest request){
