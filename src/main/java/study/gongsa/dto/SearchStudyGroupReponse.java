@@ -21,6 +21,7 @@ public class SearchStudyGroupReponse {
         for(StudyGroup studyGroup: studyGroupList){
             StudyGroupDTO.Search studyGroupDTO = new StudyGroupDTO.Search();
             studyGroupDTO.setStudyGroupUID(studyGroup.getUID());
+            studyGroupDTO.setImgPath(studyGroup.getImgPath());
             studyGroupDTO.setName(studyGroup.getName());
             studyGroupDTO.setIsCam(studyGroup.getIsCam());
             studyGroupDTO.setCreatedAt(studyGroup.getCreatedAt());

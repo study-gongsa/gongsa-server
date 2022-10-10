@@ -53,8 +53,9 @@ public class StudyGroupController {
     @GetMapping("/{groupUID}")
     public ResponseEntity findOneByUID(@PathVariable("groupUID") int groupUID){
         StudyGroup studyGroupInfo = studyGroupService.findOneByUID(groupUID);
+        int currentMember = groupMemberService.findCurrentGroupMemberCnt(groupUID);
         List<Category> categories = categoryService.getStudyGroupCategory(groupUID);
-        DefaultResponse response = new DefaultResponse(new GetStudyGroupInfoResponse(studyGroupInfo, categories));
+        DefaultResponse response = new DefaultResponse(new GetStudyGroupInfoResponse(studyGroupInfo, categories, currentMember));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
@@ -71,8 +72,9 @@ public class StudyGroupController {
     @GetMapping("/code/{code}")
     public ResponseEntity findOneByUID(@PathVariable("code") String code){
         StudyGroup studyGroupInfo = studyGroupService.findOneByCode(code);
+        int currentMember = groupMemberService.findCurrentGroupMemberCnt(studyGroupInfo.getUID());
         List<Category> categories = categoryService.getStudyGroupCategory(studyGroupInfo.getUID());
-        DefaultResponse response = new DefaultResponse(new GetStudyGroupInfoResponse(studyGroupInfo, categories));
+        DefaultResponse response = new DefaultResponse(new GetStudyGroupInfoResponse(studyGroupInfo, categories, currentMember));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 

@@ -18,9 +18,11 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class GetStudyGroupInfoResponse {
-    public GetStudyGroupInfoResponse(StudyGroup studyGroup, List<Category> categories){
+    public GetStudyGroupInfoResponse(StudyGroup studyGroup, List<Category> categories, int currentMember){
         this.groupUID = studyGroup.getUID();
         this.name = studyGroup.getName();
+        this.maxMember = studyGroup.getMaxMember();
+        this.currentMember = currentMember;
         this.code = studyGroup.getCode();
         this.isCam = studyGroup.getIsCam();
         this.minStudyHour = studyGroup.getMinStudyHour();
@@ -43,6 +45,12 @@ public class GetStudyGroupInfoResponse {
 
     @ApiModelProperty(value="스터디 그룹명")
     private String name;
+
+    @ApiModelProperty(value="최대 멤버 수")
+    private int maxMember;
+
+    @ApiModelProperty(value="현재 가입된 멤버 수")
+    private int currentMember;
 
     @ApiModelProperty(value="코드")
     private String code;
