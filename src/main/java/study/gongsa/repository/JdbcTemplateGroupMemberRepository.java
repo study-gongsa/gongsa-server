@@ -78,10 +78,11 @@ public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
                 "LEFT JOIN StudyMember sm ON sm.groupMemberUID = mi.groupMemberUID " +
                 "GROUP BY mi.groupMemberUID " +
                 "ORDER BY totalStudyTime desc ";
-        String subQuery2 = "SELECT IFNULL(sm.studyStatus, 'stop') AS studyStatus, MAX(sm.updatedAt) AS updatedAt, " +
+        String subQuery2 = "SELECT IFNULL(sm.studyStatus, 'inactive') AS studyStatus, MAX(sm.updatedAt) AS updatedAt, " +
                 "mi.userUID, mi.nickname, mi.imgPath " +
                 "FROM MemberInfo mi " +
-                "LEFT JOIN StudyMember sm ON sm.groupMemberUID = mi.groupMemberUID ";
+                "LEFT JOIN StudyMember sm ON sm.groupMemberUID = mi.groupMemberUID " +
+                "GROUP BY mi.userUID ";
 
         String query = with + "SELECT * FROM ( " + subQuery1 + ") AS studyTimeTable  " +
                 "INNER JOIN ( "+ subQuery2 +") AS studyStatusTable ON studyTimeTable.userUID = studyStatusTable.userUID";
