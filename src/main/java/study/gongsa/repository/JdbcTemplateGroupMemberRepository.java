@@ -76,8 +76,7 @@ public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
                 "IFNULL(TIME(SUM(sm.studyTime)),TIME(0)) AS totalStudyTime, mi.userUID " +
                 "FROM MemberInfo mi " +
                 "LEFT JOIN StudyMember sm ON sm.groupMemberUID = mi.groupMemberUID " +
-                "GROUP BY mi.groupMemberUID " +
-                "ORDER BY totalStudyTime desc ";
+                "GROUP BY mi.groupMemberUID ";
         String subQuery2 = "SELECT IFNULL(sm.studyStatus, 'inactive') AS studyStatus, MAX(sm.updatedAt) AS updatedAt, " +
                 "mi.userUID, mi.nickname, mi.imgPath " +
                 "FROM MemberInfo mi " +
@@ -85,7 +84,8 @@ public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
                 "GROUP BY mi.userUID ";
 
         String query = with + "SELECT * FROM ( " + subQuery1 + ") AS studyTimeTable  " +
-                "INNER JOIN ( "+ subQuery2 +") AS studyStatusTable ON studyTimeTable.userUID = studyStatusTable.userUID";
+                "INNER JOIN ( "+ subQuery2 +") AS studyStatusTable ON studyTimeTable.userUID = studyStatusTable.userUID "+
+                "ORDER BY studyTimeTable.ranking ";
 
         List<GroupMemberUserInfo> result = jdbcTemplate.query(query, groupMemberUserInfoRowMapper(), groupUID);
         return result.stream().collect(Collectors.toList());
