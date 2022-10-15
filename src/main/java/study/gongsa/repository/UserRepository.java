@@ -1,6 +1,7 @@
 package study.gongsa.repository;
 
 import study.gongsa.domain.User;
+import study.gongsa.dto.UserMyPageInfo;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -19,4 +20,6 @@ public interface UserRepository {
     void updateNicknameAndImage(int uid, String nickname, String imgPath, Timestamp updatedAt);
 
     Optional<User> findByNicknameExceptUser(String nickname, int uid);
+
+    Optional<UserMyPageInfo> getUserMyPageInfo(int uid);
 }
