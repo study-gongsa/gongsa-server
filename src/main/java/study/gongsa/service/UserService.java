@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import study.gongsa.domain.User;
 import study.gongsa.dto.MailDto;
 import study.gongsa.dto.MyPageUserResponse;
+import study.gongsa.dto.UserMyPageInfo;
 import study.gongsa.repository.UserRepository;
 import study.gongsa.support.CodeGenerator;
 import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
@@ -166,20 +167,12 @@ public class UserService {
 
     public MyPageUserResponse.Setting getUserSettingInfo(int userUID) {
         Optional<User> userByUID = userRepository.findByUID(userUID);
-        if (userByUID.isEmpty()){
-            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, null,"등록되지 않은 회원입니다.");
-        }
 
         MyPageUserResponse.Setting settingUserInfo = new MyPageUserResponse.Setting(userByUID.get().getImgPath(), userByUID.get().getNickname());
         return settingUserInfo;
     }
 
     public void changePasswd(int uid, String nextPasswd){
-        Optional<User> userByUID = userRepository.findByUID(uid);
-        if (userByUID.isEmpty()){
-            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, null,"등록되지 않은 회원입니다.");
-        }
-        User user = userByUID.get();
         String encryptedPassword = passwordEncoder.encode(nextPasswd);
         //user 정보 업데이트
         userRepository.updatePasswd(encryptedPassword, new Timestamp(new Date().getTime()), uid);
@@ -201,5 +194,17 @@ public class UserService {
             // 기존 이미지 삭제
         }
         userRepository.updateNicknameAndImage(uid, nickname, fileName, new Timestamp(new Date().getTime()));
+    }
+
+    public MyPageUserResponse.Info getUserMyPageInfo(int uid) {
+        Optional<UserMyPageInfo> userMyPageInfo = userRepository.getUserMyPageInfo(uid);
+
+        //cnt, ranking으로 퍼센트 계산하기
+        UserMyPageInfo user = userMyPageInfo.get();
+        Double percentage = Double.valueOf((double)user.getRanking()/user.getCnt() * 100);
+        percentage = Math.round(percentage * 100) / 100.0; //소수점 둘째자리까지
+
+        MyPageUserResponse.Info userInfo = new MyPageUserResponse.Info(user, percentage);
+        return userInfo;
     }
 }
