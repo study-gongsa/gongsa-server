@@ -72,6 +72,19 @@ public class JdbcTemplateUserRepository implements UserRepository {
         return jdbcTemplate.queryForObject("select isAuth from User where UID = ?", Boolean.class, uid);
     }
 
+    @Override
+    public void updateNicknameAndImage(int uid, String nickname, String imgPath, Timestamp updatedAt){
+        String sql = "update User set nickname=?, imgPath=?, updatedAt=? " + " where UID=?";
+        jdbcTemplate.update(sql, nickname, imgPath, updatedAt, uid);
+    }
+
+    @Override
+    public Optional<User> findByNicknameExceptUser(String nickname, int uid){
+        String query = "select * from User where nickname = ? and UID != ?";
+        List<User> result = jdbcTemplate.query(query, userRowMapper(), nickname, uid);
+        return result.stream().findAny();
+    }
+
     private RowMapper<User> userRowMapper() {
         return (rs, rowNum) -> {
             User user = new User();

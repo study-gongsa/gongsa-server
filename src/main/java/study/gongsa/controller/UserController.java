@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import study.gongsa.domain.UserAuth;
 import study.gongsa.dto.*;
 import study.gongsa.domain.User;
@@ -21,6 +22,8 @@ import study.gongsa.support.jwt.JwtTokenProvider;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Map;
+
+import static java.util.Objects.isNull;
 
 @RestController
 @CrossOrigin("*")
@@ -160,6 +163,28 @@ public class UserController {
         DefaultResponse response = new DefaultResponse(userSettingInfo);
         return new ResponseEntity(response, HttpStatus.OK);
     }
-    
 
+    @ApiOperation(value="환경 설정-유저 정보 변경")
+    @ApiResponses({
+            @ApiResponse(code=200, message="환경 설정 유저 정보 변경 성공"),
+            @ApiResponse(code=401, message="로그인 정보 불일치 에러"),
+    })
+    @PostMapping("")
+    @Transactional
+    public ResponseEntity changeUserSettingInfo(@RequestPart("json") @Valid ChangeUserInfoRequest req,
+                                                @RequestPart(value = "image", required = false) MultipartFile image,
+                                                HttpServletRequest request){
+        int userUID = (int) request.getAttribute("userUID");
+
+        //비밀번호 null이면 미변경
+        if(!isNull(req.getPasswd())){
+            userService.changePasswd(userUID, req.getPasswd());
+        }
+
+        //닉네임, 이미지 변경
+        userService.changeUserSettingInfo(userUID, req.getNickname(), image, req.getChangeImage());
+
+        DefaultResponse response = new DefaultResponse();
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
 }
