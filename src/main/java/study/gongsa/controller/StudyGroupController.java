@@ -155,9 +155,7 @@ public class StudyGroupController {
         groupMemberService.makeStudyGroupMember(groupUID, userUID, true);
 
         //이미지 저장
-        if(!isNull(image)) { // image null일 때 기본 이미지로 설정 추가 필요
-            studyGroupService.saveGroupImage(groupUID, image);
-        }
+        studyGroupService.saveGroupImage(groupUID, image);
 
         //그룹 UID return
         HashMap<String, Integer> makeStudyGroupResponse = new HashMap<>();
