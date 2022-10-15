@@ -56,6 +56,10 @@ public class UserService {
         String encryptedPassword = passwordEncoder.encode(user.getPasswd());
         user.setPasswd(encryptedPassword);
 
+        //랜덤 이미지 설정
+        String fileName = "r"+codeGenerator.generateRandomNumber(1)+"jpg";
+        user.setImgPath(fileName);
+
         return userRepository.save(user);
     }
 
