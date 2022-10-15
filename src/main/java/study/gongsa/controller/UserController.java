@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import study.gongsa.domain.UserAuth;
 import study.gongsa.dto.*;
@@ -146,5 +147,19 @@ public class UserController {
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
+    @ApiOperation(value="환경 설정-유저 정보 조회")
+    @ApiResponses({
+            @ApiResponse(code=200, message="환경 설정 유저 정보 반환"),
+            @ApiResponse(code=401, message="로그인 정보 불일치 에러"),
+    })
+    @GetMapping("")
+    public ResponseEntity getUserSettingInfo(HttpServletRequest request){
+        int userUID = (int) request.getAttribute("userUID");
+        MyPageUserResponse.Setting userSettingInfo = userService.getUserSettingInfo(userUID);
+
+        DefaultResponse response = new DefaultResponse(userSettingInfo);
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+    
 
 }
