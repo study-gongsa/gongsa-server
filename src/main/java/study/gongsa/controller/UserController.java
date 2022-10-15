@@ -1,6 +1,5 @@
 package study.gongsa.controller;
 
-import io.jsonwebtoken.Claims;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -21,7 +20,6 @@ import study.gongsa.support.jwt.JwtTokenProvider;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.Map;
 
 import static java.util.Objects.isNull;
 
@@ -148,6 +146,20 @@ public class UserController {
 
         DefaultResponse response = new DefaultResponse(new RefreshResponse(accessToken));
         return new ResponseEntity(response, HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value="마이페이지-유저 정보 조회")
+    @ApiResponses({
+            @ApiResponse(code=200, message="마이페이지 유저 정보 반환"),
+            @ApiResponse(code=401, message="로그인 정보 불일치 에러"),
+    })
+    @GetMapping("/mypage")
+    public ResponseEntity getUserInfo(HttpServletRequest request){
+        int userUID = (int) request.getAttribute("userUID");
+        MyPageUserResponse.Info userMypageInfo = userService.getUserMyPageInfo(userUID);
+
+        DefaultResponse response = new DefaultResponse(userMypageInfo);
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
     @ApiOperation(value="환경 설정-유저 정보 조회")

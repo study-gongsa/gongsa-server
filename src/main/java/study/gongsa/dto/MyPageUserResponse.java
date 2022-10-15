@@ -16,6 +16,14 @@ public class MyPageUserResponse {
         private Time totalStudyTime;
         private Integer level;
         private Double percentage;
+
+        public Info(UserMyPageInfo user, Double percentage){
+            this.imgPath = user.getImgPath();
+            this.nickname = user.getNickname();
+            this.totalStudyTime = user.getTotalStudyTime();
+            this.level = user.getLevel();
+            this.percentage = percentage;
+        }
     }
 
     @Getter
