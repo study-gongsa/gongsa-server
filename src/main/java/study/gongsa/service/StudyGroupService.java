@@ -16,6 +16,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
+
 @Service
 public class StudyGroupService {
     private final StudyGroupRepository studyGroupRepository;
@@ -105,10 +107,16 @@ public class StudyGroupService {
         return minStudyHour.get();
     }
 
-    public void saveGroupImage (int groupUID, MultipartFile image){
-        String fileName = "g" + groupUID + ".jpg"; //groupImage rename
-        imageService.save(image, fileName);
-        studyGroupRepository.updateImgPath(groupUID, fileName);
+    public void saveGroupImage (int uid, MultipartFile image){
+        String fileName = "g" + uid + ".jpg"; //groupImage rename
+
+        if( !isNull(image) && !image.isEmpty() ){ // 받은 이미지 저장
+            imageService.save(image, fileName);
+        }else{ //이미지 없으면 랜덤 이미지 지정
+            fileName = "r"+codeGenerator.generateRandomNumber(1)+"jpg";
+        }
+
+        studyGroupRepository.updateImgPath(uid, fileName);
     }
 
     public int getMaxMember(int groupUID){
