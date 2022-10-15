@@ -15,4 +15,8 @@ public interface UserRepository {
     Optional<User> findByEmail(String email);
     Optional<User> findByNickname(String nickname);
     boolean isAuth(int uid);
+
+    void updateNicknameAndImage(int uid, String nickname, String imgPath, Timestamp updatedAt);
+
+    Optional<User> findByNicknameExceptUser(String nickname, int uid);
 }
