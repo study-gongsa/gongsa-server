@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import study.gongsa.domain.User;
 import study.gongsa.dto.MailDto;
+import study.gongsa.dto.MyPageUserResponse;
 import study.gongsa.repository.UserRepository;
 import study.gongsa.support.CodeGenerator;
 import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
@@ -156,5 +157,15 @@ public class UserService {
 
     public boolean isAuth(int uid){
         return userRepository.isAuth(uid);
+    }
+
+    public MyPageUserResponse.Setting getUserSettingInfo(int userUID) {
+        Optional<User> userByUID = userRepository.findByUID(userUID);
+        if (userByUID.isEmpty()){
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, null,"등록되지 않은 회원입니다.");
+        }
+
+        MyPageUserResponse.Setting settingUserInfo = new MyPageUserResponse.Setting(userByUID.get().getImgPath(), userByUID.get().getNickname());
+        return settingUserInfo;
     }
 }
