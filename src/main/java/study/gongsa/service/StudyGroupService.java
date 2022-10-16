@@ -116,4 +116,8 @@ public class StudyGroupService {
         if(maxMember.isEmpty()) throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "groupUID", "존재하지 않는 그룹입니다.");
         return maxMember.get();
     }
+
+    public List<StudyGroup> findMyStudyGroup(int userUID){
+        return studyGroupRepository.findMyStudyGroup(userUID);
+    }
 }

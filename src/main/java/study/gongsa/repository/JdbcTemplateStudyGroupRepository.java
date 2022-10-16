@@ -150,6 +150,16 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
         return result.stream().findAny();
     }
 
+    @Override
+    public List<StudyGroup> findMyStudyGroup(int userUID) {
+        System.out.println(userUID);
+        String sql = "SELECT * "
+                + "FROM StudyGroup a "
+                + "JOIN GroupMember b ON a.UID = b.groupUID "
+                + "WHERE b.userUID = ?";
+        return jdbcTemplate.query(sql, studyGroupRowMapper(), userUID);
+    }
+
     private RowMapper<StudyGroup> studyGroupRowMapper() {
         return (rs, rowNum) -> {
             StudyGroup studyGroup = new StudyGroup();
