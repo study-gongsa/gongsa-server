@@ -30,6 +30,6 @@ public class ServletContext implements WebMvcConfigurer {
         registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/**") // Interceptor가 적용될 경로
                 .excludePathPatterns(new String[]{"/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/swagger-ui/**", "/webjars /**", //swagger 문서 제외
-                        "/api/user/login", "/api/user/join", "/api/user/mail/join", "/api/user/code", "/api/user/mail/passwd"}); // 회원가입, 로그인, 이메일 인증 api 제외
+                        "/api/user/login", "/api/user/join", "/api/user/mail/join", "/api/user/code", "/api/user/mail/passwd", "/api/push"}); // 회원가입, 로그인, 이메일 인증 api 제외
     }
 }
