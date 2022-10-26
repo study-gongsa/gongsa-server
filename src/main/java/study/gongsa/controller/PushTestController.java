@@ -7,6 +7,8 @@ import study.gongsa.dto.DefaultResponse;
 import study.gongsa.service.FirebaseCloudMessageService;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Date;
 
 @RestController
 @CrossOrigin("*")
@@ -21,7 +23,7 @@ public class PushTestController {
 
     @GetMapping()
     public ResponseEntity sendtestPush(@RequestParam String targetToken) throws IOException {
-        firebaseCloudMessageService.sendMessageTo(targetToken, "TestTitle", "TestBody");
+        firebaseCloudMessageService.sendMessageTo(targetToken, "TestTitle", new Timestamp(new Date().getTime())+": TestBody");
 
         DefaultResponse response = new DefaultResponse();
         return new ResponseEntity(response, HttpStatus.OK);
