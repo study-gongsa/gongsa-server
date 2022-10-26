@@ -22,8 +22,7 @@ public class FirebaseCloudMessageService {
     private String firebaseConfigPath;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-
-    // FCM에 push 요청 시 Header에 사용할 Access Token 받아오기
+    
     private String getAccessToken() throws IOException {
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new
