@@ -1,6 +1,5 @@
 package study.gongsa.controller;
 
-import com.mysql.cj.util.StringUtils;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,12 +12,12 @@ import study.gongsa.domain.StudyGroup;
 import study.gongsa.dto.*;
 import study.gongsa.service.CategoryService;
 import study.gongsa.service.GroupMemberService;
-import study.gongsa.service.ImageService;
 import study.gongsa.service.StudyGroupService;
 import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -129,6 +128,34 @@ public class StudyGroupController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
+    @ApiOperation(value="나의 스터디그룹 랭킹 조회")
+    @ApiResponses({
+            @ApiResponse(code=200, message="추천 리스트 조회 성공"),
+            @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
+            @ApiResponse(code=403, message="가입되지 않은 그룹일 경우, 토큰 에러(토큰이 만료되었을 경우 등)")
+    })
+    @GetMapping("/my-ranking")
+    public ResponseEntity findMyStudyGroupRank(HttpServletRequest request){
+        int userUID = (int) request.getAttribute("userUID");
+        List<StudyGroup> groupList = studyGroupService.findMyStudyGroup(userUID);
+        List<GetMyStudyGroupRankResponse.GroupRank> groupRankList = new ArrayList<GetMyStudyGroupRankResponse.GroupRank>();;
+
+        for(StudyGroup studyGroup : groupList){
+            int groupUID = studyGroup.getUID();
+            System.out.println(groupUID);
+            List<GroupMemberResponse.Member> memberList = groupMemberService.getMembers(groupUID);
+            System.out.println(memberList);
+            GetMyStudyGroupRankResponse.GroupRank groupRank = new GetMyStudyGroupRankResponse.GroupRank();
+            groupRank.setGroupUID(groupUID);
+            groupRank.setName(studyGroup.getName());
+            groupRank.setMembers(memberList);
+            groupRankList.add(groupRank);
+        }
+
+        DefaultResponse response = new DefaultResponse(new GetMyStudyGroupRankResponse(groupRankList));
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
     @ApiOperation(value="스터디 그룹 생성")
     @ApiResponses({
             @ApiResponse(code=201, message="스터디 그룹 생성"),
@@ -155,9 +182,7 @@ public class StudyGroupController {
         groupMemberService.makeStudyGroupMember(groupUID, userUID, true);
 
         //이미지 저장
-        if(!isNull(image)) { // image null일 때 기본 이미지로 설정 추가 필요
-            studyGroupService.saveGroupImage(groupUID, image);
-        }
+        studyGroupService.saveGroupImage(groupUID, image);
 
         //그룹 UID return
         HashMap<String, Integer> makeStudyGroupResponse = new HashMap<>();

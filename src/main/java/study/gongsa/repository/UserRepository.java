@@ -1,6 +1,7 @@
 package study.gongsa.repository;
 
 import study.gongsa.domain.User;
+import study.gongsa.dto.UserMyPageInfo;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -15,4 +16,10 @@ public interface UserRepository {
     Optional<User> findByEmail(String email);
     Optional<User> findByNickname(String nickname);
     boolean isAuth(int uid);
+
+    void updateNicknameAndImage(int uid, String nickname, String imgPath, Timestamp updatedAt);
+
+    Optional<User> findByNicknameExceptUser(String nickname, int uid);
+
+    Optional<UserMyPageInfo> getUserMyPageInfo(int uid);
 }

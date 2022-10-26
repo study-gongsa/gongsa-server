@@ -5,15 +5,19 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import study.gongsa.domain.GroupMemberUserInfo;
 import study.gongsa.domain.User;
+import study.gongsa.dto.UserMyPageInfo;
 
 import javax.sql.DataSource;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class JdbcTemplateUserRepository implements UserRepository {
@@ -72,6 +76,34 @@ public class JdbcTemplateUserRepository implements UserRepository {
         return jdbcTemplate.queryForObject("select isAuth from User where UID = ?", Boolean.class, uid);
     }
 
+    @Override
+    public void updateNicknameAndImage(int uid, String nickname, String imgPath, Timestamp updatedAt){
+        String sql = "update User set nickname=?, imgPath=?, updatedAt=? " + " where UID=?";
+        jdbcTemplate.update(sql, nickname, imgPath, updatedAt, uid);
+    }
+
+    @Override
+    public Optional<User> findByNicknameExceptUser(String nickname, int uid){
+        String query = "select * from User where nickname = ? and UID != ?";
+        List<User> result = jdbcTemplate.query(query, userRowMapper(), nickname, uid);
+        return result.stream().findAny();
+    }
+
+    @Override
+    public Optional<UserMyPageInfo> getUserMyPageInfo(int uid){
+        String with = "WITH UserInfo AS (" +
+                "SELECT DENSE_RANK() OVER (ORDER BY IFNULL(SUM(sm.studyTime),0) DESC) AS ranking, " +
+                "u.UID as userUID, u.nickname, u.imgPath, u.`level`, " +
+                "IFNULL(TIME(SUM(sm.studyTime)), TIME(0)) as totalStudyTime " +
+                "FROM `User` u LEFT JOIN StudyMember sm on u.UID = sm.userUID " +
+                "WHERE u.isAuth = 1 " +
+                "GROUP BY u.UID) ";
+        String query = "SELECT * FROM (SELECT COUNT(*) as cnt FROM UserInfo) cnt " +
+                "CROSS JOIN (SELECT * FROM UserInfo WHERE userUID = ?) userInfo ";
+        List<UserMyPageInfo> result = jdbcTemplate.query(with+query, userMyPageInfoRowMapper(), uid);
+        return result.stream().findAny();
+    }
+
     private RowMapper<User> userRowMapper() {
         return (rs, rowNum) -> {
             User user = new User();
@@ -89,6 +121,22 @@ public class JdbcTemplateUserRepository implements UserRepository {
             return user;
         };
     }
+    private RowMapper<UserMyPageInfo> userMyPageInfoRowMapper(){
+        return (rs, rowNum) -> {
+            UserMyPageInfo user = new UserMyPageInfo();
+
+            user.setImgPath(rs.getString("imgPath"));
+            user.setNickname(rs.getString("nickname"));
+            user.setTotalStudyTime(rs.getTime("totalStudyTime"));
+            user.setRanking(rs.getInt("ranking"));
+            user.setCnt(rs.getInt("cnt"));
+            user.setLevel(rs.getInt("level"));
+
+            return user;
+        };
+
+    }
+
     private HashMap<String, Object> setParameter(User user) {
         HashMap<String, Object> hashMap = new HashMap<String, Object>();
         hashMap.put("UID",user.getUID());

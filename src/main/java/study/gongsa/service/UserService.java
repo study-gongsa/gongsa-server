@@ -4,8 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import study.gongsa.domain.User;
 import study.gongsa.dto.MailDto;
+import study.gongsa.dto.MyPageUserResponse;
+import study.gongsa.dto.UserMyPageInfo;
 import study.gongsa.repository.UserRepository;
 import study.gongsa.support.CodeGenerator;
 import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
@@ -16,6 +19,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
+
 @Service
 public class UserService {
 
@@ -23,13 +28,15 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final GmailSender gmailSender;
     private final CodeGenerator codeGenerator;
+    private final ImageService imageService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, GmailSender gmailSender, CodeGenerator codeGenerator){
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, GmailSender gmailSender, CodeGenerator codeGenerator, ImageService imageService){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.gmailSender = gmailSender;
         this.codeGenerator = codeGenerator;
+        this.imageService = imageService;
     }
 
     public Number join(User user){
@@ -48,6 +55,10 @@ public class UserService {
         //비밀번호 암호화
         String encryptedPassword = passwordEncoder.encode(user.getPasswd());
         user.setPasswd(encryptedPassword);
+
+        //랜덤 이미지 설정
+        String fileName = "r"+codeGenerator.generateRandomNumber(1)+"jpg";
+        user.setImgPath(fileName);
 
         return userRepository.save(user);
     }
@@ -156,5 +167,48 @@ public class UserService {
 
     public boolean isAuth(int uid){
         return userRepository.isAuth(uid);
+    }
+
+    public MyPageUserResponse.Setting getUserSettingInfo(int userUID) {
+        Optional<User> userByUID = userRepository.findByUID(userUID);
+
+        MyPageUserResponse.Setting settingUserInfo = new MyPageUserResponse.Setting(userByUID.get().getImgPath(), userByUID.get().getNickname());
+        return settingUserInfo;
+    }
+
+    public void changePasswd(int uid, String nextPasswd){
+        String encryptedPassword = passwordEncoder.encode(nextPasswd);
+        //user 정보 업데이트
+        userRepository.updatePasswd(encryptedPassword, new Timestamp(new Date().getTime()), uid);
+    }
+
+    public void changeUserSettingInfo(int uid, String nickname, MultipartFile image, Boolean changeImage) {
+        //자신 제외하고 닉네임 중복 체크
+        Optional<User> userByNickname = userRepository.findByNicknameExceptUser(nickname, uid);
+        userByNickname.ifPresent(m -> {
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST,"nickname","중복된 닉네임입니다.");
+        });
+
+        String fileName = "u" + uid + ".jpg";//userImage rename
+
+        if( !isNull(image) && !image.isEmpty() ){ // 받은 이미지 저장
+            imageService.save(image, fileName);
+        }else if(changeImage){ //이미지 없음 + 이미지 변경 원하면 랜덤 이미지 지정
+            fileName = "r"+codeGenerator.generateRandomNumber(1)+"jpg";
+            // 기존 이미지 삭제
+        }
+        userRepository.updateNicknameAndImage(uid, nickname, fileName, new Timestamp(new Date().getTime()));
+    }
+
+    public MyPageUserResponse.Info getUserMyPageInfo(int uid) {
+        Optional<UserMyPageInfo> userMyPageInfo = userRepository.getUserMyPageInfo(uid);
+
+        //cnt, ranking으로 퍼센트 계산하기
+        UserMyPageInfo user = userMyPageInfo.get();
+        Double percentage = Double.valueOf((double)user.getRanking()/user.getCnt() * 100);
+        percentage = Math.round(percentage * 100) / 100.0; //소수점 둘째자리까지
+
+        MyPageUserResponse.Info userInfo = new MyPageUserResponse.Info(user, percentage);
+        return userInfo;
     }
 }
