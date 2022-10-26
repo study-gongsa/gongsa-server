@@ -9,8 +9,7 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 @Getter
-public class FcmMessage {
-    // push 알림 보내기 위해 준수해야 하는 request body
+public class FcmMessage { // push 알림 보내기 위해 준수해야 하는 request body
     private boolean validate_only;
     private Message message;
 
