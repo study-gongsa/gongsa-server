@@ -3,19 +3,25 @@ package study.gongsa.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.jayway.jsonpath.JsonPath;
+import io.swagger.annotations.ApiModelProperty;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import study.gongsa.domain.User;
@@ -26,6 +32,13 @@ import study.gongsa.repository.UserRepository;
 import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
 import study.gongsa.support.jwt.JwtTokenProvider;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.File;
+import java.io.FileInputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Optional;
@@ -72,6 +85,7 @@ class UserControllerTest {
                 .level(1)
                 .isAuth(false)
                 .authCode("00000a")
+                .imgPath("t1.jpg")
                 .createdAt(new Timestamp(new Date().getTime()))
                 .updatedAt(new Timestamp(new Date().getTime()))
                 .build();
@@ -89,6 +103,13 @@ class UserControllerTest {
 
     @AfterEach
     void tearDown() throws Exception {
+        Path root = Paths.get("image");
+        Path file = root.resolve(root.getFileName() + "/u"+userUID+".jpg");
+        Resource resource = new UrlResource(file.toUri());
+
+        if (resource.exists() || resource.isReadable()) {
+            new File(root.getFileName() + "/u" + userUID + ".jpg").delete();
+        }
     }
 
     @Test
@@ -145,7 +166,7 @@ class UserControllerTest {
     }
 
     @Test
-    void 이메일_전송_성공() throws Exception {
+    void 이메일전송_성공() throws Exception {
         // given
         MailRequest mailRequest = new MailRequest("gong40sa04@gmail.com");
 
@@ -160,7 +181,7 @@ class UserControllerTest {
     }
 
     @Test
-    void 이메일_전송_실패_미가입자() throws Exception {
+    void 이메일전송_실패_미가입자() throws Exception {
         // given
         MailRequest mailRequest = new MailRequest("gong40sa04_@gmail.com");
 
@@ -176,7 +197,7 @@ class UserControllerTest {
     }
 
     @Test
-    void 이메일_전송_실패_인증_완료자() throws Exception {
+    void 이메일전송_실패_인증완료자() throws Exception {
         // given
         userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
         MailRequest mailRequest = new MailRequest("gong40sa04@gmail.com");
@@ -194,7 +215,7 @@ class UserControllerTest {
     }
 
     @Test
-    void 이메일_인증번호_검증_성공() throws Exception {
+    void 이메일인증번호검증_성공() throws Exception {
         // given
         CodeRequest codeRequest = new CodeRequest("gong40sa04@gmail.com","00000a");
 
@@ -210,7 +231,7 @@ class UserControllerTest {
     }
 
     @Test
-    void 이메일_인증번호_검증_실패_미가입자() throws Exception {
+    void 이메일인증번호검증_실패_미가입자() throws Exception {
         // given
         CodeRequest codeRequest = new CodeRequest("gong40sa04_@gmail.com","000000");
 
@@ -227,7 +248,7 @@ class UserControllerTest {
     }
 
     @Test
-    void 이메일_인증번호_검증_실패_잘못된_인증코드() throws Exception {
+    void 이메일인증번호검증_실패_잘못된인증코드() throws Exception {
         // given
         CodeRequest codeRequest = new CodeRequest("gong40sa04@gmail.com","00000b");
 
@@ -244,7 +265,7 @@ class UserControllerTest {
     }
 
     @Test
-    void 이메일_인증번호_검증_실패_만료된_인증코드() throws Exception {
+    void 이메일인증번호검증_실패_만료된인증코드() throws Exception {
         // given
         userRepository.update("update User set updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()-(24 * 60 * 60 * 1000)));
         CodeRequest codeRequest = new CodeRequest("gong40sa04@gmail.com","00000a");
@@ -262,7 +283,7 @@ class UserControllerTest {
     }
 
     @Test
-    void 임시_비밀번호_생성_전송_성공() throws Exception {
+    void 임시비밀번호생성전송_성공() throws Exception {
         // given
         MailRequest mailRequest = new MailRequest("gong40sa04@gmail.com");
 
@@ -278,7 +299,7 @@ class UserControllerTest {
     }
 
     @Test
-    void 임시_비밀번호_생성_전송_실패_미가입자() throws Exception {
+    void 임시비밀번호생성전송_실패_미가입자() throws Exception {
         // given
         MailRequest mailRequest = new MailRequest("gong40sa04_@gmail.com");
 
@@ -331,7 +352,7 @@ class UserControllerTest {
     }
 
     @Test
-    void 로그인_실패_비밀번호_불일치() throws Exception {
+    void 로그인_실패_비밀번호불일치() throws Exception {
         // given
         LoginRequest loginRequest = new LoginRequest("gong40sa04@gmail.com", "123456789");
 
@@ -348,7 +369,7 @@ class UserControllerTest {
     }
 
     @Test
-    void 로그인_연장_성공() throws Exception {
+    void 로그인연장_성공() throws Exception {
         // given
         userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
         RefreshRequest refreshRequest = new RefreshRequest(refreshToken);
@@ -367,7 +388,7 @@ class UserControllerTest {
     }
 
     @Test
-    void 로그인_연장_실패_refreshToken_불일치() throws Exception {
+    void 로그인연장_실패_refreshToken불일치() throws Exception {
         // given
         userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
         RefreshRequest refreshRequest = new RefreshRequest(refreshToken+"_fail");
@@ -386,7 +407,7 @@ class UserControllerTest {
     }
 
     @Test
-    void 비정상_access_token_로그인_필요() throws Exception {
+    void 비정상accessToken_로그인필요() throws Exception {
         // given
         RefreshRequest refreshRequest = new RefreshRequest(refreshToken);
 
@@ -404,7 +425,7 @@ class UserControllerTest {
     }
 
     @Test
-    void 비정상_access_token_미인증자() throws Exception {
+    void 비정상accessToken_미인증자() throws Exception {
         // given
         RefreshRequest refreshRequest = new RefreshRequest(refreshToken);
 
@@ -422,9 +443,10 @@ class UserControllerTest {
     }
 
     @Test
-    void 비밀번호_변경_성공() throws Exception {
+    void 비밀번호변경_성공() throws Exception {
         // given
         userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+
         ChangePasswdRequest changePasswdRequest = new ChangePasswdRequest("12345678", "123456789");
 
         // when
@@ -440,9 +462,10 @@ class UserControllerTest {
     }
 
     @Test
-    void 비밀번호_변경_실패_현재_비밀번호_불일치() throws Exception{
+    void 비밀번호변경_실패_현재비밀번호불일치() throws Exception{
         // given
         userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+
         ChangePasswdRequest changePasswdRequest = new ChangePasswdRequest("12345678_fail", "123456789");
 
         // when
@@ -459,9 +482,10 @@ class UserControllerTest {
     }
 
     @Test
-    void 비밀번호_변경_실패_비밀번호가_이전과_동일() throws Exception{
+    void 비밀번호변경_실패_비밀번호가이전과동일() throws Exception{
         // given
         userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+
         ChangePasswdRequest changePasswdRequest = new ChangePasswdRequest("12345678", "12345678");
 
         // when
@@ -478,45 +502,136 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("마이페이지 유저 정보 조회")
-    void getUserInfo() throws Exception {
+    void 마이페이지_유저정보조회_성공() throws Exception {
         // given
-        
+        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
 
         // when
-
+        ResultActions resultActions = mockMvc.perform(get(baseURL+"/mypage")
+                        .header("Authorization", "Bearer "+accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print());
 
         // then
-
-
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.imgPath").exists())
+                .andExpect(jsonPath("$.data.nickname").exists())
+                .andExpect(jsonPath("$.data.totalStudyTime").exists())
+                .andExpect(jsonPath("$.data.level").exists())
+                .andExpect(jsonPath("$.data.percentage").exists());
     }
 
     @Test
-    @DisplayName("환경설정 유저 정보 조회")
-    void getUserSettingInfo() throws Exception {
+    void 환경설정_유저정보조회_성공() throws Exception {
         // given
-
+        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
 
         // when
-
+        ResultActions resultActions = mockMvc.perform(get(baseURL)
+                        .header("Authorization", "Bearer "+accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print());
 
         // then
-
-
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.imgPath").exists())
+                .andExpect(jsonPath("$.data.nickname").exists());
     }
 
     @Test
-    @DisplayName("환경설정 유저 정보 변경")
-    void changeUserSettingInfo() throws Exception {
+    void 환경설정_유저정보변경_성공_이미지미변경() throws Exception {
         // given
+        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
 
+        ChangeUserInfoRequest changeUserInfoRequest = new ChangeUserInfoRequest("통합테스트_","123456789",false);
+        MockMultipartFile json = new MockMultipartFile("json","json","application/json",
+                objectMapper.writeValueAsString(changeUserInfoRequest).getBytes());
 
         // when
-
+        ResultActions resultActions = mockMvc.perform(multipart(HttpMethod.PATCH,baseURL)
+                        .file(json)
+                        .header("Authorization", "Bearer "+accessToken))
+                .andDo(print());
 
         // then
-
-
+        resultActions.andExpect(status().isOk());
     }
 
+    @Test
+    void 환경설정_유저정보변경_성공_이미지변경() throws Exception{
+        // given
+        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+
+        Path root = Paths.get("image");
+        String filePath = root.getFileName() + "/t1.jpg";
+        FileInputStream fileInputStream = new FileInputStream(filePath);
+
+        ChangeUserInfoRequest changeUserInfoRequest = new ChangeUserInfoRequest("통합테스트_","123456789",true);
+        MockMultipartFile json = new MockMultipartFile("json","json","application/json",
+                objectMapper.writeValueAsString(changeUserInfoRequest).getBytes());
+        MockMultipartFile image = new MockMultipartFile("image", "r1.jpg", "img", fileInputStream);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(multipart(HttpMethod.PATCH,baseURL)
+                        .file(json)
+                        .file(image)
+                        .header("Authorization", "Bearer "+accessToken))
+                .andDo(print());
+
+        // then
+        resultActions.andExpect(status().isOk());
+    }
+
+    @Test
+    void 환경설정_유저정보변경_성공_랜덤이미지변경() throws Exception{
+        // given
+        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+
+        ChangeUserInfoRequest changeUserInfoRequest = new ChangeUserInfoRequest("통합테스트_","123456789",true);
+        MockMultipartFile json = new MockMultipartFile("json","json","application/json",
+                objectMapper.writeValueAsString(changeUserInfoRequest).getBytes());
+
+        // when
+        ResultActions resultActions = mockMvc.perform(multipart(HttpMethod.PATCH,baseURL)
+                        .file(json)
+                        .header("Authorization", "Bearer "+accessToken))
+                .andDo(print());
+
+        // then
+        resultActions.andExpect(status().isOk());
+    }
+
+    @Test
+    void 환경설정_유저정보변경_실패_닉네임중복() throws Exception{
+        // given
+        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+        User user = User.builder()
+                .email("gong40sa04_@gmail.com")
+                .passwd(passwordEncoder.encode("12345678"))
+                .nickname("통합테스트_")
+                .level(1)
+                .isAuth(true)
+                .authCode("00000a")
+                .imgPath("t1.jpg")
+                .createdAt(new Timestamp(new Date().getTime()))
+                .updatedAt(new Timestamp(new Date().getTime()))
+                .build();
+        userRepository.save(user).intValue();
+
+        ChangeUserInfoRequest changeUserInfoRequest = new ChangeUserInfoRequest("통합테스트_","123456789",true);
+        MockMultipartFile json = new MockMultipartFile("json","json","application/json",
+                objectMapper.writeValueAsString(changeUserInfoRequest).getBytes());
+
+        // when
+        ResultActions resultActions = mockMvc.perform(multipart(HttpMethod.PATCH,baseURL)
+                        .file(json)
+                        .header("Authorization", "Bearer "+accessToken))
+                .andDo(print());
+
+        // then
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.location").value("nickname"));
+    }
 }
