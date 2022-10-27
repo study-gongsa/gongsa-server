@@ -52,6 +52,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest // 통합 테스트이므로
 class UserControllerTest {
 
+    private static String baseURL = "/api/user";
+    private Integer userUID;
+    private String accessToken;
+    private String refreshToken;
+
     @Autowired
     private WebApplicationContext context;
     @Autowired
@@ -66,10 +71,6 @@ class UserControllerTest {
     private JwtTokenProvider jwtTokenProvider;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    private static String baseURL = "/api/user";
-    private Integer userUID;
-    private String accessToken;
-    private String refreshToken;
 
     @BeforeEach
     void setUp() throws Exception {
