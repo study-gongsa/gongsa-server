@@ -1,9 +1,6 @@
 package study.gongsa.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -12,6 +9,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class UserAuth {
     public UserAuth(int userUID, String refreshToken) {
         this.userUID = userUID;
