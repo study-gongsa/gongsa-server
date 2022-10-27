@@ -104,11 +104,11 @@ class UserControllerTest {
     @AfterEach
     void tearDown() throws Exception {
         Path root = Paths.get("image");
-        Path file = root.resolve(root.getFileName() + "/u"+userUID+".jpg");
-        Resource resource = new UrlResource(file.toUri());
+        String filePath = root.getFileName() + "/u"+userUID+".jpg";
+        File file = new File(filePath);
 
-        if (resource.exists() || resource.isReadable()) {
-            new File(root.getFileName() + "/u" + userUID + ".jpg").delete();
+        if (file.exists()) {
+            file.delete();
         }
     }
 
