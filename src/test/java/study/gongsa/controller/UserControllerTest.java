@@ -1,25 +1,34 @@
 package study.gongsa.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import study.gongsa.domain.User;
+import study.gongsa.domain.UserAuth;
 import study.gongsa.dto.*;
+import study.gongsa.repository.UserAuthRepository;
 import study.gongsa.repository.UserRepository;
+import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
+import study.gongsa.support.jwt.JwtTokenProvider;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -39,11 +48,15 @@ class UserControllerTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private UserAuthRepository userAuthRepository;
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+    @Autowired
     private PasswordEncoder passwordEncoder;
     private static String baseURL = "/api/user";
-    private Number userUID;
-
-
+    private Integer userUID;
+    private String accessToken;
+    private String refreshToken;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -62,8 +75,16 @@ class UserControllerTest {
                 .createdAt(new Timestamp(new Date().getTime()))
                 .updatedAt(new Timestamp(new Date().getTime()))
                 .build();
+        userUID = userRepository.save(user).intValue();
 
-        userUID = userRepository.save(user);
+        refreshToken = jwtTokenProvider.makeRefreshToken(userUID);
+        Integer userAuthUID = userAuthRepository.save(UserAuth.builder()
+                        .userUID(userUID)
+                        .refreshToken(refreshToken)
+                        .createdAt(new Timestamp(new Date().getTime()))
+                        .updatedAt(new Timestamp(new Date().getTime()))
+                .build()).intValue();
+        accessToken = jwtTokenProvider.makeAccessToken(userUID, userAuthUID);
     }
 
     @AfterEach
@@ -286,8 +307,10 @@ class UserControllerTest {
                 .andDo(print());
 
         // then
-        resultActions.andExpect(status().isCreated())
-                .andExpect(jsonPath("$.data.accessToken").exists());
+        MvcResult mvcResult = resultActions.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.accessToken").exists())
+                .andExpect(jsonPath("$.data.refreshToken").exists())
+                .andReturn();
     }
 
     @Test
@@ -327,43 +350,138 @@ class UserControllerTest {
     @Test
     void 로그인_연장_성공() throws Exception {
         // given
-
+        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+        RefreshRequest refreshRequest = new RefreshRequest(refreshToken);
 
         // when
-
+        ResultActions resultActions = mockMvc.perform(post(baseURL+"/login/refresh")
+                        .header("Authorization", "Bearer "+accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(refreshRequest))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print());
 
         // then
-
-
+        resultActions.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.accessToken").exists());
     }
 
     @Test
     void 로그인_연장_실패_refreshToken_불일치() throws Exception {
-    }
-
-    @Test
-    void 로그인_연장_실패_잘못된_accessToken() throws Exception {
-    }
-
-    @Test
-    @DisplayName("비밀번호 변경")
-    void changePasswd2() throws Exception {
         // given
-
+        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+        RefreshRequest refreshRequest = new RefreshRequest(refreshToken+"_fail");
 
         // when
-
+        ResultActions resultActions = mockMvc.perform(post(baseURL+"/login/refresh")
+                        .header("Authorization", "Bearer "+accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(refreshRequest))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print());
 
         // then
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.location").value("refreshToken"));
+    }
 
+    @Test
+    void 비정상_access_token_로그인_필요() throws Exception {
+        // given
+        RefreshRequest refreshRequest = new RefreshRequest(refreshToken);
 
+        // when
+        ResultActions resultActions = mockMvc.perform(post(baseURL+"/login/refresh")
+                        .header("Authorization", "Bearer "+accessToken+"_fail")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(refreshRequest))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print());
+
+        // then
+        resultActions.andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.location").value("auth"));
+    }
+
+    @Test
+    void 비정상_access_token_미인증자() throws Exception {
+        // given
+        RefreshRequest refreshRequest = new RefreshRequest(refreshToken);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post(baseURL+"/login/refresh")
+                        .header("Authorization", "Bearer "+accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(refreshRequest))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print());
+
+        // then
+        resultActions.andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.location").value("auth"));
+    }
+
+    @Test
+    void 비밀번호_변경_성공() throws Exception {
+        // given
+        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+        ChangePasswdRequest changePasswdRequest = new ChangePasswdRequest("12345678", "123456789");
+
+        // when
+        ResultActions resultActions = mockMvc.perform(patch(baseURL+"/passwd")
+                        .header("Authorization", "Bearer "+accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(changePasswdRequest))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print());
+
+        // then
+        resultActions.andExpect(status().isOk());
+    }
+
+    @Test
+    void 비밀번호_변경_실패_현재_비밀번호_불일치() throws Exception{
+        // given
+        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+        ChangePasswdRequest changePasswdRequest = new ChangePasswdRequest("12345678_fail", "123456789");
+
+        // when
+        ResultActions resultActions = mockMvc.perform(patch(baseURL+"/passwd")
+                        .header("Authorization", "Bearer "+accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(changePasswdRequest))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print());
+
+        // then
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.location").value("currentPasswd"));
+    }
+
+    @Test
+    void 비밀번호_변경_실패_비밀번호가_이전과_동일() throws Exception{
+        // given
+        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+        ChangePasswdRequest changePasswdRequest = new ChangePasswdRequest("12345678", "12345678");
+
+        // when
+        ResultActions resultActions = mockMvc.perform(patch(baseURL+"/passwd")
+                        .header("Authorization", "Bearer "+accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(changePasswdRequest))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print());
+
+        // then
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.location").value("nextPasswd"));
     }
 
     @Test
     @DisplayName("마이페이지 유저 정보 조회")
     void getUserInfo() throws Exception {
         // given
-
+        
 
         // when
 
