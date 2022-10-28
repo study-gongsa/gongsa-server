@@ -13,18 +13,13 @@ public class GroupMember {
     private int UID;
     private int userUID;
     private int groupUID;
-    private int reportCnt;
-    private int penaltyCnt;
     private Boolean isLeader;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
-
-    public GroupMember(int userUID, int groupUID, Boolean isLeader){
-        this.userUID = userUID;
-        this.groupUID = groupUID;
-        this.isLeader = isLeader;
-
-        this.reportCnt = 0;
-        this.penaltyCnt = 0;
-    }
+    @Builder.Default
+    private int reportCnt = 0;
+    @Builder.Default
+    private int penaltyCnt = 0;
+    @Builder.Default
+    private Timestamp createdAt = new Timestamp(new java.util.Date().getTime());
+    @Builder.Default
+    private Timestamp updatedAt = new Timestamp(new java.util.Date().getTime());
 }

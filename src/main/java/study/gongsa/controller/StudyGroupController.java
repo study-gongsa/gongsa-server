@@ -174,7 +174,7 @@ public class StudyGroupController {
         categoryService.checkValidCategoryUID(req.getCategoryUIDs());
 
         //그룹, 카테고리 생성
-        StudyGroup studyGroup = MakeStudyGroupRequest.toConvert(req);
+        StudyGroup studyGroup = MakeStudyGroupRequest.convertToStudyGroup(req);
 
         int groupUID = studyGroupService.makeStudyGroup(studyGroup, req.getCategoryUIDs());
 

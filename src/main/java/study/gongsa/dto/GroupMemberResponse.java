@@ -30,17 +30,17 @@ public class GroupMemberResponse {
        String imaPath;
        String studyStatus;
        Time totalStudyTime;
-        Integer ranking;
+       Integer ranking;
 
-       public static Member convertTo(GroupMemberUserInfo groupMemberUserInfo){
-           Member member = new Member();
-           member.setUserUID(groupMemberUserInfo.getUserUID());
-           member.setNickname(groupMemberUserInfo.getNickname());
-           member.setImaPath(groupMemberUserInfo.getImgPath());
-           member.setStudyStatus(groupMemberUserInfo.getStudyStatus());
-           member.setTotalStudyTime(groupMemberUserInfo.getTotalStudyTime());
-           member.setRanking(groupMemberUserInfo.getRanking());
-
+       public static Member convertToMember(GroupMemberUserInfo groupMemberUserInfo){
+           Member member = Member.builder()
+                   .userUID(groupMemberUserInfo.getUserUID())
+                   .nickname(groupMemberUserInfo.getNickname())
+                   .imaPath(groupMemberUserInfo.getImgPath())
+                   .studyStatus(groupMemberUserInfo.getStudyStatus())
+                   .totalStudyTime(groupMemberUserInfo.getTotalStudyTime())
+                   .ranking(groupMemberUserInfo.getRanking())
+                   .build();
            return member;
        }
     }

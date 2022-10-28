@@ -22,10 +22,13 @@ public class StudyGroup {
     private int maxTodayStudy;
     private Boolean isPenalty;
     private int maxPenalty;
-    private String imgPath;
     private Date expiredAt;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
+    @Builder.Default
+    private String imgPath = "r0.jpg";
+    @Builder.Default
+    private Timestamp createdAt = new Timestamp(new java.util.Date().getTime());
+    @Builder.Default
+    private Timestamp updatedAt = new Timestamp(new java.util.Date().getTime());
 
     @Override
     public String toString() {
