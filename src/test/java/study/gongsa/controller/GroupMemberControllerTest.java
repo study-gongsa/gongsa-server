@@ -270,20 +270,10 @@ class GroupMemberControllerTest {
         GroupMember groupMember1 = GroupMember.builder()
                 .userUID(member1UserUID)
                 .groupUID(groupUID)
-                .reportCnt(0)
-                .penaltyCnt(0)
-                .isLeader(false)
-                .createdAt(new Timestamp(new Date().getTime()))
-                .updatedAt(new Timestamp(new Date().getTime()))
                 .build();
         GroupMember groupMember2 = GroupMember.builder()
                 .userUID(member2UserUID)
                 .groupUID(groupUID)
-                .reportCnt(0)
-                .penaltyCnt(0)
-                .isLeader(false)
-                .createdAt(new Timestamp(new Date().getTime()))
-                .updatedAt(new Timestamp(new Date().getTime()))
                 .build();
         groupMemberRepository.save(groupMember1);
         groupMemberRepository.save(groupMember2);
