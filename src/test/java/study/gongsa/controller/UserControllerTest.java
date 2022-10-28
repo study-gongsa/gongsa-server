@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.jayway.jsonpath.JsonPath;
 import io.swagger.annotations.ApiModelProperty;
 import org.junit.jupiter.api.*;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -83,21 +84,15 @@ class UserControllerTest {
                 .email("gong40sa04@gmail.com")
                 .passwd(passwordEncoder.encode("12345678"))
                 .nickname("통합테스트")
-                .level(1)
-                .isAuth(false)
                 .authCode("00000a")
-                .imgPath("t1.jpg")
-                .createdAt(new Timestamp(new Date().getTime()))
-                .updatedAt(new Timestamp(new Date().getTime()))
                 .build();
         userUID = userRepository.save(user).intValue();
+        LoggerFactory.getLogger(getClass()).info(user.toString());
 
         refreshToken = jwtTokenProvider.makeRefreshToken(userUID);
         Integer userAuthUID = userAuthRepository.save(UserAuth.builder()
                         .userUID(userUID)
                         .refreshToken(refreshToken)
-                        .createdAt(new Timestamp(new Date().getTime()))
-                        .updatedAt(new Timestamp(new Date().getTime()))
                 .build()).intValue();
         accessToken = jwtTokenProvider.makeAccessToken(userUID, userAuthUID);
     }
@@ -200,7 +195,7 @@ class UserControllerTest {
     @Test
     void 이메일전송_실패_인증완료자() throws Exception {
         // given
-        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+        userRepository.updateIsAuth(true, new Timestamp(new Date().getTime()), userUID);
         MailRequest mailRequest = new MailRequest("gong40sa04@gmail.com");
 
         // when
@@ -268,7 +263,7 @@ class UserControllerTest {
     @Test
     void 이메일인증번호검증_실패_만료된인증코드() throws Exception {
         // given
-        userRepository.update("update User set updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()-(24 * 60 * 60 * 1000)));
+        userRepository.updateIsAuth(false, new Timestamp(new Date().getTime()-(24 * 60 * 60 * 1000)), userUID);
         CodeRequest codeRequest = new CodeRequest("gong40sa04@gmail.com","00000a");
 
         // when
@@ -372,7 +367,7 @@ class UserControllerTest {
     @Test
     void 로그인연장_성공() throws Exception {
         // given
-        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+        userRepository.updateIsAuth(true, new Timestamp(new Date().getTime()), userUID);
         RefreshRequest refreshRequest = new RefreshRequest(refreshToken);
 
         // when
@@ -391,7 +386,7 @@ class UserControllerTest {
     @Test
     void 로그인연장_실패_refreshToken불일치() throws Exception {
         // given
-        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+        userRepository.updateIsAuth(true, new Timestamp(new Date().getTime()), userUID);
         RefreshRequest refreshRequest = new RefreshRequest(refreshToken+"_fail");
 
         // when
@@ -446,8 +441,7 @@ class UserControllerTest {
     @Test
     void 비밀번호변경_성공() throws Exception {
         // given
-        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
-
+        userRepository.updateIsAuth(true, new Timestamp(new Date().getTime()), userUID);
         ChangePasswdRequest changePasswdRequest = new ChangePasswdRequest("12345678", "123456789");
 
         // when
@@ -465,8 +459,7 @@ class UserControllerTest {
     @Test
     void 비밀번호변경_실패_현재비밀번호불일치() throws Exception{
         // given
-        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
-
+        userRepository.updateIsAuth(true, new Timestamp(new Date().getTime()), userUID);
         ChangePasswdRequest changePasswdRequest = new ChangePasswdRequest("12345678_fail", "123456789");
 
         // when
@@ -485,8 +478,7 @@ class UserControllerTest {
     @Test
     void 비밀번호변경_실패_비밀번호가이전과동일() throws Exception{
         // given
-        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
-
+        userRepository.updateIsAuth(true, new Timestamp(new Date().getTime()), userUID);
         ChangePasswdRequest changePasswdRequest = new ChangePasswdRequest("12345678", "12345678");
 
         // when
@@ -505,7 +497,7 @@ class UserControllerTest {
     @Test
     void 마이페이지_유저정보조회_성공() throws Exception {
         // given
-        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+        userRepository.updateIsAuth(true, new Timestamp(new Date().getTime()), userUID);
 
         // when
         ResultActions resultActions = mockMvc.perform(get(baseURL+"/mypage")
@@ -526,7 +518,7 @@ class UserControllerTest {
     @Test
     void 환경설정_유저정보조회_성공() throws Exception {
         // given
-        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+        userRepository.updateIsAuth(true, new Timestamp(new Date().getTime()), userUID);
 
         // when
         ResultActions resultActions = mockMvc.perform(get(baseURL)
@@ -544,7 +536,7 @@ class UserControllerTest {
     @Test
     void 환경설정_유저정보변경_성공_이미지미변경() throws Exception {
         // given
-        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+        userRepository.updateIsAuth(true, new Timestamp(new Date().getTime()), userUID);
 
         ChangeUserInfoRequest changeUserInfoRequest = new ChangeUserInfoRequest("통합테스트_","123456789",false);
         MockMultipartFile json = new MockMultipartFile("json","json","application/json",
@@ -563,7 +555,7 @@ class UserControllerTest {
     @Test
     void 환경설정_유저정보변경_성공_이미지변경() throws Exception{
         // given
-        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+        userRepository.updateIsAuth(true, new Timestamp(new Date().getTime()), userUID);
 
         Path root = Paths.get("image");
         String filePath = root.getFileName() + "/t1.jpg";
@@ -588,7 +580,7 @@ class UserControllerTest {
     @Test
     void 환경설정_유저정보변경_성공_랜덤이미지변경() throws Exception{
         // given
-        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+        userRepository.updateIsAuth(true, new Timestamp(new Date().getTime()), userUID);
 
         ChangeUserInfoRequest changeUserInfoRequest = new ChangeUserInfoRequest("통합테스트_","123456789",true);
         MockMultipartFile json = new MockMultipartFile("json","json","application/json",
@@ -607,7 +599,7 @@ class UserControllerTest {
     @Test
     void 환경설정_유저정보변경_실패_닉네임중복() throws Exception{
         // given
-        userRepository.update("update User set isAuth = true, updatedAt= ? where UID="+userUID, new Timestamp(new Date().getTime()));
+        userRepository.updateIsAuth(true, new Timestamp(new Date().getTime()), userUID);
         User user = User.builder()
                 .email("gong40sa04_@gmail.com")
                 .passwd(passwordEncoder.encode("12345678"))
