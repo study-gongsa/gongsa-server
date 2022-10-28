@@ -17,7 +17,6 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class RegisterGroupMemberRequest {
     @ApiModelProperty(value="가입하고자 하는 스터디 그룹 UID")
-    @Min(value=1, message="그룹 UID의 최소값은 1입니다.")
     @NotNull(message = "그룹 UID는 필수값 입니다.")
     int groupUID;
 }
