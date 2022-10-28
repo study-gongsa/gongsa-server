@@ -27,7 +27,7 @@ public class GroupMemberResponse {
     public static class Member{
        Integer userUID;
        String nickname;
-       String imaPath;
+       String imgPath;
        String studyStatus;
        Time totalStudyTime;
        Integer ranking;
@@ -36,7 +36,7 @@ public class GroupMemberResponse {
            Member member = Member.builder()
                    .userUID(groupMemberUserInfo.getUserUID())
                    .nickname(groupMemberUserInfo.getNickname())
-                   .imaPath(groupMemberUserInfo.getImgPath())
+                   .imgPath(groupMemberUserInfo.getImgPath())
                    .studyStatus(groupMemberUserInfo.getStudyStatus())
                    .totalStudyTime(groupMemberUserInfo.getTotalStudyTime())
                    .ranking(groupMemberUserInfo.getRanking())
