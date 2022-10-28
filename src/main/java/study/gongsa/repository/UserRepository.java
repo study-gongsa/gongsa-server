@@ -22,6 +22,4 @@ public interface UserRepository {
     Optional<User> findByNicknameExceptUser(String nickname, int uid);
 
     Optional<UserMyPageInfo> getUserMyPageInfo(int uid);
-
-    void update(String sql, Timestamp updatedAt);
 }

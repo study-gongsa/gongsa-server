@@ -151,10 +151,4 @@ public class JdbcTemplateUserRepository implements UserRepository {
         hashMap.put("updatedAt",user.getUpdatedAt());
         return hashMap;
     }
-
-    // For Test
-    @Override
-    public void update(String sql, Timestamp updatedAt) {
-        jdbcTemplate.update(sql, updatedAt);
-    }
 }
