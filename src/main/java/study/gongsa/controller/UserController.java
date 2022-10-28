@@ -47,7 +47,12 @@ public class UserController {
     })
     @PostMapping("/join")
     public ResponseEntity join(@RequestBody @Valid JoinRequest req){
-        userService.join(new User(req.getEmail(), req.getPasswd(), req.getNickname())).intValue();
+        User user = User.builder()
+                .email(req.getEmail())
+                .passwd(req.getPasswd())
+                .nickname(req.getNickname())
+                .build();
+        userService.join(user);
 
         DefaultResponse response = new DefaultResponse();
         return new ResponseEntity(response, HttpStatus.CREATED);
@@ -112,10 +117,17 @@ public class UserController {
     })
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid LoginRequest req){
-        int userUID = userService.login(new User(req.getEmail(), req.getPasswd())).intValue();
+        User user = User.builder()
+                .email(req.getEmail())
+                .passwd(req.getPasswd())
+                .build();
+        int userUID = userService.login(user).intValue();
         String refreshToken = jwtTokenProvider.makeRefreshToken(userUID);
 
-        UserAuth userAuth = new UserAuth(userUID, refreshToken);
+        UserAuth userAuth = UserAuth.builder()
+                .userUID(userUID)
+                .refreshToken(refreshToken)
+                .build();
         int userAuthUID = userAuthService.save(userAuth).intValue();
         String accessToken = jwtTokenProvider.makeAccessToken(userUID, userAuthUID);
         DefaultResponse response = new DefaultResponse(new LoginResponse(accessToken, refreshToken));

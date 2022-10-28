@@ -12,37 +12,21 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 public class User {
-
-    public User(String email, String passwd, String nickname) {
-        this.email = email;
-        this.passwd = passwd;
-        this.nickname = nickname;
-
-        //기본값
-        this.level = 1;
-        this.isAuth = false;
-        this.createdAt = new Timestamp(new Date().getTime());
-        this.updatedAt = this.createdAt;
-    }
-
-    public User(String email, String passwd) {
-        this.email = email;
-        this.passwd = passwd;
-
-        this.createdAt = new Timestamp(new Date().getTime());
-        this.updatedAt = this.createdAt;
-    }
-
     private int UID;
     private String email;
     private String passwd;
     private String nickname;
-    private String imgPath;
-    private int level;
     private String authCode;
-    private Boolean isAuth;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
+    @Builder.Default
+    private String imgPath = "r0.jpg";
+    @Builder.Default
+    private int level = 1;
+    @Builder.Default
+    private Boolean isAuth = false;
+    @Builder.Default
+    private Timestamp createdAt = new Timestamp(new Date().getTime());
+    @Builder.Default
+    private Timestamp updatedAt = new Timestamp(new Date().getTime());
 
     @Override
     public String toString() {
