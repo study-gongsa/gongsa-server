@@ -1,7 +1,9 @@
 package study.gongsa.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -13,25 +15,28 @@ import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
+import study.gongsa.domain.StudyGroup;
 import study.gongsa.domain.User;
 import study.gongsa.domain.UserAuth;
 import study.gongsa.dto.DefaultResponse;
 import study.gongsa.dto.MakeStudyGroupRequest;
+import study.gongsa.repository.StudyGroupRepository;
 import study.gongsa.repository.UserAuthRepository;
 import study.gongsa.repository.UserRepository;
 import study.gongsa.support.jwt.JwtTokenProvider;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -44,10 +49,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class StudyGroupControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(StudyGroupControllerTest.class);
+
     private static String baseURL = "/api/study-group";
     private Integer userUID;
     private String accessToken;
-    private Integer makeGroupUID = 0;
+    private Integer madeGroupUID = 0;
 
     @Autowired
     private WebApplicationContext context;
@@ -59,6 +65,8 @@ class StudyGroupControllerTest {
     private UserRepository userRepository;
     @Autowired
     private UserAuthRepository userAuthRepository;
+    @Autowired
+    private StudyGroupRepository studyGroupRepository;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
     @Autowired
@@ -90,6 +98,15 @@ class StudyGroupControllerTest {
 
     @AfterEach
     void tearDown() {
+        if(madeGroupUID!=0){
+            Path root = Paths.get("image");
+            String filePath = root.getFileName() + "/g"+madeGroupUID+".jpg";
+            File file = new File(filePath);
+
+            if (file.exists()) {
+                file.delete();
+            }
+        }
     }
 
     @Test
@@ -143,9 +160,16 @@ class StudyGroupControllerTest {
                 .andDo(print());
 
         // then
-        resultActions
+        MvcResult mvcResult = resultActions
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.data.groupUID").exists());
+                .andExpect(jsonPath("$.data.groupUID").exists())
+                .andReturn();
+
+        JSONObject jsonObject = new JSONObject(mvcResult.getResponse().getContentAsString());
+        madeGroupUID = jsonObject.getJSONObject("data").getInt("groupUID");
+        StudyGroup studyGroup = studyGroupRepository.findByUID(madeGroupUID).get();
+        logger.info(studyGroup.toString()); // 생성된 스터디 그룹 정보 확인 위한 로그
+        Assertions.assertEquals(studyGroup.getMinStudyHour().getHours(),makeStudyGroupRequest.getMinStudyHour());
     }
 
     @Test
@@ -173,9 +197,15 @@ class StudyGroupControllerTest {
                 .andDo(print());
 
         // then
-        resultActions
+        MvcResult mvcResult = resultActions
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.data.groupUID").exists());
+                .andExpect(jsonPath("$.data.groupUID").exists())
+                .andReturn();
+        JSONObject jsonObject = new JSONObject(mvcResult.getResponse().getContentAsString());
+        madeGroupUID = jsonObject.getJSONObject("data").getInt("groupUID");
+        studyGroupRepository.findByUID(madeGroupUID).ifPresent((studyGroup)->{
+            logger.info(studyGroup.toString());
+        });
     }
 
     @Test
