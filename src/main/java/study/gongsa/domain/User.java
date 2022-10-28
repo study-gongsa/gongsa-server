@@ -11,6 +11,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class User {
     private int UID;
     private String email;
@@ -27,20 +28,4 @@ public class User {
     private Timestamp createdAt = new Timestamp(new Date().getTime());
     @Builder.Default
     private Timestamp updatedAt = new Timestamp(new Date().getTime());
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "UID=" + UID +
-                ", email='" + email + '\'' +
-                ", passwd='" + passwd + '\'' +
-                ", nickname='" + nickname + '\'' +
-                ", imgPath='" + imgPath + '\'' +
-                ", level=" + level +
-                ", authCode='" + authCode + '\'' +
-                ", isAuth=" + isAuth +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
 }

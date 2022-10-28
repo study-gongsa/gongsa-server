@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class GroupMember {
     private int UID;
     private int userUID;

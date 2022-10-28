@@ -10,6 +10,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class UserAuth {
     private int UID;
     private int userUID;
@@ -18,14 +19,4 @@ public class UserAuth {
     private Timestamp createdAt = new Timestamp(new Date().getTime());
     @Builder.Default
     private Timestamp updatedAt = new Timestamp(new Date().getTime());
-
-    @Override
-    public String toString() {
-        return "UserAuth{" +
-                "userUID=" + userUID +
-                ", refreshToken='" + refreshToken + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
 }

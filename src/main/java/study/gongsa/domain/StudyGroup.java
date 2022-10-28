@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class StudyGroup {
     private int UID;
     private String name;
@@ -29,23 +30,4 @@ public class StudyGroup {
     private Timestamp createdAt = new Timestamp(new java.util.Date().getTime());
     @Builder.Default
     private Timestamp updatedAt = new Timestamp(new java.util.Date().getTime());
-
-    @Override
-    public String toString() {
-        return "StudyGroup{" +
-                "UID=" + UID +
-                ", name='" + name + '\'' +
-                ", code='" + code + '\'' +
-                ", isCam=" + isCam +
-                ", isPrivate=" + isPrivate +
-                ", minStudyHour=" + minStudyHour +
-                ", maxMember=" + maxMember +
-                ", maxTodayStudy=" + maxTodayStudy +
-                ", isPenalty=" + isPenalty +
-                ", maxPenalty=" + maxPenalty +
-                ", expiredAt=" + expiredAt +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
 }

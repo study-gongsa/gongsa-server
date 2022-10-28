@@ -188,7 +188,7 @@ class UserControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print());
         // then
-        resultActions.andExpect(status().isBadRequest())
+        resultActions.andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.msg").value("가입되지 않은 이메일입니다."));
     }
 
@@ -239,7 +239,7 @@ class UserControllerTest {
                 .andDo(print());
 
         // then
-        resultActions.andExpect(status().isBadRequest())
+        resultActions.andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.location").value("email"));
     }
 

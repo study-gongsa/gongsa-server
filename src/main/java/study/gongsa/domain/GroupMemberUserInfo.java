@@ -9,6 +9,7 @@ import java.sql.Time;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class GroupMemberUserInfo {
     private Integer userUID;
     private String nickname;
