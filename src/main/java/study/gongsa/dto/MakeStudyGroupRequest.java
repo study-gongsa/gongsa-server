@@ -2,10 +2,7 @@ package study.gongsa.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import study.gongsa.domain.StudyGroup;
 
@@ -19,6 +16,7 @@ import java.sql.Timestamp;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class MakeStudyGroupRequest {
     @ApiModelProperty(value="그룹명")
     @NotBlank(message = "그룹명은 필수값 입니다")
@@ -64,18 +62,18 @@ public class MakeStudyGroupRequest {
     @NotNull(message = "만료 날짜는 필수값 입니다.")
     Date expiredAt;
 
-    public static StudyGroup toConvert(MakeStudyGroupRequest req){
-        StudyGroup studyGroup = new StudyGroup();
-
-        studyGroup.setName(req.getName());
-        studyGroup.setIsCam(req.getIsCam());
-        studyGroup.setIsPrivate(req.getIsPrivate());
-        studyGroup.setMaxMember(req.getMaxMember());
-        studyGroup.setMaxTodayStudy(req.getMaxTodayStudy());
-        studyGroup.setIsPenalty(req.getIsPenalty());
-        studyGroup.setMaxPenalty(req.getMaxPenalty());
-        studyGroup.setExpiredAt(req.getExpiredAt());
-        studyGroup.setMinStudyHour(new Time(req.getMinStudyHour(),0,0));
+    public static StudyGroup convertToStudyGroup(MakeStudyGroupRequest req){
+        StudyGroup studyGroup = StudyGroup.builder()
+                .name(req.getName())
+                .isCam(req.getIsCam())
+                .isPrivate(req.getIsPrivate())
+                .maxMember(req.getMaxMember())
+                .maxTodayStudy(req.getMaxTodayStudy())
+                .isPenalty(req.getIsPenalty())
+                .maxPenalty(req.getMaxPenalty())
+                .expiredAt(req.getExpiredAt())
+                .minStudyHour(Time.valueOf(req.getMinStudyHour()+":00:00"))
+                .build();
 
         return studyGroup;
     }

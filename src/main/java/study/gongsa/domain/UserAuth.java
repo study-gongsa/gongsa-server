@@ -1,9 +1,6 @@
 package study.gongsa.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -12,21 +9,15 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class UserAuth {
-    public UserAuth(int userUID, String refreshToken) {
-        this.userUID = userUID;
-        this.refreshToken = refreshToken;
-
-        //기본값값
-        this.createdAt = new Timestamp(new Date().getTime());
-        this.updatedAt = this.createdAt;
-    }
-
     private int UID;
     private int userUID;
     private String refreshToken;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
+    @Builder.Default
+    private Timestamp createdAt = new Timestamp(new Date().getTime());
+    @Builder.Default
+    private Timestamp updatedAt = new Timestamp(new Date().getTime());
 
     @Override
     public String toString() {
