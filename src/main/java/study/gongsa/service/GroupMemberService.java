@@ -92,7 +92,7 @@ public class GroupMemberService {
 
         List<GroupMemberResponse.Member> members = new ArrayList<>();
         for(GroupMemberUserInfo memberInfo : memberInfoList){
-            members.add(GroupMemberResponse.Member.convertTo(memberInfo));
+            members.add(GroupMemberResponse.Member.convertToMember(memberInfo));
         }
         return members;
     }
