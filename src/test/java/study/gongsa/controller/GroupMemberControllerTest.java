@@ -84,20 +84,14 @@ class GroupMemberControllerTest {
                 .email("gong40sa04@gmail.com")
                 .passwd(passwordEncoder.encode("12345678"))
                 .nickname("통합테스트")
-                .level(1)
-                .isAuth(true)
                 .authCode("00000a")
-                .imgPath("t1.jpg")
-                .createdAt(new Timestamp(new Date().getTime()))
-                .updatedAt(new Timestamp(new Date().getTime()))
                 .build();
+        user.setIsAuth(true);
         userUID = userRepository.save(user).intValue();
 
         Integer userAuthUID = userAuthRepository.save(UserAuth.builder()
                 .userUID(userUID)
                 .refreshToken(jwtTokenProvider.makeRefreshToken(userUID))
-                .createdAt(new Timestamp(new Date().getTime()))
-                .updatedAt(new Timestamp(new Date().getTime()))
                 .build()).intValue();
         accessToken = jwtTokenProvider.makeAccessToken(userUID, userAuthUID);
 
@@ -106,25 +100,17 @@ class GroupMemberControllerTest {
                 .email("gong40sa04_@gmail.com")
                 .passwd(passwordEncoder.encode("12345678"))
                 .nickname("통합테스트_리더")
-                .level(1)
-                .isAuth(true)
                 .authCode("00000b")
-                .imgPath("t1.jpg")
-                .createdAt(new Timestamp(new Date().getTime()))
-                .updatedAt(new Timestamp(new Date().getTime()))
                 .build();
+        leader.setIsAuth(true);
         leaderUserUID = userRepository.save(leader).intValue();
         User member = User.builder()
                 .email("gong40sa04_2@gmail.com")
                 .passwd(passwordEncoder.encode("12345678"))
                 .nickname("통합테스트_멤버")
-                .level(1)
-                .isAuth(true)
                 .authCode("00000c")
-                .imgPath("t1.jpg")
-                .createdAt(new Timestamp(new Date().getTime()))
-                .updatedAt(new Timestamp(new Date().getTime()))
                 .build();
+        member.setIsAuth(true);
         memberUserUID = userRepository.save(member).intValue();
 
         // 스터디 그룹 생성 및 멤버들 가입
@@ -138,29 +124,18 @@ class GroupMemberControllerTest {
                 .maxTodayStudy(6)
                 .isPenalty(true)
                 .maxPenalty(6)
-                .imgPath("r0.jpg")
                 .expiredAt(java.sql.Date.valueOf(LocalDate.of(2023, 12, 31)))
-                .createdAt(new Timestamp(new Date().getTime()))
-                .updatedAt(new Timestamp(new Date().getTime()))
                 .build();
         groupUID = studyGroupRepository.save(studyGroup).intValue();
         GroupMember groupLeader = GroupMember.builder()
                 .userUID(leaderUserUID)
                 .groupUID(groupUID)
-                .reportCnt(0)
-                .penaltyCnt(0)
                 .isLeader(true)
-                .createdAt(new Timestamp(new Date().getTime()))
-                .updatedAt(new Timestamp(new Date().getTime()))
                 .build();
         GroupMember groupMember = GroupMember.builder()
                 .userUID(memberUserUID)
                 .groupUID(groupUID)
-                .reportCnt(0)
-                .penaltyCnt(0)
                 .isLeader(false)
-                .createdAt(new Timestamp(new Date().getTime()))
-                .updatedAt(new Timestamp(new Date().getTime()))
                 .build();
         groupMemberRepository.save(groupLeader);
         groupMemberRepository.save(groupMember);
@@ -201,21 +176,14 @@ class GroupMemberControllerTest {
                 .maxTodayStudy(6)
                 .isPenalty(true)
                 .maxPenalty(6)
-                .imgPath("r0.jpg")
                 .expiredAt(java.sql.Date.valueOf(LocalDate.of(2023, 12, 31)))
-                .createdAt(new Timestamp(new Date().getTime()))
-                .updatedAt(new Timestamp(new Date().getTime()))
                 .build();
 
         Integer registeredGroupUID = studyGroupRepository.save(studyGroup).intValue();
         GroupMember groupMember = GroupMember.builder()
                 .userUID(userUID)
                 .groupUID(registeredGroupUID)
-                .reportCnt(0)
-                .penaltyCnt(0)
                 .isLeader(true)
-                .createdAt(new Timestamp(new Date().getTime()))
-                .updatedAt(new Timestamp(new Date().getTime()))
                 .build();
         groupMemberRepository.save(groupMember);
 
@@ -240,11 +208,7 @@ class GroupMemberControllerTest {
         GroupMember groupMember = GroupMember.builder()
                 .userUID(userUID)
                 .groupUID(groupUID)
-                .reportCnt(0)
-                .penaltyCnt(0)
                 .isLeader(true)
-                .createdAt(new Timestamp(new Date().getTime()))
-                .updatedAt(new Timestamp(new Date().getTime()))
                 .build();
         groupMemberRepository.save(groupMember);
 
@@ -291,25 +255,17 @@ class GroupMemberControllerTest {
                 .email("gong40sa04_3@gmail.com")
                 .passwd(passwordEncoder.encode("12345678"))
                 .nickname("통합테스트_멤버2")
-                .level(1)
-                .isAuth(true)
                 .authCode("00000d")
-                .imgPath("t1.jpg")
-                .createdAt(new Timestamp(new Date().getTime()))
-                .updatedAt(new Timestamp(new Date().getTime()))
                 .build();
+        member1.setIsAuth(true);
         Integer member1UserUID = userRepository.save(member1).intValue();
         User member2 = User.builder()
                 .email("gong40sa04_4@gmail.com")
                 .passwd(passwordEncoder.encode("12345678"))
                 .nickname("통합테스트_멤버3")
-                .level(1)
-                .isAuth(true)
                 .authCode("00000e")
-                .imgPath("t1.jpg")
-                .createdAt(new Timestamp(new Date().getTime()))
-                .updatedAt(new Timestamp(new Date().getTime()))
                 .build();
+        member2.setIsAuth(true);
         Integer member2UserUID = userRepository.save(member2).intValue();
         GroupMember groupMember1 = GroupMember.builder()
                 .userUID(member1UserUID)

@@ -63,9 +63,11 @@ public class GroupMemberService {
     }
 
     public void makeStudyGroupMember(int groupUID, int userUID, boolean isLeader) {
-        GroupMember groupMember = new GroupMember(userUID, groupUID, isLeader);
-        groupMember.setCreatedAt(new Timestamp(new Date().getTime()));
-        groupMember.setUpdatedAt(groupMember.getCreatedAt());
+        GroupMember groupMember = GroupMember.builder()
+                .userUID(userUID)
+                .groupUID(groupUID)
+                .isLeader(isLeader)
+                .build();
 
         groupMemberRepository.save(groupMember);
     }
