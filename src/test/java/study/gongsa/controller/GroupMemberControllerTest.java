@@ -2,7 +2,10 @@ package study.gongsa.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.util.DateUtil;
+import org.json.JSONObject;
 import org.junit.jupiter.api.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,11 +33,11 @@ import study.gongsa.repository.UserAuthRepository;
 import study.gongsa.repository.UserRepository;
 import study.gongsa.support.jwt.JwtTokenProvider;
 
+import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Date;
 import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,6 +51,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 class GroupMemberControllerTest {
+
+    private static Logger logger = LoggerFactory.getLogger(GroupMemberControllerTest.class);
 
     private static String baseURL = "/api/group-member";
     private Integer userUID, leaderUserUID, memberUserUID;
@@ -124,7 +130,7 @@ class GroupMemberControllerTest {
                 .maxTodayStudy(6)
                 .isPenalty(true)
                 .maxPenalty(6)
-                .expiredAt(java.sql.Date.valueOf(LocalDate.of(2023, 12, 31)))
+                .expiredAt(Date.valueOf("2023-10-10"))
                 .build();
         groupUID = studyGroupRepository.save(studyGroup).intValue();
         GroupMember groupLeader = GroupMember.builder()
@@ -161,6 +167,11 @@ class GroupMemberControllerTest {
         // then
         resultActions
                 .andExpect(status().isCreated());
+
+        // 생성된 그룹 멤버 정보 확인
+        groupMemberRepository.findByGroupUIDUserUID(groupUID, userUID).ifPresent((groupMember)->{
+            logger.info(groupMember.toString());
+        });
     }
 
     @Test
@@ -176,7 +187,7 @@ class GroupMemberControllerTest {
                 .maxTodayStudy(6)
                 .isPenalty(true)
                 .maxPenalty(6)
-                .expiredAt(java.sql.Date.valueOf(LocalDate.of(2023, 12, 31)))
+                .expiredAt(Date.valueOf("2023-10-10"))
                 .build();
 
         Integer registeredGroupUID = studyGroupRepository.save(studyGroup).intValue();
