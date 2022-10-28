@@ -1,15 +1,14 @@
 package study.gongsa.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.assertj.core.util.DateUtil;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -22,6 +21,7 @@ import study.gongsa.domain.StudyGroup;
 import study.gongsa.domain.User;
 import study.gongsa.domain.UserAuth;
 import study.gongsa.dto.JoinRequest;
+import study.gongsa.dto.MakeStudyGroupRequest;
 import study.gongsa.dto.RegisterGroupMemberRequest;
 import study.gongsa.repository.GroupMemberRepository;
 import study.gongsa.repository.StudyGroupRepository;
@@ -31,9 +31,13 @@ import study.gongsa.support.jwt.JwtTokenProvider;
 
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
+import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -67,7 +71,6 @@ class GroupMemberControllerTest {
     private JwtTokenProvider jwtTokenProvider;
     @Autowired
     private PasswordEncoder passwordEncoder;
-
 
     @BeforeEach
     void setUp() throws Exception {
@@ -130,13 +133,13 @@ class GroupMemberControllerTest {
                 .code("0000000000000000")
                 .isCam(true)
                 .isPrivate(false)
-                .minStudyHour(new Time(7,0,0))
+                .minStudyHour(Time.valueOf("23:00:00"))
                 .maxMember(4)
                 .maxTodayStudy(6)
                 .isPenalty(true)
                 .maxPenalty(6)
                 .imgPath("r0.jpg")
-                .expiredAt(new java.sql.Date(0,5,0))
+                .expiredAt(java.sql.Date.valueOf(LocalDate.of(2023, 12, 31)))
                 .createdAt(new Timestamp(new Date().getTime()))
                 .updatedAt(new Timestamp(new Date().getTime()))
                 .build();
@@ -193,16 +196,17 @@ class GroupMemberControllerTest {
                 .code("0000000000000001")
                 .isCam(true)
                 .isPrivate(false)
-                .minStudyHour(new Time(77,0,0))
+                .minStudyHour(Time.valueOf("70:0:0"))
                 .maxMember(6)
                 .maxTodayStudy(6)
                 .isPenalty(true)
                 .maxPenalty(6)
                 .imgPath("r0.jpg")
-                .expiredAt(new java.sql.Date(0,5,0))
+                .expiredAt(java.sql.Date.valueOf(LocalDate.of(2023, 12, 31)))
                 .createdAt(new Timestamp(new Date().getTime()))
                 .updatedAt(new Timestamp(new Date().getTime()))
                 .build();
+
         Integer registeredGroupUID = studyGroupRepository.save(studyGroup).intValue();
         GroupMember groupMember = GroupMember.builder()
                 .userUID(userUID)
@@ -345,8 +349,38 @@ class GroupMemberControllerTest {
     }
 
     @Test
-    @DisplayName("스터디 그룹 멤버 정보 조회")
-    void getGroupMember() {
+    void 그룹멤버정보조회_성공() throws Exception {
+        // when
+        ResultActions resultActions = mockMvc.perform(get(baseURL+"/"+groupUID)
+                        .header("Authorization", "Bearer "+accessToken))
+                .andDo(print());
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.maxMember").exists())
+                .andExpect(jsonPath("$.data.members").exists())
+                .andExpect(jsonPath("$.data.members[0].userUID").exists())
+                .andExpect(jsonPath("$.data.members[0].nickname").exists())
+                .andExpect(jsonPath("$.data.members[0].imgPath").exists())
+                .andExpect(jsonPath("$.data.members[0].studyStatus").exists())
+                .andExpect(jsonPath("$.data.members[0].totalStudyTime").exists())
+                .andExpect(jsonPath("$.data.members[0].ranking").exists())
+                .andExpect(jsonPath("$.data.members.length()").value(2));
+    }
+
+    @Test
+    void 그룹멤버정보조회_실패_존재하지않는그룹() throws Exception {
+        // when
+        ResultActions resultActions = mockMvc.perform(get(baseURL+"/0")
+                        .header("Authorization", "Bearer "+accessToken))
+                .andDo(print());
+
+        // then
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.location").value("groupUID"))
+                .andExpect(jsonPath("$.msg").value("존재하지 않는 그룹입니다."));
     }
 
     @Test
