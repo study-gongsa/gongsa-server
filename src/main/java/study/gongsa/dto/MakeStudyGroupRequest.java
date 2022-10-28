@@ -2,10 +2,7 @@ package study.gongsa.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import study.gongsa.domain.StudyGroup;
 
@@ -19,6 +16,7 @@ import java.sql.Timestamp;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class MakeStudyGroupRequest {
     @ApiModelProperty(value="그룹명")
     @NotBlank(message = "그룹명은 필수값 입니다")
