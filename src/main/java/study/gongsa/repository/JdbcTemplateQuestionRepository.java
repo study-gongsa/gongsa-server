@@ -5,8 +5,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import study.gongsa.domain.Answer;
 import study.gongsa.domain.Category;
 import study.gongsa.domain.Question;
+import study.gongsa.domain.StudyGroup;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -42,6 +44,12 @@ public class JdbcTemplateQuestionRepository implements QuestionRepository{
         return jdbcTemplate.query(sql, questionRowMapper(), groupUID);
     }
 
+    @Override
+    public Optional<Question> findOne(int questionUID) {
+        List<Question> result = jdbcTemplate.query("select * from Question where UID = ?", questionInfoRowMapper(), questionUID);
+        return result.stream().findAny();
+    }
+
     private RowMapper<Question> questionRowMapper() {
         return (rs, rowNum) -> {
             Question question = new Question();
@@ -49,6 +57,17 @@ public class JdbcTemplateQuestionRepository implements QuestionRepository{
             question.setTitle(rs.getString("title"));
             question.setContent(rs.getString("content"));
             question.setAnswerStatus(rs.getString("answerStatus"));
+            question.setCreatedAt(rs.getTimestamp("createdAt"));
+            return question;
+        };
+    }
+
+    private RowMapper<Question> questionInfoRowMapper() {
+        return (rs, rowNum) -> {
+            Question question = new Question();
+            question.setUID(rs.getInt("UID"));
+            question.setTitle(rs.getString("title"));
+            question.setContent(rs.getString("content"));
             question.setCreatedAt(rs.getTimestamp("createdAt"));
             return question;
         };

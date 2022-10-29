@@ -31,6 +31,12 @@ public class QuestionService {
         return questionRepository.findMyQuestion(userUID);
     }
 
+    public Question findOne(int questionUID) {
+        Optional<Question> question = questionRepository.findOne(questionUID);
+        if(question.isEmpty()) throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, null, "존재하지 않는 질문입니다.");
+        return question.get();
+    }
+
     public List<Question> findGroupQuestion(int userUID, int groupUID){
         Optional<StudyGroup> studyGroup = studyGroupRepository.findByUID(groupUID);
         if (studyGroup.isEmpty()){
