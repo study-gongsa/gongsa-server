@@ -9,4 +9,5 @@ import java.util.Optional;
 
 public interface QuestionRepository {
     List<Question> findMyQuestion(int userUID);
+    List<Question> findGroupQuestion(int groupUID);
 }

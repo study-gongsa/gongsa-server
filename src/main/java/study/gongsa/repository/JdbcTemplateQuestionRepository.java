@@ -32,6 +32,16 @@ public class JdbcTemplateQuestionRepository implements QuestionRepository{
         return jdbcTemplate.query(sql, questionRowMapper(), userUID);
     }
 
+    @Override
+    public List<Question> findGroupQuestion(int groupUID) {
+        String sql = "SELECT a.UID, LEFT(a.title, 31) AS title, LEFT(a.content, 73) AS content, IF(b.answer is NULL, '응답 대기 중', '응답 완료') AS answerStatus, a.createdAt "
+                + "FROM Question a "
+                + "LEFT JOIN Answer b ON a.UID = b.questionUID "
+                + "WHERE a.groupUID = ? "
+                + "ORDER BY a.createdAt DESC";
+        return jdbcTemplate.query(sql, questionRowMapper(), groupUID);
+    }
+
     private RowMapper<Question> questionRowMapper() {
         return (rs, rowNum) -> {
             Question question = new Question();
