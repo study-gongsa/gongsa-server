@@ -38,6 +38,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Date;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -169,7 +170,7 @@ class StudyGroupControllerTest {
         madeGroupUID = jsonObject.getJSONObject("data").getInt("groupUID");
         StudyGroup studyGroup = studyGroupRepository.findByUID(madeGroupUID).get();
         logger.info(studyGroup.toString()); // 생성된 스터디 그룹 정보 확인 위한 로그
-        Assertions.assertEquals(studyGroup.getMinStudyHour().getHours(),makeStudyGroupRequest.getMinStudyHour());
+        assertThat(studyGroup.getMinStudyHour().getHours()).isEqualTo(makeStudyGroupRequest.getMinStudyHour());
     }
 
     @Test

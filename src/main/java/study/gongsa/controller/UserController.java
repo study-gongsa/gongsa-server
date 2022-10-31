@@ -193,7 +193,7 @@ public class UserController {
             @ApiResponse(code=200, message="환경 설정 유저 정보 변경 성공"),
             @ApiResponse(code=401, message="로그인 정보 불일치 에러"),
     })
-    @PatchMapping("")
+    @PatchMapping(path="",consumes = {"multipart/form-data"})
     @Transactional
     public ResponseEntity changeUserSettingInfo(@RequestPart("json") @Valid ChangeUserInfoRequest req,
                                                 @RequestPart(value = "image", required = false) MultipartFile image,

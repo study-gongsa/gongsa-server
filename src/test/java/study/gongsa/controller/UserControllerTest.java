@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.jayway.jsonpath.JsonPath;
 import io.swagger.annotations.ApiModelProperty;
+import org.json.JSONObject;
 import org.junit.jupiter.api.*;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
+import study.gongsa.domain.StudyGroup;
 import study.gongsa.domain.User;
 import study.gongsa.domain.UserAuth;
 import study.gongsa.dto.*;
@@ -384,6 +386,45 @@ class UserControllerTest {
     }
 
     @Test
+    void 로그인재연장_성공() throws Exception {
+        // first given
+        userRepository.updateIsAuth(true, new Timestamp(new Date().getTime()), userUID);
+        RefreshRequest refreshRequest = new RefreshRequest(refreshToken);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post(baseURL+"/login/refresh")
+                        .header("Authorization", "Bearer "+accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(refreshRequest))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print());
+
+        // then
+        MvcResult mvcResult = resultActions.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.accessToken").exists())
+                .andReturn();
+
+        JSONObject jsonObject = new JSONObject(mvcResult.getResponse().getContentAsString());
+        accessToken = jsonObject.getJSONObject("data").getString("accessToken");
+
+        // second given
+        userRepository.updateIsAuth(true, new Timestamp(new Date().getTime()), userUID);
+        RefreshRequest refreshRequest2 = new RefreshRequest(refreshToken);
+
+        // when
+        ResultActions resultActions2 = mockMvc.perform(post(baseURL+"/login/refresh")
+                        .header("Authorization", "Bearer "+accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(refreshRequest))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print());
+
+        // then
+        resultActions2.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.accessToken").exists());
+    }
+
+    @Test
     void 로그인연장_실패_refreshToken불일치() throws Exception {
         // given
         userRepository.updateIsAuth(true, new Timestamp(new Date().getTime()), userUID);
@@ -583,6 +624,29 @@ class UserControllerTest {
         userRepository.updateIsAuth(true, new Timestamp(new Date().getTime()), userUID);
 
         ChangeUserInfoRequest changeUserInfoRequest = new ChangeUserInfoRequest("통합테스트_","123456789",true);
+        MockMultipartFile json = new MockMultipartFile("json","json","application/json",
+                objectMapper.writeValueAsString(changeUserInfoRequest).getBytes());
+
+        // when
+        ResultActions resultActions = mockMvc.perform(multipart(HttpMethod.PATCH,baseURL)
+                        .file(json)
+                        .header("Authorization", "Bearer "+accessToken))
+                .andDo(print());
+
+        // then
+        resultActions.andExpect(status().isOk());
+    }
+
+    @Test
+    void 환경설정_유저정보변경_성공_비밀번호미변경() throws Exception{
+        // given
+        userRepository.updateIsAuth(true, new Timestamp(new Date().getTime()), userUID);
+
+        ChangeUserInfoRequest changeUserInfoRequest = ChangeUserInfoRequest.builder()
+                .nickname("통합테스트_")
+                .changeImage(false)
+                .build();
+
         MockMultipartFile json = new MockMultipartFile("json","json","application/json",
                 objectMapper.writeValueAsString(changeUserInfoRequest).getBytes());
 
