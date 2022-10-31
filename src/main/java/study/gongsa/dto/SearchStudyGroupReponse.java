@@ -10,7 +10,7 @@ import study.gongsa.domain.StudyGroup;
 
 import java.util.*;
 
-@ApiModel(value="SearchStudyGroupReponse", description = "스터디그룹 검색, 추천 결과")
+@ApiModel(value="SearchStudyGroupReponse", description = "스터디그룹 검색, 추천, 나의 스터디그룹 조회 결과")
 @Getter
 @Setter
 @NoArgsConstructor

@@ -2,7 +2,6 @@ package study.gongsa.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,12 +10,12 @@ import study.gongsa.domain.Question;
 import java.util.ArrayList;
 import java.util.List;
 
-@ApiModel(value="GetMyQuestionResponse", description = "내 질문 조회")
+@ApiModel(value="GetQuestionResponse", description = "질문 리스트 조회")
 @Getter
 @Setter
 @NoArgsConstructor
-public class GetMyQuestionResponse {
-    public GetMyQuestionResponse(List<Question> questionList){
+public class GetQuestionResponse {
+    public GetQuestionResponse(List<Question> questionList){
         List<QuestionDTO> list = new ArrayList<QuestionDTO>();
         for(Question question : questionList){
             QuestionDTO questionDTO = new QuestionDTO();

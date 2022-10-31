@@ -1,6 +1,7 @@
 package study.gongsa.repository;
 
 
+import study.gongsa.domain.Answer;
 import study.gongsa.domain.Question;
 
 import java.sql.Timestamp;
@@ -9,4 +10,6 @@ import java.util.Optional;
 
 public interface QuestionRepository {
     List<Question> findMyQuestion(int userUID);
+    List<Question> findGroupQuestion(int groupUID);
+    Optional<Question> findOne(int questionUID);
 }
