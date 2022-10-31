@@ -58,7 +58,7 @@ public class LogFilter implements Filter {
                 .build();
         httpServletResponse.copyBodyToResponse();
 
-        log.debug("[REQUEST] {}\n[RESPONSE] {}", requestLog, responseLog);
+        log.info("[REQUEST] {}\n[RESPONSE] {}", requestLog, responseLog);
     }
 
 }
