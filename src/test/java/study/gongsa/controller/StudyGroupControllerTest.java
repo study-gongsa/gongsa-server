@@ -1,13 +1,12 @@
 package study.gongsa.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,9 +46,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @AutoConfigureMockMvc
 @SpringBootTest
+@Slf4j
 class StudyGroupControllerTest {
-
-    private static Logger logger = LoggerFactory.getLogger(StudyGroupControllerTest.class);
 
     private static String baseURL = "/api/study-group";
     private Integer userUID;
@@ -199,7 +197,8 @@ class StudyGroupControllerTest {
         JSONObject jsonObject = new JSONObject(mvcResult.getResponse().getContentAsString());
         madeGroupUID = jsonObject.getJSONObject("data").getInt("groupUID");
         StudyGroup studyGroup = studyGroupRepository.findByUID(madeGroupUID).get();
-        logger.info(studyGroup.toString()); // 생성된 스터디 그룹 정보 확인 위한 로그
+
+        logger.info("생성된 스터디 그룹 > {}",studyGroup); // 생성된 스터디 그룹 정보 확인 위한 로그
         assertThat(studyGroup.getMinStudyHour().getHours()).isEqualTo(makeStudyGroupRequest.getMinStudyHour());
     }
 
@@ -235,7 +234,7 @@ class StudyGroupControllerTest {
         JSONObject jsonObject = new JSONObject(mvcResult.getResponse().getContentAsString());
         madeGroupUID = jsonObject.getJSONObject("data").getInt("groupUID");
         studyGroupRepository.findByUID(madeGroupUID).ifPresent((studyGroup)->{
-            logger.info(studyGroup.toString());
+            log.debug("생성된 스터디 그룹 > {}",studyGroup);
         });
     }
 

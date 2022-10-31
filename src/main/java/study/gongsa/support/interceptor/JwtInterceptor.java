@@ -2,6 +2,7 @@ package study.gongsa.support.interceptor;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import study.gongsa.support.jwt.JwtTokenProvider;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@Slf4j
 @Component
 public class JwtInterceptor implements HandlerInterceptor {
     private final JwtTokenProvider jwtTokenProvider;
@@ -54,13 +56,13 @@ public class JwtInterceptor implements HandlerInterceptor {
             }
             throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED,"auth", "로그인 후 이용해주세요.");
         } catch(IllegalArgumentException e){
-            System.out.println(e.getMessage());
+            log.info("{}: {}",e.getClass().getName(), e.getMessage());
             if(e.getMessage().equals("notAuth"))
                 throw new IllegalStateExceptionWithLocation(HttpStatus.FORBIDDEN,"auth", "이메일 인증 후 이용해주세요.");
             else
                 throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED,"auth", "로그인 후 이용해주세요.");
         } catch (Exception e){
-            System.out.println(e.getClass() + " message: " + e.getMessage());
+            log.info("{}: {}",e.getClass().getName(), e.getMessage());
             throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED,"auth", "로그인 후 이용해주세요.");
         }
     }

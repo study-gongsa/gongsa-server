@@ -1,8 +1,6 @@
 package study.gongsa.controller;
 
 import io.swagger.annotations.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static java.util.Objects.isNull;
 
 @RestController
 @CrossOrigin("*")
@@ -144,9 +141,7 @@ public class StudyGroupController {
 
         for(StudyGroup studyGroup : groupList){
             int groupUID = studyGroup.getUID();
-            System.out.println(groupUID);
             List<GroupMemberResponse.Member> memberList = groupMemberService.getMembers(groupUID);
-            System.out.println(memberList);
             GetMyStudyGroupRankResponse.GroupRank groupRank = new GetMyStudyGroupRankResponse.GroupRank();
             groupRank.setGroupUID(groupUID);
             groupRank.setName(studyGroup.getName());

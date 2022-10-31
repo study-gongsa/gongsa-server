@@ -2,6 +2,7 @@ package study.gongsa.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -13,6 +14,7 @@ import java.util.List;
 
 import static org.springframework.http.HttpHeaders.*;
 
+@Slf4j
 @Service
 public class FirebaseCloudMessageService {
 
@@ -48,7 +50,7 @@ public class FirebaseCloudMessageService {
             Response response = client.newCall(request)
                     .execute();
         }catch(Exception e){
-            System.out.println(e.getMessage());
+            log.info("{}: {}",e.getClass().getName(), e.getMessage());
         }
     }
 
@@ -70,7 +72,7 @@ public class FirebaseCloudMessageService {
 
             return objectMapper.writeValueAsString(fcmMessage);
         }catch(Exception e) {
-            System.out.println(e.getMessage());
+            log.info("{}: {}",e.getClass().getName(), e.getMessage());
             return null;
         }
     }

@@ -27,9 +27,7 @@ public class ImageService {
     public void init() { //서버 최초 실행 때만
         try {
             Files.createDirectory(root);
-        } catch (IOException e) {
-            System.out.println("image init() "+e.getMessage());
-        }
+        } catch (IOException e) {}
     }
 
     public void save(MultipartFile file, String fileName) {
