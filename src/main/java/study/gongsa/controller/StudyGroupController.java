@@ -158,6 +158,21 @@ public class StudyGroupController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
+    @ApiOperation(value="나의 스터디그룹  조회")
+    @ApiResponses({
+            @ApiResponse(code=200, message="추천 리스트 조회 성공"),
+            @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
+            @ApiResponse(code=403, message="가입되지 않은 그룹일 경우, 토큰 에러(토큰이 만료되었을 경우 등)")
+    })
+    @GetMapping("/my-group")
+    public ResponseEntity findMyStudyGroup(HttpServletRequest request){
+        int userUID = (int) request.getAttribute("userUID");
+        List<StudyGroup> groupList = studyGroupService.findMyStudyGroup(userUID);
+
+        DefaultResponse response = new DefaultResponse(new SearchStudyGroupReponse(groupList));
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
     @ApiOperation(value="스터디 그룹 생성")
     @ApiResponses({
             @ApiResponse(code=201, message="스터디 그룹 생성"),
