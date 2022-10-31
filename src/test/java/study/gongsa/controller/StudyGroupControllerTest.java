@@ -161,6 +161,36 @@ class StudyGroupControllerTest {
                 .andDo(print());
 
         // then
+        resultActions
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.groupUID").exists());
+    }
+
+    @Test
+    void 스터디그룹생성_성공_목표시간24시간이상() throws Exception {
+        // given
+        MakeStudyGroupRequest makeStudyGroupRequest = MakeStudyGroupRequest.builder()
+                .name("통합테스트 위한 스터디")
+                .isCam(true)
+                .maxMember(6)
+                .isPrivate(false)
+                .categoryUIDs(new int[]{1,2})
+                .isPenalty(true)
+                .maxTodayStudy(5)
+                .minStudyHour(24)
+                .expiredAt(Date.valueOf("2023-10-10"))
+                .build();
+
+        MockMultipartFile json = new MockMultipartFile("json","json","application/json",
+                objectMapper.writeValueAsString(makeStudyGroupRequest).getBytes());
+
+        // when
+        ResultActions resultActions = mockMvc.perform(multipart(HttpMethod.POST,baseURL)
+                        .file(json)
+                        .header("Authorization", "Bearer "+accessToken))
+                .andDo(print());
+
+        // then
         MvcResult mvcResult = resultActions
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.groupUID").exists())
