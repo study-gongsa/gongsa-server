@@ -159,9 +159,16 @@ class StudyGroupControllerTest {
                 .andDo(print());
 
         // then
-        resultActions
+        MvcResult mvcResult = resultActions
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.data.groupUID").exists());
+                .andExpect(jsonPath("$.data.groupUID").exists())
+                .andReturn();
+
+        JSONObject jsonObject = new JSONObject(mvcResult.getResponse().getContentAsString());
+        madeGroupUID = jsonObject.getJSONObject("data").getInt("groupUID");
+        studyGroupRepository.findByUID(madeGroupUID).ifPresent((studyGroup)->{
+            log.debug("생성된 스터디 그룹 > {}",studyGroup);
+        });
     }
 
     @Test
