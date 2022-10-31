@@ -1,11 +1,8 @@
 package study.gongsa.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.jayway.jsonpath.JsonPath;
-import io.swagger.annotations.ApiModelProperty;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,6 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional // 각 테스트 종료 후 rollback
 @AutoConfigureMockMvc // MockMvc를 빈으로 등록
 @SpringBootTest // 통합 테스트이므로
+@Slf4j
 class UserControllerTest {
 
     private static String baseURL = "/api/user";
@@ -87,7 +85,7 @@ class UserControllerTest {
                 .authCode("00000a")
                 .build();
         userUID = userRepository.save(user).intValue();
-        LoggerFactory.getLogger(getClass()).info(user.toString());
+       log.debug("테스트 유저 > {}",user);
 
         refreshToken = jwtTokenProvider.makeRefreshToken(userUID);
         Integer userAuthUID = userAuthRepository.save(UserAuth.builder()
@@ -324,7 +322,7 @@ class UserControllerTest {
                 .andDo(print());
 
         // then
-        MvcResult mvcResult = resultActions.andExpect(status().isCreated())
+        MvcResult mvcResult = resultActions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.accessToken").exists())
                 .andExpect(jsonPath("$.data.refreshToken").exists())
                 .andReturn();
