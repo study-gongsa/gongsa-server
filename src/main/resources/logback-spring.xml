@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 60초마다 설정 파일의 변경을 확인 하여 변경시 갱신 -->
 <configuration scan="true" scanPeriod="30 seconds">
+    <property name="LOG_PATTERN" value="%-5level %d{yyyy-MM-dd HH:mm:ss}[%thread] [%logger{0}:%line] - %msg%n" />
+    <!-- 하이라이트 원할 시
     <property name="LOG_PATTERN" value="%highlight(%-5level) %d{yyyy-MM-dd HH:mm:ss}[%thread] [%logger{0}:%line] - %msg%n" />
+    -->
 
     <!-- Console Appender -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
@@ -113,9 +116,24 @@
         </rollingPolicy>
     </appender>
 
-    <root level="INFO">
+    <!-- SQL Logger -->
+    <logger name="jdbc.connection" level="OFF"/>
+    <logger name="jdbc.audit" level="OFF" />
+    <logger name="jdbc.resultset" level="OFF" />
+    <logger name="jdbc.sqlonly"  level="OFF" />
+
+    <logger name="jdbc.sqltiming" additivity="false">
+        <level value="DEBUG" />
+        <appender-ref ref="DEBUG" />
+    </logger>
+    <logger name="jdbc.resultsettable" additivity="false">
+        <level value="DEBUG"/>
+        <appender-ref ref="DEBUG" />
+    </logger>
+
+    <root level="DEBUG"> <!-- <root level="DEBUG"> -->
         <appender-ref ref="CONSOLE" />
-        <!--<appender-ref ref="DEBUG" />-->
+        <appender-ref ref="DEBUG" />
         <appender-ref ref="INFO" />
         <appender-ref ref="WARN" />
         <appender-ref ref="ERROR" />
