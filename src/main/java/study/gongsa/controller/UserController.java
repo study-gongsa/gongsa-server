@@ -104,7 +104,7 @@ public class UserController {
     @PatchMapping("/passwd")
     public ResponseEntity changePasswd(@RequestBody @Valid ChangePasswdRequest req, HttpServletRequest request){
         int userUID = (int) request.getAttribute("userUID");
-        System.out.println("userUID: " + userUID);
+
         userService.changePasswd(userUID, req.getCurrentPasswd(), req.getNextPasswd());
         DefaultResponse response = new DefaultResponse();
         return new ResponseEntity(response, HttpStatus.OK);

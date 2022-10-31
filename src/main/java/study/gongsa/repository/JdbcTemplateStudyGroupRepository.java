@@ -63,7 +63,6 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
             case "random":
                 sql += "order by rand()";
         }
-        System.out.println(sql);
 
         return jdbcTemplate.query(sql, studyGroupRowMapper());
     }
@@ -76,7 +75,6 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
                     +"where categoryUID in (select categoryUID from GroupCategory where groupUID = ?) and a.isPrivate = false "
                     +"group by b.groupUID "
                     +"order by rand()";
-        System.out.println(sql);
         return jdbcTemplate.query(sql, studyGroupRowMapper(), uid);
     }
 
@@ -88,7 +86,6 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
                 +"where categoryUID in (select categoryUID from UserCategory where userUID = ?) and a.isPrivate = false "
                 +"group by b.groupUID "
                 +"order by rand()";
-        System.out.println(sql);
         return jdbcTemplate.query(sql, studyGroupRowMapper(), userUID);
     }
 
@@ -152,7 +149,6 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
 
     @Override
     public List<StudyGroup> findMyStudyGroup(int userUID) {
-        System.out.println(userUID);
         String sql = "SELECT * "
                 + "FROM StudyGroup a "
                 + "JOIN GroupMember b ON a.UID = b.groupUID "
