@@ -161,7 +161,6 @@ public class UserService {
         if (!passwordEncoder.matches(user.getPasswd(), userByEmail.get().getPasswd()))
             throw new IllegalStateExceptionWithLocation(HttpStatus.UNAUTHORIZED, "passwd","올바르지 않은 비밀번호입니다.");
 
-        System.out.println(userByEmail.get().getUID());
         return userByEmail.get().getUID();
     }
 

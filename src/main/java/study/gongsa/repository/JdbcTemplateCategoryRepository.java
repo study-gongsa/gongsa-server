@@ -44,7 +44,6 @@ public class JdbcTemplateCategoryRepository implements CategoryRepository{
                 + "JOIN StudyGroup b ON a.groupUID = b.UID "
                 + "JOIN Category c ON a.categoryUID = c.UID "
                 + "WHERE groupUID = ?";
-        System.out.println(sql);
         return jdbcTemplate.query(sql, categoryRowMapper(), groupUID);
     }
 

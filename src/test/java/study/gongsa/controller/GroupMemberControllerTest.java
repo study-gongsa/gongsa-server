@@ -1,11 +1,10 @@
 package study.gongsa.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.util.DateUtil;
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -50,9 +49,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @AutoConfigureMockMvc
 @SpringBootTest
+@Slf4j
 class GroupMemberControllerTest {
-
-    private static Logger logger = LoggerFactory.getLogger(GroupMemberControllerTest.class);
 
     private static String baseURL = "/api/group-member";
     private Integer userUID, leaderUserUID, memberUserUID;
@@ -170,7 +168,7 @@ class GroupMemberControllerTest {
 
         // 생성된 그룹 멤버 정보 확인
         groupMemberRepository.findByGroupUIDUserUID(groupUID, userUID).ifPresent((groupMember)->{
-            logger.info(groupMember.toString());
+            log.debug("생성된 그룹 멤버 > {}",groupMember);
         });
     }
 

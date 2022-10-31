@@ -36,7 +36,6 @@ public class ImageController {
     })
     @GetMapping("/{imageName:.+}")
     public ResponseEntity<Resource> getImage(@PathVariable String imageName) {
-        System.out.println(imageName);
         Resource imageFile = imageService.load(imageName);
 
         return ResponseEntity.ok()
