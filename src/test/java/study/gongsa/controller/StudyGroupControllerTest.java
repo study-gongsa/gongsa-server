@@ -198,7 +198,7 @@ class StudyGroupControllerTest {
         madeGroupUID = jsonObject.getJSONObject("data").getInt("groupUID");
         StudyGroup studyGroup = studyGroupRepository.findByUID(madeGroupUID).get();
 
-        log.info("생성된 스터디 그룹 > {}",studyGroup); // 생성된 스터디 그룹 정보 확인 위한 로그
+        log.debug("생성된 스터디 그룹 > {}",studyGroup); // 생성된 스터디 그룹 정보 확인 위한 로그
         assertThat(studyGroup.getMinStudyHour().getHours()).isEqualTo(makeStudyGroupRequest.getMinStudyHour());
     }
 
