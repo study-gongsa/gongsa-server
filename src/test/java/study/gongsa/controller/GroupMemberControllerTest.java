@@ -171,7 +171,7 @@ class GroupMemberControllerTest {
             log.debug("생성된 그룹 멤버 > {}",groupMember);
         });
     }
-
+/*
     @Test
     void 스터디그룹가입_실패_주최소공부시간초과() throws Exception {
         // given
@@ -211,7 +211,7 @@ class GroupMemberControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.location").value("minStudyHour"));
     }
-
+*/
     @Test
     void 스터디그룹가입_실패_이미가입() throws Exception {
         GroupMember groupMember = GroupMember.builder()

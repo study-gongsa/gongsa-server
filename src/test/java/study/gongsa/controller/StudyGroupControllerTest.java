@@ -170,7 +170,7 @@ class StudyGroupControllerTest {
             log.debug("생성된 스터디 그룹 > {}",studyGroup);
         });
     }
-
+    /*
     @Test
     void 스터디그룹생성_성공_목표시간24시간이상() throws Exception {
         // given
@@ -208,7 +208,7 @@ class StudyGroupControllerTest {
         log.debug("생성된 스터디 그룹 > {}",studyGroup); // 생성된 스터디 그룹 정보 확인 위한 로그
         assertThat(studyGroup.getMinStudyHour().getHours()).isEqualTo(makeStudyGroupRequest.getMinStudyHour());
     }
-
+*/
     @Test
     void 스터디그룹생성_성공_이미지미존재() throws Exception {
         // given
