@@ -2,10 +2,7 @@ package study.gongsa.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -16,6 +13,7 @@ import javax.validation.constraints.Size;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ChangeUserInfoRequest {
     @ApiModelProperty(value="닉네임")
     @NotBlank(message = "닉네임은 필수값 입니다.")
@@ -29,5 +27,6 @@ public class ChangeUserInfoRequest {
     @ApiModelProperty(value="유저 이미지 변경 여부")
     @NotNull(message = "이미지 변경 여부는 필수값 입니다.")
     private Boolean changeImage;
+
 }
 
