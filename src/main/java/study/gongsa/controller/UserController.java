@@ -46,6 +46,7 @@ public class UserController {
             @ApiResponse(code=400, message="이메일 혹은 닉네임이 중복된 경우")
     })
     @PostMapping("/join")
+    @Transactional
     public ResponseEntity join(@RequestBody @Valid JoinRequest req){
         User user = User.builder()
                 .email(req.getEmail())
@@ -64,6 +65,7 @@ public class UserController {
             @ApiResponse(code=400, message="이미 인증된 사용자인 경우, 가입되지 않은 이메일인 경우")
     })
     @PatchMapping("/mail/join")
+    @Transactional
     public ResponseEntity sendMail(@RequestBody @Valid MailRequest req){
         userService.sendJoinMail(req.getEmail());
         DefaultResponse response = new DefaultResponse();
@@ -76,6 +78,7 @@ public class UserController {
             @ApiResponse(code=400, message="가입되지 않은 이메일인 경우, 잘못되거나 만료된 인증코드인 경우")
     })
     @PatchMapping("/code")
+    @Transactional
     public ResponseEntity verifyAuthCode(@RequestBody @Valid CodeRequest req){
         userService.verifyAuthCode(req.getEmail(), req.getAuthCode());
         DefaultResponse response = new DefaultResponse();
@@ -88,6 +91,7 @@ public class UserController {
             @ApiResponse(code=400, message="가입되지 않은 이메일인 경우")
     })
     @PatchMapping("/mail/passwd")
+    @Transactional
     public ResponseEntity changePasswd(@RequestBody @Valid MailRequest req){
         userService.sendChangePasswdMail(req.getEmail());
         DefaultResponse response = new DefaultResponse();
@@ -102,6 +106,7 @@ public class UserController {
             @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등)")
     })
     @PatchMapping("/passwd")
+    @Transactional
     public ResponseEntity changePasswd(@RequestBody @Valid ChangePasswdRequest req, HttpServletRequest request){
         int userUID = (int) request.getAttribute("userUID");
 
@@ -116,6 +121,7 @@ public class UserController {
             @ApiResponse(code=401, message="로그인 정보 불일치 에러"),
     })
     @PostMapping("/login")
+    @Transactional
     public ResponseEntity login(@RequestBody @Valid LoginRequest req){
         User user = User.builder()
                 .email(req.getEmail())
@@ -142,6 +148,7 @@ public class UserController {
             @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등)")
     })
     @PostMapping("/login/refresh")
+    @Transactional
     public ResponseEntity refresh(@RequestBody @Valid RefreshRequest req, HttpServletRequest request){
         int userUID = (int) request.getAttribute("userUID");
         int userAuthUID = (int) request.getAttribute("userAuthUID");

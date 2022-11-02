@@ -74,7 +74,7 @@
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>50MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
-            <maxHistory>20</maxHistory>
+            <maxHistory>10</maxHistory>
         </rollingPolicy>
     </appender>
 
@@ -116,22 +116,45 @@
         </rollingPolicy>
     </appender>
 
+    <appender name="API" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/api/current.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/api/api.%d{yyyy-MM-dd}_%i.gz</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>20MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>20</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <logger name="study.gongsa.support" level="INFO" additivity="true">
+        <appender-ref ref="API" />
+    </logger>
+
     <!-- SQL Logger -->
     <logger name="jdbc.connection" level="OFF"/>
     <logger name="jdbc.audit" level="OFF" />
     <logger name="jdbc.resultset" level="OFF" />
-    <logger name="jdbc.sqlonly"  level="OFF" />
-
-    <logger name="jdbc.sqltiming" additivity="false">
-        <level value="DEBUG" />
+    <logger name="jdbc.sqlonly"  level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="INFO" />
+    </logger>
+    <logger name="jdbc.sqltiming" level="DEBUG" additivity="false">
         <appender-ref ref="DEBUG" />
     </logger>
-    <logger name="jdbc.resultsettable" additivity="false">
-        <level value="DEBUG"/>
-        <appender-ref ref="DEBUG" />
-    </logger>
+    <logger name="jdbc.resultsettable" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="INFO" />    </logger>
 
-    <root level="DEBUG"> <!-- <root level="DEBUG"> -->
+    <root level="DEBUG"> <!--배포 시엔 INFO-->
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="DEBUG" />
         <appender-ref ref="INFO" />

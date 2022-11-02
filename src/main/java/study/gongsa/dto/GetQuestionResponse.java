@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import study.gongsa.domain.Question;
+import study.gongsa.domain.QuestionInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +16,9 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class GetQuestionResponse {
-    public GetQuestionResponse(List<Question> questionList){
+    public GetQuestionResponse(List<QuestionInfo> questionList){
         List<QuestionDTO> list = new ArrayList<QuestionDTO>();
-        for(Question question : questionList){
+        for(QuestionInfo question : questionList){
             QuestionDTO questionDTO = new QuestionDTO();
             questionDTO.setQuestionUID(question.getUID());
             questionDTO.setTitle(question.getTitle());
