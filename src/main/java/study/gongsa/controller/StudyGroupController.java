@@ -38,7 +38,7 @@ public class StudyGroupController {
         this.categoryService = categoryService;
     }
 
-    @ApiOperation(value="스터디룸 정보 조회 (UID로 조회)")
+    @ApiOperation(value="스터디 그룹 정보 조회 (UID로 조회)")
     @ApiResponses({
             @ApiResponse(code=200, message="조회 성공"),
             @ApiResponse(code=400, message="존재하지 않는 그룹일 경우"),
@@ -57,7 +57,7 @@ public class StudyGroupController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    @ApiOperation(value="스터디룸 정보 조회 (UID로 조회)")
+    @ApiOperation(value="스터디 그룹 정보 조회 (code로 조회)")
     @ApiResponses({
             @ApiResponse(code=200, message="조회 성공"),
             @ApiResponse(code=400, message="존재하지 않는 그룹일 경우"),
@@ -68,7 +68,7 @@ public class StudyGroupController {
             @ApiImplicitParam(name = "code", value = "스터디그룹 코드", required = true, dataType = "Striing", paramType = "path", defaultValue = ""),
     })
     @GetMapping("/code/{code}")
-    public ResponseEntity findOneByUID(@PathVariable("code") String code){
+    public ResponseEntity findOneByCode(@PathVariable("code") String code){
         StudyGroup studyGroupInfo = studyGroupService.findOneByCode(code);
         int currentMember = groupMemberService.findCurrentGroupMemberCnt(studyGroupInfo.getUID());
         List<Category> categories = categoryService.getStudyGroupCategory(studyGroupInfo.getUID());
@@ -76,7 +76,7 @@ public class StudyGroupController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    @ApiOperation(value="스터디룸 조회")
+    @ApiOperation(value="스터디 그룹 조회")
     @ApiResponses({
             @ApiResponse(code=200, message="조회 성공"),
             @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
@@ -98,7 +98,7 @@ public class StudyGroupController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    @ApiOperation(value="추천 스터디룸 조회 - 메인페이지/종료 임박했을 때 추천 페이지")
+    @ApiOperation(value="추천 스터디 그룹 조회 - 메인페이지/종료 임박했을 때 추천 페이지")
     @ApiResponses({
             @ApiResponse(code=200, message="추천 리스트 조회 성공"),
             @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
@@ -127,7 +127,7 @@ public class StudyGroupController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    @ApiOperation(value="나의 스터디그룹 랭킹 조회")
+    @ApiOperation(value="나의 스터디 그룹 랭킹 조회")
     @ApiResponses({
             @ApiResponse(code=200, message="추천 리스트 조회 성공"),
             @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
@@ -153,7 +153,7 @@ public class StudyGroupController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    @ApiOperation(value="나의 스터디그룹  조회")
+    @ApiOperation(value="나의 스터디 그룹  조회")
     @ApiResponses({
             @ApiResponse(code=200, message="추천 리스트 조회 성공"),
             @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
