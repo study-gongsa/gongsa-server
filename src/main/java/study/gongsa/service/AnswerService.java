@@ -43,14 +43,22 @@ public class AnswerService {
         answerRepository.save(answer);
     }
 
-    public int getQuestionUIDByAnswerUID(int answerUID) {
-        // 존재하는 답변인지 확인
+    public int getQuestionUIDByAnswerUID(int userUID, int answerUID) {
+        Optional<Answer> answer = answerRepository.findOne(answerUID);
+        answer.ifPresentOrElse(answer1->{
+            if(answer1.getUserUID() != userUID){
+                throw new IllegalStateExceptionWithLocation(HttpStatus.FORBIDDEN, "userUID","수정 권한이 없습니다.");
+            }
+        }, ()->{
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "answerUID","존재하지 않는 답변입니다.");
+        });
 
         // 질문글 찾기
-        return 0;
+        Question question = questionService.findOne(answer.get().getQuestionUID());
+        return question.getUID();
     }
 
-    public void updateAnswer(int userUID, int questionUID, int answerUID, String content) {
-        // 답변 수정
+    public void updateAnswer(int answerUID, String content) {
+        answerRepository.update(answerUID, content);
     }
 }

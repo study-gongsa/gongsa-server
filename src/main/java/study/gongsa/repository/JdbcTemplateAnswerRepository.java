@@ -8,10 +8,13 @@ import org.springframework.stereotype.Repository;
 import study.gongsa.domain.Answer;
 import study.gongsa.domain.AnswerInfo;
 import study.gongsa.domain.Category;
+import study.gongsa.domain.Question;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class JdbcTemplateAnswerRepository implements AnswerRepository{
@@ -30,6 +33,18 @@ public class JdbcTemplateAnswerRepository implements AnswerRepository{
     }
 
     @Override
+    public Optional<Answer> findOne(int UID) {
+        List<Answer> result = jdbcTemplate.query("select * from Answer where UID = ?", answerRowMapper(), UID);
+        return result.stream().findAny();
+    }
+
+    @Override
+    public void update(int UID, String content) {
+        String sql = "update Answer set answer=?" + " where UID=?";
+        jdbcTemplate.update(sql, content, UID);
+    }
+
+    @Override
     public List<AnswerInfo> findAnswer(int questionUID) {
         String sql = "SELECT a.UID, a.userUID, c.nickname, a.answer, a.createdAt "
                 + "FROM Answer a "
@@ -37,10 +52,10 @@ public class JdbcTemplateAnswerRepository implements AnswerRepository{
                 + "JOIN User c ON c.UID = a.userUID "
                 + "WHERE a.questionUID = ?";
         System.out.println(sql);
-        return jdbcTemplate.query(sql, AnswerRowMapper(), questionUID);
+        return jdbcTemplate.query(sql, answerInfoRowMapper(), questionUID);
     }
 
-    private RowMapper<AnswerInfo> AnswerRowMapper() {
+    private RowMapper<AnswerInfo> answerInfoRowMapper() {
         return (rs, rowNum) -> {
             AnswerInfo answer = new AnswerInfo();
             answer.setUID(rs.getInt("UID"));
@@ -48,6 +63,19 @@ public class JdbcTemplateAnswerRepository implements AnswerRepository{
             answer.setNickname(rs.getString("nickName"));
             answer.setAnswer(rs.getString("answer"));
             answer.setCreatedAt(rs.getTimestamp("createdAt"));
+            return answer;
+        };
+    }
+
+    private RowMapper<Answer> answerRowMapper() {
+        return (rs, rowNum) -> {
+            Answer answer = new Answer();
+            answer.setUID(rs.getInt("UID"));
+            answer.setQuestionUID(rs.getInt("questionUID"));
+            answer.setUserUID(rs.getInt("userUID"));
+            answer.setAnswer(rs.getString("answer"));
+            answer.setCreatedAt(rs.getTimestamp("createdAt"));
+            answer.setUpdatedAt(rs.getTimestamp("updatedAt"));
             return answer;
         };
     }

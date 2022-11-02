@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import study.gongsa.domain.User;
 import study.gongsa.domain.UserCategory;
@@ -38,6 +39,7 @@ public class UserCategoryController {
             @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등)")
     })
     @PostMapping("")
+    @Transactional
     public ResponseEntity save(@RequestBody @Valid UserCategoryRequest req, HttpServletRequest request){
         int userUID = (int) request.getAttribute("userUID");
         userCategoryService.remove(userUID);

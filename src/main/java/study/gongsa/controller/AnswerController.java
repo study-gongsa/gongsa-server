@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import study.gongsa.dto.DefaultResponse;
 import study.gongsa.dto.MakeAnswerDTO;
@@ -40,6 +41,7 @@ public class AnswerController {
             @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등)")
     })
     @PostMapping("")
+    @Transactional
     public ResponseEntity save(@RequestBody @Valid MakeAnswerDTO.Request req, HttpServletRequest request){
         int userUID = (int) request.getAttribute("userUID");
         answerService.makeAnswer(userUID, req.getQuestionUID(), req.getContent());
@@ -59,10 +61,11 @@ public class AnswerController {
             @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등)")
     })
     @PatchMapping("")
+    @Transactional
     public ResponseEntity update(@RequestBody @Valid UpdateAnswerDTO.Request req, HttpServletRequest request){
         int userUID = (int) request.getAttribute("userUID");
-        int questionUID = answerService.getQuestionUIDByAnswerUID(req.getAnswerUID());
-        answerService.updateAnswer(userUID, questionUID, req.getAnswerUID(), req.getContent());
+        int questionUID = answerService.getQuestionUIDByAnswerUID(userUID, req.getAnswerUID());
+        answerService.updateAnswer(req.getAnswerUID(), req.getContent());
 
         DefaultResponse response = new DefaultResponse(MakeAnswerDTO.Response
                 .builder()
