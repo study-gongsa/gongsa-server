@@ -38,7 +38,7 @@ public class UserCategoryController {
             @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
             @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등)")
     })
-    @PostMapping("")
+    @PutMapping("")
     @Transactional
     public ResponseEntity save(@RequestBody @Valid UserCategoryRequest req, HttpServletRequest request){
         int userUID = (int) request.getAttribute("userUID");
