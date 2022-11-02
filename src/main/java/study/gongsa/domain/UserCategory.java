@@ -24,6 +24,8 @@ public class UserCategory {
     private int UID;
     private int userUID;
     private Integer categoryUID;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
+    @Builder.Default
+    private Timestamp createdAt = new Timestamp(new java.util.Date().getTime());
+    @Builder.Default
+    private Timestamp updatedAt = new Timestamp(new java.util.Date().getTime());
 }
