@@ -35,14 +35,14 @@ public class QuestionService {
 
     public Question findOne(int questionUID) {
         Optional<Question> question = questionRepository.findOne(questionUID);
-        if(question.isEmpty()) throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, null, "존재하지 않는 질문입니다.");
+        if(question.isEmpty()) throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "questionUID", "존재하지 않는 질문입니다.");
         return question.get();
     }
 
     public List<QuestionInfo> findGroupQuestion(int userUID, int groupUID){
         Optional<StudyGroup> studyGroup = studyGroupRepository.findByUID(groupUID);
         if (studyGroup.isEmpty()){
-            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, null,"존재하지 않은 그룹입니다.");
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "groupUID","존재하지 않은 그룹입니다.");
         }
 
         checkRegisteredGroup(groupUID, userUID);
