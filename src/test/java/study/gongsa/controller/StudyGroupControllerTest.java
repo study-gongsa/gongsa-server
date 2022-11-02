@@ -27,6 +27,7 @@ import study.gongsa.domain.StudyGroup;
 import study.gongsa.domain.User;
 import study.gongsa.domain.UserAuth;
 import study.gongsa.dto.DefaultResponse;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import study.gongsa.dto.MakeStudyGroupRequest;
 import study.gongsa.repository.GroupMemberRepository;
 import study.gongsa.repository.StudyGroupRepository;
@@ -42,8 +43,11 @@ import java.sql.Date;
 import java.sql.Time;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -55,7 +59,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class StudyGroupControllerTest {
 
     private static String baseURL = "/api/study-group";
-    private Integer userUID, leaderUserUID, memberUserUID, groupUID;
+
+    private Integer userUID, leaderUserUID, memberUserUID;
+    private Integer groupUID;
+
     private String accessToken;
     private Integer madeGroupUID = 0;
 
@@ -72,11 +79,11 @@ class StudyGroupControllerTest {
     @Autowired
     private StudyGroupRepository studyGroupRepository;
     @Autowired
+    private GroupMemberRepository groupMemberRepository;
+    @Autowired
     private JwtTokenProvider jwtTokenProvider;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private GroupMemberRepository groupMemberRepository;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -133,11 +140,7 @@ class StudyGroupControllerTest {
                 .expiredAt(Date.valueOf("2023-10-10"))
                 .build();
         groupUID = studyGroupRepository.save(studyGroup).intValue();
-        GroupMember groupUser = GroupMember.builder()
-                .userUID(userUID)
-                .groupUID(groupUID)
-                .isLeader(true)
-                .build();
+
         GroupMember groupLeader = GroupMember.builder()
                 .userUID(leaderUserUID)
                 .groupUID(groupUID)
@@ -148,10 +151,14 @@ class StudyGroupControllerTest {
                 .groupUID(groupUID)
                 .isLeader(false)
                 .build();
-
-        groupMemberRepository.save(groupUser);
+        GroupMember userMember = GroupMember.builder()
+                .userUID(userUID)
+                .groupUID(groupUID)
+                .isLeader(false)
+                .build();
         groupMemberRepository.save(groupLeader);
         groupMemberRepository.save(groupMember);
+        groupMemberRepository.save(userMember);
     }
 
     @AfterEach
@@ -168,7 +175,7 @@ class StudyGroupControllerTest {
     }
 
     @Test
-    void 스터디그룹_정보_UID로_조회_성공() throws Exception {
+    void UID로스터디그룹조회_성공() throws Exception {
         // when
         ResultActions resultActions = mockMvc.perform(get(baseURL + "/27")
                         .header("Authorization", "Bearer "+accessToken)
@@ -191,43 +198,76 @@ class StudyGroupControllerTest {
     }
 
     @Test
-    void 스터디그룹_정보_UID로_조회_실패_스터디그룹미존재() throws Exception {
+    void 코드로스터디그룹조회_성공() throws Exception{
+        // given
+        StudyGroup studyGroup = studyGroupRepository.findByUID(groupUID).get();
+
         // when
-        ResultActions resultActions = mockMvc.perform(get(baseURL + "/0")
+        ResultActions resultActions = mockMvc.perform(get(baseURL+"/code/"+studyGroup.getCode())
                         .header("Authorization", "Bearer "+accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print());
 
         // then
-        resultActions.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.msg").value("존재하지 않은 그룹입니다."));
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.groupUID").value(studyGroup.getUID()))
+                .andExpect(jsonPath("$.data.name").value(studyGroup.getName()))
+                .andExpect(jsonPath("$.data.code").value(studyGroup.getCode()))
+                .andExpect(jsonPath("$.data.isCam").value(studyGroup.getIsCam()))
+                .andExpect(jsonPath("$.data.minStudyHour").value(studyGroup.getMinStudyHour().toString()))
+                .andExpect(jsonPath("$.data.expiredAt").exists())
+                .andExpect(jsonPath("$.data.createdAt").exists())
+                .andExpect(jsonPath("$.data.categories").exists());
     }
 
     @Test
-    void 나의_스터디그룹_랭킹_조회_성공() throws Exception {
+    void 나의스터디그룹조회_성공() throws Exception {
+        // given
+        StudyGroup studyGroup = studyGroupRepository.findByUID(groupUID).get();
+
         // when
-        ResultActions resultActions = mockMvc.perform(get(baseURL + "/my-ranking")
+        ResultActions resultActions = mockMvc.perform(get(baseURL+"/my-group")
                         .header("Authorization", "Bearer "+accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print());
+
+        // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.studyGroupList.length()").value(1))
+                .andExpect(jsonPath("$.data.studyGroupList[0].studyGroupUID").value(groupUID))
+                .andExpect(jsonPath("$.data.studyGroupList[0].imgPath").exists())
+                .andExpect(jsonPath("$.data.studyGroupList[0].name").value(studyGroup.getName()))
+                .andExpect(jsonPath("$.data.studyGroupList[0].isCam").value(studyGroup.getIsCam()))
+                .andExpect(jsonPath("$.data.studyGroupList[0].createdAt").exists())
+                .andExpect(jsonPath("$.data.studyGroupList[0].expiredAt").exists());
+    }
+    @Test
+    void 추천스터디그룹조회_성공() throws Exception {
+        // when
+        ResultActions resultActions = mockMvc.perform(get(baseURL + "/recommend")
+                        .header("Authorization", "Bearer "+accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .queryParam("groupUID", "27")
+                        .queryParam("type", "main")
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print());
 
         // then
         resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.groupRankList").exists())
-                .andExpect(jsonPath("$.data.groupRankList[0].groupUID").exists())
-                .andExpect(jsonPath("$.data.groupRankList[0].name").exists())
-                .andExpect(jsonPath("$.data.groupRankList[0].members[0].userUID").exists())
-                .andExpect(jsonPath("$.data.groupRankList[0].members[0].nickname").exists())
-                .andExpect(jsonPath("$.data.groupRankList[0].members[0].imgPath").exists())
-                .andExpect(jsonPath("$.data.groupRankList[0].members[0].studyStatus").exists())
-                .andExpect(jsonPath("$.data.groupRankList[0].members[0].totalStudyTime").exists())
-                .andExpect(jsonPath("$.data.groupRankList[0].members[0].ranking").exists());
+                .andExpect(jsonPath("$.data.studyGroupList").exists())
+                .andExpect(jsonPath("$.data.studyGroupList[0].studyGroupUID").exists())
+                .andExpect(jsonPath("$.data.studyGroupList[0].imgPath").exists())
+                .andExpect(jsonPath("$.data.studyGroupList[0].name").exists())
+                .andExpect(jsonPath("$.data.studyGroupList[0].isCam").exists())
+                .andExpect(jsonPath("$.data.studyGroupList[0].createdAt").exists())
+                .andExpect(jsonPath("$.data.studyGroupList[0].expiredAt").exists());
     }
-
     @Test
-    void 스터디그룹_조회() throws Exception {
+    void 스터디그룹검색_성공() throws Exception {
         // when
         ResultActions resultActions = mockMvc.perform(get(baseURL + "/search")
                         .header("Authorization", "Bearer "+accessToken)
@@ -251,26 +291,27 @@ class StudyGroupControllerTest {
     }
 
     @Test
-    void 스터디그룹_추천() throws Exception {
+    void 나의스터디그룹랭킹조회_성공() throws Exception {
         // when
-        ResultActions resultActions = mockMvc.perform(get(baseURL + "/recommend")
+        ResultActions resultActions = mockMvc.perform(get(baseURL + "/my-ranking")
                         .header("Authorization", "Bearer "+accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .queryParam("groupUID", "27")
-                        .queryParam("type", "main")
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print());
 
         // then
         resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.studyGroupList").exists())
-                .andExpect(jsonPath("$.data.studyGroupList[0].studyGroupUID").exists())
-                .andExpect(jsonPath("$.data.studyGroupList[0].imgPath").exists())
-                .andExpect(jsonPath("$.data.studyGroupList[0].name").exists())
-                .andExpect(jsonPath("$.data.studyGroupList[0].isCam").exists())
-                .andExpect(jsonPath("$.data.studyGroupList[0].createdAt").exists())
-                .andExpect(jsonPath("$.data.studyGroupList[0].expiredAt").exists());
+                .andExpect(jsonPath("$.data.groupRankList").exists())
+                .andExpect(jsonPath("$.data.groupRankList[0].groupUID").exists())
+                .andExpect(jsonPath("$.data.groupRankList[0].name").exists())
+                .andExpect(jsonPath("$.data.groupRankList[0].members[0].userUID").exists())
+                .andExpect(jsonPath("$.data.groupRankList[0].members[0].nickname").exists())
+                .andExpect(jsonPath("$.data.groupRankList[0].members[0].imgPath").exists())
+                .andExpect(jsonPath("$.data.groupRankList[0].members[0].studyStatus").exists())
+                .andExpect(jsonPath("$.data.groupRankList[0].members[0].totalStudyTime").exists())
+                .andExpect(jsonPath("$.data.groupRankList[0].members[0].ranking").exists());
     }
+
 
     @Test
     void 스터디그룹생성_성공_이미지존재() throws Exception {
