@@ -57,9 +57,7 @@ public class QuestionService {
         }
     }
 
-    @Transactional
     public int makeQuestion(int userUID, int groupUID, String title, String content) {
-
         checkRegisteredGroup(groupUID, userUID);
         Question question = Question.builder()
                 .userUID(userUID)
