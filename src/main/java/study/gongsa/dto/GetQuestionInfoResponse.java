@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import study.gongsa.domain.Answer;
+import study.gongsa.domain.AnswerInfo;
 import study.gongsa.domain.Category;
 import study.gongsa.domain.Question;
 
@@ -17,13 +18,13 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class GetQuestionInfoResponse {
-    public GetQuestionInfoResponse(Question question, List<Answer> answerList){
+    public GetQuestionInfoResponse(Question question, List<AnswerInfo> answerList){
         this.title = question.getTitle();
         this.content = question.getContent();
 
         List<AnswerDTO> list = new ArrayList<AnswerDTO>();
 
-        for(Answer answer: answerList){
+        for(AnswerInfo answer: answerList){
             AnswerDTO answerDTO = new AnswerDTO();
             answerDTO.setAnswerUID(answer.getUID());
             answerDTO.setUserUID(answer.getUserUID());

@@ -3,7 +3,6 @@ package study.gongsa.domain;
 import lombok.*;
 
 import java.sql.Timestamp;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -11,13 +10,13 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @ToString
-public class Answer {
+public class AnswerInfo {
     private int UID;
     private int questionUID;
     private int userUID;
+    private String nickname;
     private String answer;
-    @Builder.Default
-    private Timestamp createdAt = new Timestamp(new Date().getTime());
-    @Builder.Default
-    private Timestamp updatedAt = new Timestamp(new Date().getTime());
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 }
+

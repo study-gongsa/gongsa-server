@@ -11,12 +11,13 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @ToString
-public class Question {
+public class QuestionInfo {
     private int UID;
     private int groupUID;
     private int userUID;
     private String title;
     private String content;
+    private String answerStatus;
     @Builder.Default
     private Timestamp createdAt = new Timestamp(new Date().getTime());
     @Builder.Default
