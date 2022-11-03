@@ -32,7 +32,7 @@ public class JdbcTemplateUserCategoryRepository implements UserCategoryRepositor
 
     @Override
     public List<UserCategory> findByUserUID(int userUID) {
-        return jdbcTemplate.query("select * from UserCategory where userUID = ?", userCategoryRowMapper(), userUID);
+        return jdbcTemplate.query("select * from UserCategory where userUID = ? order by categoryUID", userCategoryRowMapper(), userUID);
     }
 
     @Override
