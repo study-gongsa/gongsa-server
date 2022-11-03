@@ -4,13 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
+import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import study.gongsa.dto.FcmMessage;
+import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.http.HttpHeaders.*;
 
@@ -49,8 +53,11 @@ public class FirebaseCloudMessageService {
                     .build();
             Response response = client.newCall(request)
                     .execute();
+            if(!response.isSuccessful()){
+                throw new Exception(response.body().string());
+            }
         }catch(Exception e){
-            log.info("{}: {}",e.getClass().getName(), e.getMessage());
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "push", e.getMessage());
         }
     }
 
