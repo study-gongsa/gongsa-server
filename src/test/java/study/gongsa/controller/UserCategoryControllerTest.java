@@ -102,7 +102,7 @@ class UserCategoryControllerTest {
         userCategoryRepository.save(userCategory3);
     }
     @Test
-    void 사용자_카테고리_등록_성공() throws Exception {
+    void 사용자_카테고리등록_성공() throws Exception {
         // given
         ArrayList<Integer> categoryUIDs = new ArrayList<>(Arrays.asList(5,6,7));
         UserCategoryRequest userCategoryRequest = UserCategoryRequest.builder()
@@ -125,7 +125,7 @@ class UserCategoryControllerTest {
     }
 
     @Test
-    void 사용자_카테고리_조회_성공() throws Exception {
+    void 사용자_카테고리조회_성공() throws Exception {
         // given
         // when
         ResultActions resultActions = mockMvc.perform(get(baseURL)

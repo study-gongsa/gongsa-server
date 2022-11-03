@@ -284,4 +284,19 @@ class AnswerControllerTest {
                 .andExpect(jsonPath("$.location").value("userUID"))
                 .andExpect(jsonPath("$.msg").value("수정 권한이 없습니다."));
     }
+
+    @Test
+    void 답변삭제_성공() throws Exception {
+
+    }
+
+    @Test
+    void 답변삭제_실패_미존재답변() throws Exception {
+
+    }
+
+    @Test
+    void 답변삭제_실패_삭제권한없음() throws Exception {
+
+    }
 }

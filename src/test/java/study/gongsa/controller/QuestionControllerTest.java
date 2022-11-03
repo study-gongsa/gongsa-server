@@ -168,7 +168,7 @@ public class QuestionControllerTest {
     }
 
     @Test
-    void 내_질문_모아보기_성공() throws Exception {
+    void 내질문모아보기_성공() throws Exception {
         // given
         // when
         ResultActions resultActions = mockMvc.perform(get(baseURL+"/my-question")
@@ -188,7 +188,7 @@ public class QuestionControllerTest {
     }
 
     @Test
-    void 스터디그룹_질문_모아보기_성공() throws Exception {
+    void 질문모아보기_성공() throws Exception {
         // given
         // when
         ResultActions resultActions = mockMvc.perform(get(baseURL+"/group-question/"+groupUID)
@@ -208,7 +208,7 @@ public class QuestionControllerTest {
     }
 
     @Test
-    void 스터디그룹_질문_상세보기_성공() throws Exception {
+    void 질문상세보기_성공() throws Exception {
         // given
         // when
         ResultActions resultActions = mockMvc.perform(get(baseURL+"/" +questionUID)
@@ -229,7 +229,7 @@ public class QuestionControllerTest {
     }
 
     @Test
-    void 스터디그룹_질문_등록_성공() throws Exception {
+    void 질문등록_성공() throws Exception {
         // given
         MakeQuestionDTO.Request makeQuestionRequest = new MakeQuestionDTO.Request(groupUID, "통합테스트 질문 등록 제목입니다.", "통합테스트 질문 내용입니다.");
         // when
@@ -243,5 +243,10 @@ public class QuestionControllerTest {
         // then
         resultActions.andExpect(status().isCreated())
                 .andExpect(jsonPath("$.data.questionUID").exists());
+    }
+
+    @Test
+    void 질문등록_실패_미가입그룹() throws Exception {
+
     }
 }
