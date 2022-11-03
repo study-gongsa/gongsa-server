@@ -1,5 +1,6 @@
 package study.gongsa.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import static java.util.Objects.isNull;
 
 @Service
+@Slf4j
 public class StudyGroupService {
     private final StudyGroupRepository studyGroupRepository;
     private final GroupCategoryRepository groupCategoryRepository;
@@ -81,7 +83,9 @@ public class StudyGroupService {
     public int makeStudyGroup(StudyGroup studyGroup, int[] groupCategories) {
         // StudyGroup
         // make code
-        String studyGroupCode = codeGenerator.generateRandomString(12);
+        String studyGroupCode = codeGenerator.generateRandomString(4)
+                +"-"+codeGenerator.generateRandomString(4)
+                +"-"+codeGenerator.generateRandomString(4);
         studyGroup.setCode(studyGroupCode);
 
         // createdAt, updatedAt
@@ -113,7 +117,7 @@ public class StudyGroupService {
         if( !isNull(image) && !image.isEmpty() ){ // 받은 이미지 저장
             imageService.save(image, fileName);
         }else{ //이미지 없으면 랜덤 이미지 지정
-            fileName = "r"+codeGenerator.generateRandomNumber(1)+"jpg";
+            fileName = "r"+codeGenerator.generateRandomNumber(1)+".jpg";
         }
 
         studyGroupRepository.updateImgPath(uid, fileName);
