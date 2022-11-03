@@ -35,6 +35,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Date;
 import java.sql.Time;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -54,7 +56,7 @@ class StudyGroupControllerTest {
 
     private static String baseURL = "/api/study-group";
 
-    private Integer userUID, leaderUserUID, memberUserUID;
+    private Integer userUID, leaderUserUID, memberUserUID, categoryUID;
     private Integer groupUID;
 
     private String accessToken;
@@ -80,6 +82,8 @@ class StudyGroupControllerTest {
     private JwtTokenProvider jwtTokenProvider;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -165,6 +169,14 @@ class StudyGroupControllerTest {
         groupMemberRepository.save(groupLeader);
         groupMemberRepository.save(groupMember);
         groupMemberRepository.save(userMember);
+
+        List<Category> categories = categoryRepository.findAll();
+
+        GroupCategory groupCategory = GroupCategory.builder()
+                .groupUID(groupUID)
+                .categoryUID(categories.get(0).getUID())
+                .build();
+        groupCategoryRepository.save(groupCategory);
     }
 
     @AfterEach
