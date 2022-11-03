@@ -27,8 +27,16 @@ public class AnswerService {
         this.questionService = questionService;
     }
 
-    public List<AnswerInfo> findAnswer(int questionUID){
+    public List<AnswerInfo> findAnswerByQuestionUID(int questionUID){
         return answerRepository.findAnswer(questionUID);
+    }
+
+    public Answer findAnswer(int answerUID){
+        Optional<Answer> answer = answerRepository.findOne(answerUID);
+        if(answer.isEmpty()){
+            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "answerUID","존재하지 않는 답변입니다.");
+        }
+        return answer.get();
     }
 
     public void makeAnswer(int userUID, int questionUID, String content) {
@@ -44,21 +52,26 @@ public class AnswerService {
     }
 
     public int getQuestionUIDByAnswerUID(int userUID, int answerUID) {
-        Optional<Answer> answer = answerRepository.findOne(answerUID);
-        answer.ifPresentOrElse(answer1->{
-            if(answer1.getUserUID() != userUID){
-                throw new IllegalStateExceptionWithLocation(HttpStatus.FORBIDDEN, "userUID","수정 권한이 없습니다.");
-            }
-        }, ()->{
-            throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "answerUID","존재하지 않는 답변입니다.");
-        });
+        Answer answer = findAnswer(answerUID);
+        if(answer.getUserUID() != userUID){
+            throw new IllegalStateExceptionWithLocation(HttpStatus.FORBIDDEN, "userUID","수정 권한이 없습니다.");
+        }
 
         // 질문글 찾기
-        Question question = questionService.findOne(answer.get().getQuestionUID());
+        Question question = questionService.findOne(answer.getQuestionUID());
         return question.getUID();
     }
 
     public void updateAnswer(int answerUID, String content) {
         answerRepository.update(answerUID, content);
+    }
+
+    public void deleteAnswer(int answerUID, int userUID){
+        Answer answer = findAnswer(answerUID);
+        if(answer.getUserUID() != userUID){
+            throw new IllegalStateExceptionWithLocation(HttpStatus.FORBIDDEN, "userUID","삭제 권한이 없습니다.");
+        }
+
+        answerRepository.remove(answerUID);
     }
 }
