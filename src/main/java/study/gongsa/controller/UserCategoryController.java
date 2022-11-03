@@ -13,12 +13,14 @@ import study.gongsa.domain.User;
 import study.gongsa.domain.UserCategory;
 import study.gongsa.dto.DefaultResponse;
 import study.gongsa.dto.JoinRequest;
+import study.gongsa.dto.UserCategoryDTO;
 import study.gongsa.dto.UserCategoryRequest;
 import study.gongsa.service.UserCategoryService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @CrossOrigin("*")
@@ -50,5 +52,20 @@ public class UserCategoryController {
 
         DefaultResponse response = new DefaultResponse();
         return new ResponseEntity(response, HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value="사용자 카테고리 조회")
+    @ApiResponses({
+            @ApiResponse(code=201, message="등록 완료"),
+            @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
+            @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등)")
+    })
+    @GetMapping("")
+    @Transactional
+    public ResponseEntity findAll(HttpServletRequest request){
+        int userUID = (int) request.getAttribute("userUID");
+        List<UserCategoryDTO> userCategoryDTOS = userCategoryService.findAll(userUID);
+        DefaultResponse response = new DefaultResponse(userCategoryDTOS);
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 }
