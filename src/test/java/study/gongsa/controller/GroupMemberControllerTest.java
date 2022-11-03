@@ -123,7 +123,7 @@ class GroupMemberControllerTest {
                 .code("0000000000000000")
                 .isCam(true)
                 .isPrivate(false)
-                .minStudyHour(Time.valueOf("23:00:00"))
+                .minStudyHour("23:00:00")
                 .maxMember(4)
                 .maxTodayStudy(6)
                 .isPenalty(true)
@@ -171,7 +171,7 @@ class GroupMemberControllerTest {
             log.debug("생성된 그룹 멤버 > {}",groupMember);
         });
     }
-/*
+
     @Test
     void 스터디그룹가입_실패_주최소공부시간초과() throws Exception {
         // given
@@ -180,7 +180,7 @@ class GroupMemberControllerTest {
                 .code("0000000000000001")
                 .isCam(true)
                 .isPrivate(false)
-                .minStudyHour(Time.valueOf("70:0:0"))
+                .minStudyHour("70:0:0")
                 .maxMember(6)
                 .maxTodayStudy(6)
                 .isPenalty(true)
@@ -211,7 +211,7 @@ class GroupMemberControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.location").value("minStudyHour"));
     }
-*/
+
     @Test
     void 스터디그룹가입_실패_이미가입() throws Exception {
         GroupMember groupMember = GroupMember.builder()

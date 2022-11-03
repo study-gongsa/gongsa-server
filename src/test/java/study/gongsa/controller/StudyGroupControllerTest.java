@@ -77,11 +77,11 @@ class StudyGroupControllerTest {
     @Autowired
     private GroupMemberRepository groupMemberRepository;
     @Autowired
+    private GroupCategoryRepository groupCategoryRepository;
+    @Autowired
     private JwtTokenProvider jwtTokenProvider;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private GroupCategoryRepository groupCategoryRepository;
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -132,7 +132,7 @@ class StudyGroupControllerTest {
                 .code("0000000000000000")
                 .isCam(true)
                 .isPrivate(false)
-                .minStudyHour(Time.valueOf("23:00:00"))
+                .minStudyHour("25:00:00")
                 .maxMember(4)
                 .maxTodayStudy(6)
                 .isPenalty(true)
@@ -140,6 +140,16 @@ class StudyGroupControllerTest {
                 .expiredAt(Date.valueOf("2023-10-10"))
                 .build();
         groupUID = studyGroupRepository.save(studyGroup).intValue();
+        GroupCategory groupCategory1 = GroupCategory.builder()
+                .categoryUID(1)
+                .groupUID(groupUID)
+                .build();
+        GroupCategory groupCategory2 = GroupCategory.builder()
+                .categoryUID(2)
+                .groupUID(groupUID)
+                .build();
+        groupCategoryRepository.save(groupCategory1);
+        groupCategoryRepository.save(groupCategory2);
 
         GroupMember groupLeader = GroupMember.builder()
                 .userUID(leaderUserUID)
@@ -184,8 +194,11 @@ class StudyGroupControllerTest {
 
     @Test
     void UID로스터디그룹조회_성공() throws Exception {
+        // given
+        StudyGroup studyGroup = studyGroupRepository.findByUID(groupUID).get();
+
         // when
-        ResultActions resultActions = mockMvc.perform(get(baseURL+"/"+groupUID)
+        ResultActions resultActions = mockMvc.perform(get(baseURL + "/"+groupUID)
                         .header("Authorization", "Bearer "+accessToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
@@ -193,13 +206,15 @@ class StudyGroupControllerTest {
 
         // then
         resultActions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.groupUID").exists())
-                .andExpect(jsonPath("$.data.name").exists())
-                .andExpect(jsonPath("$.data.code").exists())
-                .andExpect(jsonPath("$.data.isCam").exists())
-                .andExpect(jsonPath("$.data.minStudyHour").exists())
+                .andExpect(jsonPath("$.data.groupUID").value(groupUID))
+                .andExpect(jsonPath("$.data.name").value(studyGroup.getName()))
+                .andExpect(jsonPath("$.data.code").value(studyGroup.getCode()))
+                .andExpect(jsonPath("$.data.isCam").value(studyGroup.getIsCam()))
+                .andExpect(jsonPath("$.data.minStudyHour").value(studyGroup.getMinStudyHour()))
                 .andExpect(jsonPath("$.data.createdAt").exists())
                 .andExpect(jsonPath("$.data.expiredAt").exists())
+                //.andExpect(jsonPath("$.data.createdAt").value(studyGroup.getCreatedAt().toString()))
+                //.andExpect(jsonPath("$.data.expiredAt").value(studyGroup.getExpiredAt().toString()))
                 .andExpect(jsonPath("$.data.categories").exists())
                 .andExpect(jsonPath("$.data.categories[0].categoryUID").exists())
                 .andExpect(jsonPath("$.data.categories[0].name").exists());
@@ -363,7 +378,7 @@ class StudyGroupControllerTest {
             log.debug("생성된 스터디 그룹 > {}",studyGroup);
         });
     }
-    /*
+
     @Test
     void 스터디그룹생성_성공_목표시간24시간이상() throws Exception {
         // given
@@ -399,9 +414,9 @@ class StudyGroupControllerTest {
         StudyGroup studyGroup = studyGroupRepository.findByUID(madeGroupUID).get();
 
         log.debug("생성된 스터디 그룹 > {}",studyGroup); // 생성된 스터디 그룹 정보 확인 위한 로그
-        assertThat(studyGroup.getMinStudyHour().getHours()).isEqualTo(makeStudyGroupRequest.getMinStudyHour());
+        assertThat(studyGroup.getMinStudyHour()).isEqualTo(makeStudyGroupRequest.getMinStudyHour()+":00:00");
     }
-*/
+
     @Test
     void 스터디그룹생성_성공_이미지미존재() throws Exception {
         // given
@@ -440,13 +455,65 @@ class StudyGroupControllerTest {
 
     @Test
     void 스터디그룹생성_실패_주최소공부시간초과() throws Exception {
+        // given
+        MakeStudyGroupRequest makeStudyGroupRequest = MakeStudyGroupRequest.builder()
+                .name("통합테스트 위한 스터디")
+                .isCam(true)
+                .maxMember(6)
+                .isPrivate(false)
+                .categoryUIDs(new int[]{1,2})
+                .isPenalty(true)
+                .maxTodayStudy(5)
+                .minStudyHour(70)
+                .expiredAt(Date.valueOf("2023-10-10"))
+                .build();
+
+        MockMultipartFile json = new MockMultipartFile("json","json","application/json",
+                objectMapper.writeValueAsString(makeStudyGroupRequest).getBytes());
+
+        // when
+        ResultActions resultActions = mockMvc.perform(multipart(HttpMethod.POST,baseURL)
+                        .file(json)
+                        .header("Authorization", "Bearer "+accessToken))
+                .andDo(print());
+
+        // then
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.location").value("minStudyHour"))
+                .andExpect(jsonPath("$.msg").value("가입할 수 있는 최소 공부 시간(80시간)을 초과했습니다."))
+                .andReturn();
     }
 
     @Test
     void 스터디그룹생성_실패_존재하지않는카테고리UID() throws Exception {
-    }
+        // given
+        MakeStudyGroupRequest makeStudyGroupRequest = MakeStudyGroupRequest.builder()
+                .name("통합테스트 위한 스터디")
+                .isCam(true)
+                .maxMember(6)
+                .isPrivate(false)
+                .categoryUIDs(new int[]{0, 1, 2})
+                .isPenalty(true)
+                .maxTodayStudy(5)
+                .minStudyHour(1)
+                .expiredAt(Date.valueOf("2023-10-10"))
+                .build();
 
-    @Test
-    void 스터디그룹생성_실패_이미지업로드실패() throws Exception {
+        MockMultipartFile json = new MockMultipartFile("json", "json", "application/json",
+                objectMapper.writeValueAsString(makeStudyGroupRequest).getBytes());
+
+        // when
+        ResultActions resultActions = mockMvc.perform(multipart(HttpMethod.POST, baseURL)
+                        .file(json)
+                        .header("Authorization", "Bearer " + accessToken))
+                .andDo(print());
+
+        // then
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.location").value("categoryUID"))
+                .andExpect(jsonPath("$.msg").value("존재하지 않는 카테고리입니다."))
+                .andReturn();
     }
 }

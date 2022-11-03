@@ -1,6 +1,7 @@
 package study.gongsa.controller;
 
 import io.swagger.annotations.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -153,7 +154,7 @@ public class StudyGroupController {
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    @ApiOperation(value="나의 스터디 그룹  조회")
+    @ApiOperation(value="나의 스터디 그룹 조회")
     @ApiResponses({
             @ApiResponse(code=200, message="추천 리스트 조회 성공"),
             @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),

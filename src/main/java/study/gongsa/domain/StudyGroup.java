@@ -18,7 +18,7 @@ public class StudyGroup {
     private String code;
     private Boolean isCam;
     private Boolean isPrivate;
-    private Time minStudyHour;
+    private String minStudyHour; //실제 db에서 사용하는 type:Time, 24시간 이상 저장 위해 String 사용
     private int maxMember;
     private int maxTodayStudy;
     private Boolean isPenalty;
