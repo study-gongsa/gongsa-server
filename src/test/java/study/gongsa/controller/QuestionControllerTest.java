@@ -247,6 +247,19 @@ public class QuestionControllerTest {
 
     @Test
     void 질문등록_실패_미가입그룹() throws Exception {
+        // given
+        MakeQuestionDTO.Request makeQuestionRequest = new MakeQuestionDTO.Request(0, "통합테스트 질문 등록 제목입니다.", "통합테스트 질문 내용입니다.");
+        // when
+        ResultActions resultActions = mockMvc.perform(post(baseURL)
+                        .header("Authorization", "Bearer "+accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(makeQuestionRequest))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print());
 
+        // then
+        resultActions.andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.location").value("groupUID"))
+                .andExpect(jsonPath("$.msg").value("가입되지 않은 그룹입니다."));
     }
 }
