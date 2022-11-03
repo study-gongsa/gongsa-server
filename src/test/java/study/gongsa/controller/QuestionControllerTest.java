@@ -111,7 +111,7 @@ public class QuestionControllerTest {
                 .code("0000000000000000")
                 .isCam(true)
                 .isPrivate(false)
-                .minStudyHour(Time.valueOf("23:00:00"))
+                .minStudyHour("23:00:00")
                 .maxMember(4)
                 .maxTodayStudy(6)
                 .isPenalty(true)
