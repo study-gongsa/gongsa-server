@@ -59,7 +59,7 @@ public class GetStudyGroupInfoResponse {
     private Boolean isCam;
 
     @ApiModelProperty(value="최소 공부 시간 (주 단위)")
-    private Time minStudyHour;
+    private String minStudyHour;
 
     @ApiModelProperty(value="시작일")
     private Date createdAt;

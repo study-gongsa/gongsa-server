@@ -28,7 +28,9 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
     @Override
     public Number save(StudyGroup studyGroup) {
         final Map<String, Object> parameters = setParameter(studyGroup);
-        return insertIntoStudyGroupAuth.executeAndReturnKey(parameters);
+        Number UID = insertIntoStudyGroupAuth.executeAndReturnKey(parameters);
+        updateMinStudyHour(UID.intValue(), studyGroup.getMinStudyHour());
+        return UID;
     }
 
     @Override
@@ -156,6 +158,11 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
         return jdbcTemplate.query(sql, studyGroupRowMapper(), userUID);
     }
 
+    public void updateMinStudyHour(int UID, String minStudyHour){
+        String sql = "UPDATE StudyGroup SET minStudyHour = TIME(?) WHERE UID = ?";
+        jdbcTemplate.update(sql, minStudyHour, UID);
+    }
+
     private RowMapper<StudyGroup> studyGroupRowMapper() {
         return (rs, rowNum) -> {
             StudyGroup studyGroup = new StudyGroup();
@@ -168,7 +175,7 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
             studyGroup.setIsPrivate(rs.getBoolean("isPrivate"));
             studyGroup.setIsCam(rs.getBoolean("isCam"));
             studyGroup.setIsPenalty(rs.getBoolean("isPenalty"));
-            studyGroup.setMinStudyHour(rs.getTime("minStudyHour"));
+            studyGroup.setMinStudyHour(rs.getString("minStudyHour"));
             studyGroup.setImgPath(rs.getString("imgPath"));
             studyGroup.setExpiredAt(rs.getDate("expiredAt"));
             studyGroup.setCreatedAt(rs.getTimestamp("createdAt"));

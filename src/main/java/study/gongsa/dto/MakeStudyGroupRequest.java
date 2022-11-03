@@ -72,7 +72,7 @@ public class MakeStudyGroupRequest {
                 .isPenalty(req.getIsPenalty())
                 .maxPenalty(req.getMaxPenalty())
                 .expiredAt(req.getExpiredAt())
-                .minStudyHour(Time.valueOf(req.getMinStudyHour()+":00:00"))
+                .minStudyHour(req.getMinStudyHour()+":00:00")
                 .build();
 
         return studyGroup;
