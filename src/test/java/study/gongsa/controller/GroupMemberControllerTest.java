@@ -319,8 +319,8 @@ class GroupMemberControllerTest {
                 .andExpect(jsonPath("$.data.members[0].nickname").exists())
                 .andExpect(jsonPath("$.data.members[0].imgPath").exists())
                 .andExpect(jsonPath("$.data.members[0].studyStatus").exists())
-                .andExpect(jsonPath("$.data.members[0].totalStudyTime").exists())
-                .andExpect(jsonPath("$.data.members[0].ranking").exists())
+                .andExpect(jsonPath("$.data.members[0].totalStudyTime").value("00:00:00"))
+                .andExpect(jsonPath("$.data.members[0].ranking").value(1))
                 .andExpect(jsonPath("$.data.members.length()").value(2));
     }
 
