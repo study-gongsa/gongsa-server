@@ -67,7 +67,7 @@ public class QuestionController {
     @GetMapping("/{questionUID}")
     public ResponseEntity findOne(@PathVariable("questionUID") int questionUID){
         Question question = questionService.findOne(questionUID);
-        List<AnswerInfo> answerList = answerService.findAnswer(questionUID);
+        List<AnswerInfo> answerList = answerService.findAnswerByQuestionUID(questionUID);
         DefaultResponse response = new DefaultResponse(new GetQuestionInfoResponse(question, answerList));
         return new ResponseEntity(response, HttpStatus.OK);
     }

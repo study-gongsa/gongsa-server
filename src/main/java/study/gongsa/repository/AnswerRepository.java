@@ -14,4 +14,5 @@ public interface AnswerRepository {
     Optional<Answer> findOne(int UID);
 
     void update(int UID, String content);
+    void remove(int UID);
 }

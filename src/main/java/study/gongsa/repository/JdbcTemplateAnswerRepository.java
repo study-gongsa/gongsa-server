@@ -45,6 +45,12 @@ public class JdbcTemplateAnswerRepository implements AnswerRepository{
     }
 
     @Override
+    public void remove(int UID) {
+        String sql = "delete from Answer where uid = ?";
+        jdbcTemplate.update(sql, UID);
+    }
+
+    @Override
     public List<AnswerInfo> findAnswer(int questionUID) {
         String sql = "SELECT a.UID, a.userUID, c.nickname, a.answer, a.createdAt "
                 + "FROM Answer a "
