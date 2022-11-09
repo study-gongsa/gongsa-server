@@ -1,24 +1,24 @@
 package study.gongsa.repository;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import study.gongsa.domain.GroupCategory;
-import study.gongsa.domain.GroupMember;
-import study.gongsa.domain.GroupMemberUserInfo;
-import study.gongsa.domain.StudyGroup;
+import study.gongsa.domain.*;
 
 import javax.sql.DataSource;
 import java.sql.Time;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.sql.Timestamp;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Repository
+@Slf4j
 public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
 
     private final JdbcTemplate jdbcTemplate;
@@ -91,6 +91,41 @@ public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
         return result.stream().collect(Collectors.toList());
     }
 
+    @Override
+    public List<MemberWeeklyTimeInfo> getMemberWeeklyStudyTimeInfo() {
+        String groupMemberInfoQuery = "SELECT sg.UID as groupUID, gm.UID as groupMemberUID, sg.minStudyHour, sg.isPenalty, sg.maxPenalty, gm.penaltyCnt " +
+                "FROM StudyGroup sg " +
+                "INNER JOIN GroupMember gm " +
+                "ON sg.UID = gm.groupUID " +
+                "WHERE TIMESTAMPDIFF(DAY, sg.createdAt , now()) >= 7 " +
+                "AND TIMESTAMPDIFF(DAY, gm.createdAt , now()) >= 7 ";
+        String studyInfoQuery = "SELECT sm.UID as studyMemberUID, groupMemberUID, TIME(SUM(studyTime)) as studyHour " +
+                "FROM StudyMember sm " +
+                "WHERE TIMESTAMPDIFF(DAY, updatedAt, now()) < 7 " +
+                "AND TIMESTAMPDIFF(HOUR, updatedAt, now()) > 1 " +
+                "GROUP BY groupMemberUID ";
+
+        String query = "SELECT GroupMemberInfo.groupMemberUID, GroupMemberInfo.groupUID, GroupMemberInfo.minStudyHour, IFNULL(StudyInfo.studyHour, TIME(0)) as studyHour, " +
+                "GroupMemberInfo.isPenalty, GroupMemberInfo.maxPenalty, GroupMemberInfo.PenaltyCnt as currentPenalty, " +
+                "IF(TIMEDIFF(GroupMemberInfo.minStudyHour, StudyInfo.studyHour)>=TIME(0),FALSE,TRUE) as addPenalty " +
+                "FROM ("+ groupMemberInfoQuery +") GroupMemberInfo " +
+                "LEFT JOIN ( " + studyInfoQuery + ") StudyInfo " +
+                "ON GroupMemberInfo.groupMemberUID = StudyInfo.groupMemberUID ";
+
+        List<MemberWeeklyTimeInfo> result = jdbcTemplate.query(query, memberWeeklyTimeInfoRowMapper());
+        return result.stream().collect(Collectors.toList());
+    }
+
+    @Override
+    public void updatePenalty(List<Integer> UIDs, Timestamp updatedAt) {
+        String inSql = String.join(",", Collections.nCopies(UIDs.size(), "?"));
+        String sql = "UPDATE GroupMember SET penaltyCnt=(penaltyCnt+1), updatedAt= now() WHERE UID IN (%s)";
+
+        jdbcTemplate.update(
+                String.format(sql, inSql),
+                UIDs.toArray());
+    }
+
     private RowMapper<GroupMember> groupMemberRowMapper() {
         return (rs, rowNum) -> {
             GroupMember groupMember = new GroupMember();
@@ -117,6 +152,22 @@ public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
             groupMemberUserInfo.setTotalStudyTime(rs.getTime("totalStudyTime"));
 
             return groupMemberUserInfo;
+        };
+    }
+
+    private RowMapper<MemberWeeklyTimeInfo> memberWeeklyTimeInfoRowMapper() {
+        return (rs, rowNum) -> {
+            MemberWeeklyTimeInfo memberWeeklyTimeInfo = new MemberWeeklyTimeInfo();
+            memberWeeklyTimeInfo.setGroupMemberUID(rs.getInt("groupMemberUID"));
+            memberWeeklyTimeInfo.setGroupUID(rs.getInt("groupUID"));
+            memberWeeklyTimeInfo.setMinStudyHour(rs.getString("minStudyHour"));
+            memberWeeklyTimeInfo.setStudyHour(rs.getString("studyHour"));
+            memberWeeklyTimeInfo.setIsPenalty(rs.getInt("isPenalty"));
+            memberWeeklyTimeInfo.setMaxPenalty(rs.getInt("maxPenalty"));
+            memberWeeklyTimeInfo.setCurrentPenalty(rs.getInt("currentPenalty"));
+            memberWeeklyTimeInfo.setAddPenalty(rs.getBoolean("addPenalty"));
+
+            return memberWeeklyTimeInfo;
         };
     }
 
