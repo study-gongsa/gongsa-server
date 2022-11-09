@@ -19,5 +19,5 @@ public interface GroupMemberRepository {
     List<GroupMemberUserInfo> findMemberInfo(int groupUID);
     List<MemberWeeklyTimeInfo> getMemberWeeklyStudyTimeInfo();
 
-    void updatePenalty(List<Integer> UID, Timestamp updatedAt);
+    void updatePenalty(List<Integer> UID);
 }

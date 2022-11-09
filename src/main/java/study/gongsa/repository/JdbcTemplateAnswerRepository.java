@@ -40,7 +40,7 @@ public class JdbcTemplateAnswerRepository implements AnswerRepository{
 
     @Override
     public void update(int UID, String content) {
-        String sql = "update Answer set answer=?" + " where UID=?";
+        String sql = "update Answer set answer=? , updatedAt=now()" + " where UID=?";
         jdbcTemplate.update(sql, content, UID);
     }
 
