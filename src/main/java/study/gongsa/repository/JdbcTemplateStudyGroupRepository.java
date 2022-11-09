@@ -138,7 +138,7 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
 
     @Override
     public void updateImgPath(int UID, String imgPath){
-        String sql = "UPDATE StudyGroup SET imgPath = ? WHERE UID = ?";
+        String sql = "UPDATE StudyGroup SET imgPath = ?, updatedAt=now() WHERE UID = ?";
         jdbcTemplate.update(sql, imgPath, UID);
     }
 
@@ -159,7 +159,7 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
     }
 
     public void updateMinStudyHour(int UID, String minStudyHour){
-        String sql = "UPDATE StudyGroup SET minStudyHour = TIME(?) WHERE UID = ?";
+        String sql = "UPDATE StudyGroup SET minStudyHour = TIME(?), updatedAt=now() WHERE UID = ?";
         jdbcTemplate.update(sql, minStudyHour, UID);
     }
 

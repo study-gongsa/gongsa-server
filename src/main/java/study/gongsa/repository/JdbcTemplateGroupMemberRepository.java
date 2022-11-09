@@ -61,7 +61,7 @@ public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
 
     @Override
     public void updateNewReader(int uid){
-        String sql = "UPDATE GroupMember SET isLeader = 1 WHERE UID = ?";
+        String sql = "UPDATE GroupMember SET isLeader = 1, updatedAt=now() WHERE UID = ?";
         jdbcTemplate.update(sql, uid);
     }
 
@@ -117,7 +117,7 @@ public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
     }
 
     @Override
-    public void updatePenalty(List<Integer> UIDs, Timestamp updatedAt) {
+    public void updatePenalty(List<Integer> UIDs) {
         String inSql = String.join(",", Collections.nCopies(UIDs.size(), "?"));
         String sql = "UPDATE GroupMember SET penaltyCnt=(penaltyCnt+1), updatedAt= now() WHERE UID IN (%s)";
 

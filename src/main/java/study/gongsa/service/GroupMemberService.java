@@ -107,7 +107,7 @@ public class GroupMemberService {
 
         groupMemberRepository.updatePenalty(memberToAddPenalty.stream()
                 .map(MemberWeeklyTimeInfo::getGroupMemberUID)
-                .collect(Collectors.toList()), new Timestamp(new Date().getTime()));
+                .collect(Collectors.toList()));
 
         return memberToAddPenalty; // 벌점 받은 멤버들
     }
