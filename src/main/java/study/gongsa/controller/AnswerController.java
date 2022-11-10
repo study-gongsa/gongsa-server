@@ -73,4 +73,21 @@ public class AnswerController {
                 .build());
         return new ResponseEntity(response, HttpStatus.OK);
     }
+
+    @ApiOperation(value="답변글 삭제")
+    @ApiResponses({
+            @ApiResponse(code=200, message="수정 완료"),
+            @ApiResponse(code=400, message="존재하지 않는 답변인 경우"),
+            @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
+            @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등)")
+    })
+    @DeleteMapping("/{answerUID}")
+    @Transactional
+    public ResponseEntity delete(@PathVariable("answerUID") int answerUID, HttpServletRequest request){
+        int userUID = (int) request.getAttribute("userUID");
+        answerService.deleteAnswer(answerUID, userUID);
+
+        DefaultResponse response = new DefaultResponse();
+        return new ResponseEntity(response, HttpStatus.NO_CONTENT);
+    }
 }

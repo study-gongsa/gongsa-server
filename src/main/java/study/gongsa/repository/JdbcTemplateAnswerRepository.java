@@ -37,7 +37,7 @@ public class JdbcTemplateAnswerRepository implements AnswerRepository{
 
     @Override
     public void update(int UID, String content) {
-        String sql = "UPDATE Answer SET answer=? WHERE UID=?";
+        String sql = "update Answer set answer=? , updatedAt=now()" + " where UID=?";
         jdbcTemplate.update(sql, content, UID);
     }
 
@@ -48,6 +48,12 @@ public class JdbcTemplateAnswerRepository implements AnswerRepository{
         String query = String.format("DELETE FROM Answer WHERE questionUID in (%s) AND userUID = ?", inSql);
         sqlData.add(userUID);
         jdbcTemplate.update(query, sqlData.toArray());
+    }
+
+    @Override
+    public void remove(int UID) {
+        String sql = "delete from Answer where uid = ?";
+        jdbcTemplate.update(sql, UID);
     }
 
     @Override

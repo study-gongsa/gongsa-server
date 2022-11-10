@@ -129,7 +129,7 @@ class StudyGroupControllerTest {
         // 스터디 그룹 생성 및 멤버들 가입
         StudyGroup studyGroup = StudyGroup.builder()
                 .name("test_group")
-                .code("0000000000000000")
+                .code("0000-0000-0000-0000")
                 .isCam(true)
                 .isPrivate(false)
                 .minStudyHour("25:00:00")

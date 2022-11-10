@@ -1,17 +1,22 @@
 package study.gongsa.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import study.gongsa.domain.GroupMember;
 import study.gongsa.domain.GroupMemberUserInfo;
+import study.gongsa.domain.MemberWeeklyTimeInfo;
 import study.gongsa.dto.GroupMemberResponse;
 import study.gongsa.repository.GroupMemberRepository;
 import study.gongsa.repository.StudyGroupRepository;
+import study.gongsa.repository.StudyMemberRepository;
 import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
 
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class GroupMemberService {
@@ -95,5 +100,22 @@ public class GroupMemberService {
             members.add(GroupMemberResponse.Member.convertToMember(memberInfo));
         }
         return members;
+    }
+
+    public List<MemberWeeklyTimeInfo> updatePenalty() {
+        List<MemberWeeklyTimeInfo> memberToAddPenalty = getMemberToAddPenalty();
+
+        groupMemberRepository.updatePenalty(memberToAddPenalty.stream()
+                .map(MemberWeeklyTimeInfo::getGroupMemberUID)
+                .collect(Collectors.toList()));
+
+        return memberToAddPenalty; // 벌점 받은 멤버들
+    }
+
+    public List<MemberWeeklyTimeInfo> getMemberToAddPenalty(){
+        return groupMemberRepository.getMemberWeeklyStudyTimeInfo()
+                .stream()
+                .filter(info -> (info.getIsPenalty()==1) && info.getAddPenalty()) // 벌점 기준 존재하는 그룹에서만
+                .collect(Collectors.toList());
     }
 }

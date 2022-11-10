@@ -68,7 +68,7 @@ public class GroupMemberController {
 
     @ApiOperation(value="스터디 그룹 탈퇴")
     @ApiResponses({
-            @ApiResponse(code=200, message="스터디 그룹 탈퇴"),
+            @ApiResponse(code=204, message="스터디 그룹 탈퇴 완료"),
             @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
             @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등), 가입하지 않은 그룹일 경우")
     })
@@ -86,7 +86,7 @@ public class GroupMemberController {
         groupMemberService.remove(groupMember);
         // 점수 2점이면 벌점 -1
         DefaultResponse response = new DefaultResponse();
-        return new ResponseEntity(response, HttpStatus.OK);
+        return new ResponseEntity(response, HttpStatus.NO_CONTENT);
     }
 
     @ApiOperation(value="스터디 그룹 멤버 조회")
