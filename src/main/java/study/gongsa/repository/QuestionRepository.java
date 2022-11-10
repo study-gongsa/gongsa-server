@@ -13,6 +13,7 @@ public interface QuestionRepository {
     List<QuestionInfo> findMyQuestion(int userUID);
     List<QuestionInfo> findGroupQuestion(int groupUID);
     Optional<Question> findOne(int questionUID);
-
+    List<Question> findAllByUserUIDAndGroupUID(int userUID, int groupUID);
     Number save(Question question);
+    void deleteUserQuestion(List<Integer> questionUIDs);
 }

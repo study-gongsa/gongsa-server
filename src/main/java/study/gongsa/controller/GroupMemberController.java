@@ -10,10 +10,7 @@ import study.gongsa.domain.GroupMember;
 import study.gongsa.dto.DefaultResponse;
 import study.gongsa.dto.GroupMemberResponse;
 import study.gongsa.dto.RegisterGroupMemberRequest;
-import study.gongsa.dto.SearchStudyGroupReponse;
-import study.gongsa.service.GroupMemberService;
-import study.gongsa.service.StudyGroupService;
-import study.gongsa.service.StudyMemberService;
+import study.gongsa.service.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -26,13 +23,17 @@ import java.util.List;
 public class GroupMemberController {
     private final StudyGroupService studyGroupService;
     private final GroupMemberService groupMemberService;
+    private final QuestionService questionService;
     private final StudyMemberService studyMemberService;
+    private final AnswerService answerService;
 
     @Autowired
-    public GroupMemberController(StudyGroupService studyGroupService, GroupMemberService groupMemberService, StudyMemberService studyMemberService) {
+    public GroupMemberController(StudyGroupService studyGroupService, GroupMemberService groupMemberService, QuestionService questionService, StudyMemberService studyMemberService, AnswerService answerService) {
         this.studyGroupService = studyGroupService;
         this.groupMemberService = groupMemberService;
+        this.questionService = questionService;
         this.studyMemberService = studyMemberService;
+        this.answerService = answerService;
     }
 
     @ApiOperation(value="스터디 그룹 가입")
@@ -67,7 +68,7 @@ public class GroupMemberController {
 
     @ApiOperation(value="스터디 그룹 탈퇴")
     @ApiResponses({
-            @ApiResponse(code=201, message="스터디 그룹 가입"),
+            @ApiResponse(code=200, message="스터디 그룹 탈퇴"),
             @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
             @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등), 가입하지 않은 그룹일 경우")
     })
@@ -75,9 +76,15 @@ public class GroupMemberController {
     @Transactional
     public ResponseEntity removeGroupMember(@PathVariable("groupUID") int groupUID, HttpServletRequest request){
         int userUID = (int) request.getAttribute("userUID");
+        List<Integer> questionUIDs = questionService.findAllByUserUIDAndGroupUID(userUID, groupUID);
+        if(questionUIDs.size() != 0) {
+            answerService.deleteUserAnswer(questionUIDs, userUID);
+            questionService.deleteUserQuestion(questionUIDs);
+        }
         GroupMember groupMember = groupMemberService.findOne(groupUID, userUID);
         studyMemberService.remove(groupMember);
         groupMemberService.remove(groupMember);
+        // 점수 2점이면 벌점 -1
         DefaultResponse response = new DefaultResponse();
         return new ResponseEntity(response, HttpStatus.OK);
     }
