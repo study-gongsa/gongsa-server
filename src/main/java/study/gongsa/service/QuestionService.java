@@ -11,6 +11,7 @@ import study.gongsa.repository.QuestionRepository;
 import study.gongsa.repository.StudyGroupRepository;
 import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +40,14 @@ public class QuestionService {
         return question.get();
     }
 
+    public List<Integer> findAllByUserUIDAndGroupUID(int userUID, int groupUID){
+        List<Question> questionList = questionRepository.findAllByUserUIDAndGroupUID(userUID, groupUID);
+        List<Integer> result = new ArrayList<>();
+        for(Question question: questionList)
+            result.add(question.getUID());
+        return result;
+    }
+
     public List<QuestionInfo> findGroupQuestion(int userUID, int groupUID){
         Optional<StudyGroup> studyGroup = studyGroupRepository.findByUID(groupUID);
         if (studyGroup.isEmpty()){
@@ -55,6 +64,10 @@ public class QuestionService {
         if(groupMember.isEmpty()){
             throw new IllegalStateExceptionWithLocation(HttpStatus.FORBIDDEN, "groupUID","가입되지 않은 그룹입니다.");
         }
+    }
+
+    public void deleteUserQuestion(List<Integer> questionUIDs){
+        questionRepository.deleteUserQuestion(questionUIDs);
     }
 
     public int makeQuestion(int userUID, int groupUID, String title, String content) {

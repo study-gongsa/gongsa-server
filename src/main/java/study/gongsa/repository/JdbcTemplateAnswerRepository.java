@@ -11,10 +11,7 @@ import study.gongsa.domain.Category;
 import study.gongsa.domain.Question;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public class JdbcTemplateAnswerRepository implements AnswerRepository{
@@ -42,6 +39,15 @@ public class JdbcTemplateAnswerRepository implements AnswerRepository{
     public void update(int UID, String content) {
         String sql = "update Answer set answer=? , updatedAt=now()" + " where UID=?";
         jdbcTemplate.update(sql, content, UID);
+    }
+
+    @Override
+    public void deleteUserAnswer(List<Integer> questionUIDs, int userUID) {
+        List<Integer> sqlData = questionUIDs;
+        String inSql = String.join(",", Collections.nCopies(questionUIDs.size(), "?"));
+        String query = String.format("DELETE FROM Answer WHERE questionUID in (%s) AND userUID = ?", inSql);
+        sqlData.add(userUID);
+        jdbcTemplate.update(query, sqlData.toArray());
     }
 
     @Override

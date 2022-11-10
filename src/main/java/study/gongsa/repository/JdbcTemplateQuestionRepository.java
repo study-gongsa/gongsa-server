@@ -13,10 +13,7 @@ import study.gongsa.domain.Question;
 import study.gongsa.domain.QuestionInfo;
 
 import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 @Slf4j
@@ -36,6 +33,13 @@ public class JdbcTemplateQuestionRepository implements QuestionRepository{
     public Number save(Question question) {
         final Map<String, Object> parameters = setParameter(question);
         return insertIntoQuestion.executeAndReturnKey(parameters);
+    }
+
+    @Override
+    public void deleteUserQuestion(List<Integer> questionUIDs) {
+        String inSql = String.join(",", Collections.nCopies(questionUIDs.size(), "?"));
+        String query = String.format("DELETE FROM Question WHERE UID in (%s)", inSql);
+        jdbcTemplate.update(query, questionUIDs.toArray());
     }
 
     @Override
@@ -64,7 +68,13 @@ public class JdbcTemplateQuestionRepository implements QuestionRepository{
         return result.stream().findAny();
     }
 
-
+    @Override
+    public List<Question> findAllByUserUIDAndGroupUID(int userUID, int groupUID) {
+        String sql = "SELECT * "
+                + "FROM Question "
+                + "WHERE userUID = ? and groupUID = ?";
+        return jdbcTemplate.query(sql, questionRowMapper(), userUID, groupUID);
+    }
 
     private RowMapper<QuestionInfo> questionInfoRowMapper() { // Question, Answer join
         return (rs, rowNum) -> {

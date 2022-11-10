@@ -62,6 +62,10 @@ public class AnswerService {
         return question.getUID();
     }
 
+    public void deleteUserAnswer(List<Integer> questionUIDs, int userUID){
+        answerRepository.deleteUserAnswer(questionUIDs, userUID);
+    }
+
     public void updateAnswer(int answerUID, String content) {
         answerRepository.update(answerUID, content);
     }
