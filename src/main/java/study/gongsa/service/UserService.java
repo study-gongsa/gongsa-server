@@ -1,5 +1,6 @@
 package study.gongsa.service;
 
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,9 +16,7 @@ import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
 import study.gongsa.support.mail.GmailSender;
 
 import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 import static java.util.Objects.isNull;
 
@@ -179,6 +178,16 @@ public class UserService {
         String encryptedPassword = passwordEncoder.encode(nextPasswd);
         //user 정보 업데이트
         userRepository.updatePasswd(encryptedPassword, new Timestamp(new Date().getTime()), uid);
+    }
+
+    public void downLevel(List<Integer> userUIDs){
+        userRepository.updateLevel(userUIDs);
+    }
+
+    public void downLevel(int userUID){
+        List<Integer> userUIDs = new ArrayList<Integer>();
+        userUIDs.add(userUID);
+        userRepository.updateLevel(userUIDs);
     }
 
     public void changeUserSettingInfo(int uid, String nickname, MultipartFile image, Boolean changeImage) {

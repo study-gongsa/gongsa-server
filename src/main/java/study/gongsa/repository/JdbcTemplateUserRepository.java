@@ -12,11 +12,7 @@ import study.gongsa.dto.UserMyPageInfo;
 import javax.sql.DataSource;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -52,6 +48,13 @@ public class JdbcTemplateUserRepository implements UserRepository {
     public void updatePasswd(String passwd, Timestamp updatedAt, int uid) {
         String sql = "update User set passwd=?, updatedAt=? " + " where UID=?";
         jdbcTemplate.update(sql, passwd, updatedAt, uid);
+    }
+
+    @Override
+    public void updateLevel(List<Integer> userUIDs) {
+        String inSql = String.join(",", Collections.nCopies(userUIDs.size(), "?"));
+        String query = String.format("UPDATE User SET LEVEL = LEVEL - 1 WHERE UID IN (%s) AND LEVEL >= 2", inSql);
+        jdbcTemplate.update(query, userUIDs.toArray());
     }
 
     @Override

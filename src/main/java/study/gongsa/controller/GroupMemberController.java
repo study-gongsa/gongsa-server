@@ -26,14 +26,16 @@ public class GroupMemberController {
     private final QuestionService questionService;
     private final StudyMemberService studyMemberService;
     private final AnswerService answerService;
+    private final UserService userService;
 
     @Autowired
-    public GroupMemberController(StudyGroupService studyGroupService, GroupMemberService groupMemberService, QuestionService questionService, StudyMemberService studyMemberService, AnswerService answerService) {
+    public GroupMemberController(StudyGroupService studyGroupService, GroupMemberService groupMemberService, QuestionService questionService, StudyMemberService studyMemberService, AnswerService answerService, UserService userService) {
         this.studyGroupService = studyGroupService;
         this.groupMemberService = groupMemberService;
         this.questionService = questionService;
         this.studyMemberService = studyMemberService;
         this.answerService = answerService;
+        this.userService = userService;
     }
 
     @ApiOperation(value="스터디 그룹 가입")
@@ -84,7 +86,7 @@ public class GroupMemberController {
         GroupMember groupMember = groupMemberService.findOne(groupUID, userUID);
         studyMemberService.remove(groupMember);
         groupMemberService.remove(groupMember);
-        // 점수 2점이면 벌점 -1
+        userService.downLevel(userUID);
         DefaultResponse response = new DefaultResponse();
         return new ResponseEntity(response, HttpStatus.NO_CONTENT);
     }
