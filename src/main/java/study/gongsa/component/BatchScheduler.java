@@ -46,7 +46,7 @@ public class BatchScheduler {
         log.info("addPenaltyAndWidthDrawGroupMember() 실행");
 
         List<Integer> memberUIDsToWithDraw = groupMemberService.updatePenalty().stream()
-                .filter(info -> (info.getMaxPenalty() < (info.getCurrentPenalty()+1))) // 최대 벌점 초과
+                .filter(info -> (info.getIsPenalty()) && (info.getMaxPenalty() < (info.getCurrentPenalty()+1))) // 최대 벌점 초과
                 .map(MemberWeeklyTimeInfo::getGroupMemberUID)
                 .collect(Collectors.toList());
 
