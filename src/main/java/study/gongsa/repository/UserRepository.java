@@ -5,6 +5,7 @@ import study.gongsa.dto.UserMyPageInfo;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository {
@@ -12,6 +13,7 @@ public interface UserRepository {
     void updateAuthCode(String authCode, Timestamp updatedAt, int uid);
     void updateIsAuth(Boolean isAuth, Timestamp updatedAt, int uid);
     void updatePasswd(String passwd, Timestamp updatedAt, int uid);
+    void updateLevel(List<Integer> userUIDs);
     Optional<User> findByUID(int uid);
     Optional<User> findByEmail(String email);
     Optional<User> findByNickname(String nickname);
