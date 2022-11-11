@@ -9,12 +9,16 @@ import lombok.*;
 @Builder
 @ToString
 public class MemberWeeklyTimeInfo {
+    private Integer userUID;
     private Integer groupMemberUID;
+
     private Integer groupUID;
+    private String groupName;
     private String minStudyHour;
-    private String studyHour;
-    private Integer isPenalty;
+    private Boolean isPenalty;
     private Integer maxPenalty;
+
+    private String studyHour;
     private Integer currentPenalty;
     private Boolean addPenalty;
 }
