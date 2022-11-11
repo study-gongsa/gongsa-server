@@ -93,7 +93,7 @@ public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
 
     @Override
     public List<MemberWeeklyTimeInfo> getMemberWeeklyStudyTimeInfo() {
-        String groupMemberInfoQuery = "SELECT sg.UID as groupUID, gm.UID as groupMemberUID, sg.minStudyHour, sg.isPenalty, sg.maxPenalty, gm.penaltyCnt " +
+        String groupMemberInfoQuery = "SELECT sg.UID as groupUID, sg.name as groupName, gm.UID as groupMemberUID, gm.userUID, sg.minStudyHour, sg.isPenalty, sg.maxPenalty, gm.penaltyCnt " +
                 "FROM StudyGroup sg " +
                 "INNER JOIN GroupMember gm " +
                 "ON sg.UID = gm.groupUID " +
@@ -105,7 +105,7 @@ public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
                 "AND TIMESTAMPDIFF(HOUR, updatedAt, now()) > 1 " +
                 "GROUP BY groupMemberUID ";
 
-        String query = "SELECT GroupMemberInfo.groupMemberUID, GroupMemberInfo.groupUID, GroupMemberInfo.minStudyHour, IFNULL(StudyInfo.studyHour, TIME(0)) as studyHour, " +
+        String query = "SELECT GroupMemberInfo.userUID, GroupMemberInfo.groupMemberUID, GroupMemberInfo.groupUID, GroupMemberInfo.groupName, GroupMemberInfo.minStudyHour, IFNULL(StudyInfo.studyHour, TIME(0)) as studyHour, " +
                 "GroupMemberInfo.isPenalty, GroupMemberInfo.maxPenalty, GroupMemberInfo.PenaltyCnt as currentPenalty, " +
                 "IF(TIMEDIFF(GroupMemberInfo.minStudyHour, StudyInfo.studyHour)>=TIME(0),FALSE,TRUE) as addPenalty " +
                 "FROM ("+ groupMemberInfoQuery +") GroupMemberInfo " +
@@ -158,12 +158,16 @@ public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
     private RowMapper<MemberWeeklyTimeInfo> memberWeeklyTimeInfoRowMapper() {
         return (rs, rowNum) -> {
             MemberWeeklyTimeInfo memberWeeklyTimeInfo = new MemberWeeklyTimeInfo();
+            memberWeeklyTimeInfo.setUserUID(rs.getInt("userUID"));
             memberWeeklyTimeInfo.setGroupMemberUID(rs.getInt("groupMemberUID"));
+
             memberWeeklyTimeInfo.setGroupUID(rs.getInt("groupUID"));
+            memberWeeklyTimeInfo.setGroupName(rs.getString("groupName"));
             memberWeeklyTimeInfo.setMinStudyHour(rs.getString("minStudyHour"));
-            memberWeeklyTimeInfo.setStudyHour(rs.getString("studyHour"));
-            memberWeeklyTimeInfo.setIsPenalty(rs.getInt("isPenalty"));
+            memberWeeklyTimeInfo.setIsPenalty(rs.getBoolean("isPenalty"));
             memberWeeklyTimeInfo.setMaxPenalty(rs.getInt("maxPenalty"));
+
+            memberWeeklyTimeInfo.setStudyHour(rs.getString("studyHour"));
             memberWeeklyTimeInfo.setCurrentPenalty(rs.getInt("currentPenalty"));
             memberWeeklyTimeInfo.setAddPenalty(rs.getBoolean("addPenalty"));
 
