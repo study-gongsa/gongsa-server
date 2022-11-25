@@ -34,6 +34,11 @@ public class LogFilter implements Filter {
         ContentCachingResponseWrapper httpServletResponse = new ContentCachingResponseWrapper((HttpServletResponse) response);
         chain.doFilter(httpServletRequest, httpServletResponse);
 
+        if(httpServletRequest.getRequestURI().contains("/api/image/")){
+            log.info("[REQUEST] {}\n[RESPONSE] {}:{}", httpServletRequest.getRequestURI(), httpServletResponse.getStatus(), httpServletResponse.getContentSize());
+            return;
+        }
+
         RequestLog requestLog = RequestLog.builder()
                 .method(httpServletRequest.getMethod())
                 .URI(httpServletRequest.getRequestURI())

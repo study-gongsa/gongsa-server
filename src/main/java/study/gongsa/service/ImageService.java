@@ -1,5 +1,6 @@
 package study.gongsa.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 @Service
+@Slf4j
 public class ImageService {
     private final Path root = Paths.get("image"); // controller, service 폴더 있는 곳
 
@@ -49,6 +51,7 @@ public class ImageService {
                 throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "image", "이미지를 불러올 수 없습니다.");
             }
         } catch (MalformedURLException e) {
+            log.error("이미지 로드 실패 {} {}", e.getClass(), e.getMessage());
             throw new IllegalStateExceptionWithLocation(HttpStatus.BAD_REQUEST, "image", "이미지를 불러올 수 없습니다.");
         }
     }
