@@ -188,6 +188,10 @@ public class UserService {
         userRepository.updateDeviceToken(user.getUID(), user.getDeviceToken(), new Timestamp(new Date().getTime()));
     }
 
+    public String getDeviceToken(int userUID) {
+        Optional<User> userByUID = userRepository.findByUID(userUID);
+        return userByUID.get().getDeviceToken();
+    }
     public void changeUserSettingInfo(int uid, String nickname, MultipartFile image, Boolean changeImage) {
         //자신 제외하고 닉네임 중복 체크
         Optional<User> userByNickname = userRepository.findByNicknameExceptUser(nickname, uid);
