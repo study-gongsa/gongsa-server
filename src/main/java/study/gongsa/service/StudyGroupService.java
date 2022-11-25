@@ -132,4 +132,8 @@ public class StudyGroupService {
     public List<StudyGroup> findMyStudyGroup(int userUID){
         return studyGroupRepository.findMyStudyGroup(userUID);
     }
+
+    public void deleteExpiredGroup(){
+        studyGroupRepository.removeExpiredGroup();
+    }
 }

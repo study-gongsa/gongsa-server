@@ -51,10 +51,15 @@ public class JdbcTemplateUserRepository implements UserRepository {
     }
 
     @Override
-    public void updateLevel(List<Integer> userUIDs) {
-        String inSql = String.join(",", Collections.nCopies(userUIDs.size(), "?"));
-        String query = String.format("UPDATE User SET LEVEL = LEVEL - 1 WHERE UID IN (%s) AND LEVEL >= 2", inSql);
-        jdbcTemplate.update(query, userUIDs.toArray());
+    public void removeExpiredUnauthenticatedUser() {
+        String sql = "DELETE FROM User WHERE isAuth = 0 AND TIMESTAMPDIFF(DAY, createdAt , NOW()) > 7";
+        jdbcTemplate.update(sql);
+    }
+
+    @Override
+    public void updateLevel(int userUID) {
+        String query = "UPDATE User SET level = level - 1 WHERE UID = ? AND level >= 2";
+        jdbcTemplate.update(query, userUID);
     }
 
     @Override

@@ -14,6 +14,7 @@ public interface GroupMemberRepository {
     Number save(GroupMember groupMember);
     Optional<GroupMember> findByGroupUIDUserUID(int groupUID, int userUID);
     void remove(int uid);
+    void removeForced(List<Integer> groupMemberUIDs);
     Optional<GroupMember> findRandUID(int groupUID);
     void updateNewReader(int groupUID);
     List<GroupMemberUserInfo> findMemberInfo(int groupUID);
