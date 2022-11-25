@@ -13,7 +13,8 @@ public interface UserRepository {
     void updateAuthCode(String authCode, Timestamp updatedAt, int uid);
     void updateIsAuth(Boolean isAuth, Timestamp updatedAt, int uid);
     void updatePasswd(String passwd, Timestamp updatedAt, int uid);
-    void updateLevel(int userUID);
+    void updateLevel(int uid, Timestamp updatedAt);
+    void updateDeviceToken(int uid, String deviceToken, Timestamp updatedAt);
     Optional<User> findByUID(int uid);
     Optional<User> findByEmail(String email);
     Optional<User> findByNickname(String nickname);

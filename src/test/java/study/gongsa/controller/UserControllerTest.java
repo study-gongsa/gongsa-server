@@ -91,7 +91,7 @@ class UserControllerTest {
                 .authCode("00000a")
                 .build();
         userUID = userRepository.save(user).intValue();
-       log.debug("테스트 유저 > {}",user);
+        log.debug("테스트 유저 > {}",user);
 
         refreshToken = jwtTokenProvider.makeRefreshToken(userUID);
         Integer userAuthUID = userAuthRepository.save(UserAuth.builder()
@@ -692,5 +692,24 @@ class UserControllerTest {
         // then
         resultActions.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.location").value("nickname"));
+    }
+
+    @Test
+    void 디바이스토큰변경_성공() throws Exception {
+        // given
+        userRepository.updateIsAuth(true, new Timestamp(new Date().getTime()), userUID);
+        DeviceTokenRequest deviceTokenRequest = new DeviceTokenRequest("abcde");
+
+        // when
+        ResultActions resultActions = mockMvc.perform(patch(baseURL+"/device-token")
+                        .header("Authorization", "Bearer "+accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(deviceTokenRequest))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andDo(print());
+
+        // then
+        resultActions
+                .andExpect(status().isOk());
     }
 }

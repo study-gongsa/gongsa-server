@@ -180,8 +180,12 @@ public class UserService {
         userRepository.updatePasswd(encryptedPassword, new Timestamp(new Date().getTime()), uid);
     }
 
-    public void downLevel(int userUID){
-        userRepository.updateLevel(userUID);
+    public void downLevel(int uid){
+        userRepository.updateLevel(uid, new Timestamp(new Date().getTime()));
+    }
+
+    public void changeDeviceToken(User user){
+        userRepository.updateDeviceToken(user.getUID(), user.getDeviceToken(), new Timestamp(new Date().getTime()));
     }
 
     public void changeUserSettingInfo(int uid, String nickname, MultipartFile image, Boolean changeImage) {

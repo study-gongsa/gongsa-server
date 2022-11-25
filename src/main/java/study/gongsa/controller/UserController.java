@@ -59,6 +59,26 @@ public class UserController {
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
+    @ApiOperation(value="디바이스 토큰 저장")
+    @ApiResponses({
+            @ApiResponse(code=200, message = "토큰 저장 완료"),
+            @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
+            @ApiResponse(code=403, message="토큰 에러(토큰이 만료되었을 경우 등), 가입하지 않은 그룹일 경우")
+    })
+    @PatchMapping("/device-token")
+    @Transactional
+    public ResponseEntity saveDeviceToken(@RequestBody @Valid DeviceTokenRequest req, HttpServletRequest request){
+        int userUID = (int) request.getAttribute("userUID");
+        User user = User.builder()
+                .deviceToken(req.getDeviceToken())
+                .UID(userUID)
+                .build();
+        userService.changeDeviceToken(user);
+
+        DefaultResponse response = new DefaultResponse();
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
     @ApiOperation(value="인증번호 생성 및 메일 전송")
     @ApiResponses({
             @ApiResponse(code=200, message="인증번호 생성 및 메일 전송 완료"),

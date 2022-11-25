@@ -18,6 +18,7 @@ public class User {
     private String passwd;
     private String nickname;
     private String authCode;
+    private String deviceToken;
     @Builder.Default
     private String imgPath = "r0.jpg";
     @Builder.Default
