@@ -63,22 +63,25 @@ public class BatchScheduler {
         // 시간 초과 push 알림, 추후 멘트 지정 후 추가 예정
         memberToStudyLess.stream().forEach(memberInfo -> {
             int userUID = memberInfo.getUserUID();
-            String fcmToken = "";
+            String fcmToken = userService.getDeviceToken(userUID);
             String groupName = memberInfo.getGroupName();
+            String studyHour = memberInfo.getStudyHour();
+            int maxPenalty = memberInfo.getMaxPenalty();
+            int currentPenalty = memberInfo.getCurrentPenalty();
             if(memberInfo.getIsPenalty()){
                 //벌점 받는 멤버들
                 if(memberInfo.getMaxPenalty() < (memberInfo.getCurrentPenalty()+1)){
                     // 강퇴당하는 멤버
                     userService.downLevel(userUID);
                     groupMemberService.removeForced(memberUIDsToWithDraw);
-                    firebaseCloudMessageService.sendMessageTo(fcmToken, "TestTitle", new Timestamp(new Date().getTime())+": TestBody");
+                    firebaseCloudMessageService.sendMessageTo(fcmToken, "["+groupName+"] 알림", "지난 주에 " + studyHour + "시간 공부해서 주 목표 공부시간을 채우지 못해 퇴장되었습니다. (벌점: " + currentPenalty + "/" + maxPenalty + ")");
                 }else{
                     // 벌점만 받는 멤버
-                    firebaseCloudMessageService.sendMessageTo(fcmToken, "TestTitle", new Timestamp(new Date().getTime())+": TestBody");
+                    firebaseCloudMessageService.sendMessageTo(fcmToken, "["+groupName+"] 알림", "지난 주에 " + studyHour + "시간 공부해서 주 목표 공부시간을 채우지 못해 벌점을 받았습니다. (벌점: " + currentPenalty + "/" + maxPenalty + ")");
                 }
             }else{
                 //단순 시간 못채운 멤버
-                firebaseCloudMessageService.sendMessageTo(fcmToken, "TestTitle", new Timestamp(new Date().getTime())+": TestBody");
+                firebaseCloudMessageService.sendMessageTo(fcmToken, "["+groupName+"] 알림", "지난 주에 " + studyHour + "시간 공부해서 주 목표 공부시간을 채우지 못했습니다.");
             }
         });
         log.info("퇴장할 멤버: {}", memberUIDsToWithDraw);
