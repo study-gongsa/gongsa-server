@@ -67,6 +67,10 @@ public class GroupMemberService {
         }
     }
 
+    public void removeForced(List<Integer> groupMemberUIDs){
+        groupMemberRepository.removeForced(groupMemberUIDs);
+    }
+
     public void makeStudyGroupMember(int groupUID, int userUID, boolean isLeader) {
         GroupMember groupMember = GroupMember.builder()
                 .userUID(userUID)
@@ -109,21 +113,6 @@ public class GroupMemberService {
                 .filter(info -> info.getIsPenalty()) // 벌점 기준 존재 그룹만
                 .map(MemberWeeklyTimeInfo::getGroupMemberUID)
                 .collect(Collectors.toList()));
-
-        // 시간 초과 push 알림, 추후 멘트 지정 후 추가 예정
-        memberToStudyLess.stream().forEach(memberInfo -> {
-            // memberInfo.getUserUID() 이용하여 device Token값 가져오기
-            if(memberInfo.getIsPenalty()){ // 벌점 받았다고 알림
-                // [memberInfo.getGroupName()]
-                // 현재 memberInfo.getCurrentPenalty()+1점, 최대 memberInfo.getMaxPenalty()점까지 가능
-                // 지난 주 공부 시간 memberInfo.getStudyHour()
-                // 그룹 주 목표 공부 시간 memberInfo.getMinStudyHour()
-            }else{ // 목표 시간 못채웠다고 알림
-                // [memberInfo.getGroupName()]
-                // 지난 주 공부 시간 memberInfo.getStudyHour()
-                // 그룹 주 목표 공부 시간 memberInfo.getMinStudyHour()
-            }
-        });
 
         return memberToStudyLess; // 벌점 받은 멤버들
     }

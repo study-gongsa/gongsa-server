@@ -180,14 +180,12 @@ public class UserService {
         userRepository.updatePasswd(encryptedPassword, new Timestamp(new Date().getTime()), uid);
     }
 
-    public void downLevel(List<Integer> userUIDs){
-        userRepository.updateLevel(userUIDs);
+    public void downLevel(int uid){
+        userRepository.updateLevel(uid, new Timestamp(new Date().getTime()));
     }
 
-    public void downLevel(int userUID){
-        List<Integer> userUIDs = new ArrayList<Integer>();
-        userUIDs.add(userUID);
-        userRepository.updateLevel(userUIDs);
+    public void changeDeviceToken(User user){
+        userRepository.updateDeviceToken(user.getUID(), user.getDeviceToken(), new Timestamp(new Date().getTime()));
     }
 
     public void changeUserSettingInfo(int uid, String nickname, MultipartFile image, Boolean changeImage) {
@@ -218,5 +216,9 @@ public class UserService {
 
         MyPageUserResponse.Info userInfo = new MyPageUserResponse.Info(user, percentage);
         return userInfo;
+    }
+
+    public void deleteExpiredUnauthenticatedUser(){
+        userRepository.removeExpiredUnauthenticatedUser();
     }
 }

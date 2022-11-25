@@ -49,6 +49,13 @@ public class JdbcTemplateGroupMemberRepository implements GroupMemberRepository{
     }
 
     @Override
+    public void removeForced(List<Integer> groupMemberUIDs) {
+        String inSql = String.join(",", Collections.nCopies(groupMemberUIDs.size(), "?"));
+        String query = String.format("DELETE FROM GroupMember WHERE UID in (%s)", inSql);
+        jdbcTemplate.update(query, groupMemberUIDs.toArray());
+    }
+
+    @Override
     public Optional<GroupMember> findRandUID(int groupUID){
         String sql = "SELECT * "
                     + "FROM GroupMember "

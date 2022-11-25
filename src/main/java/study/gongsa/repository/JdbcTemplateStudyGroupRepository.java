@@ -158,6 +158,13 @@ public class JdbcTemplateStudyGroupRepository implements StudyGroupRepository{
         return jdbcTemplate.query(sql, studyGroupRowMapper(), userUID);
     }
 
+    @Override
+    public void removeExpiredGroup() {
+        String sql = "DELETE FROM StudyGroup "
+                + "WHERE DATE_FORMAT(expiredAt,'%Y-%m-%d') < DATE_FORMAT(NOW(),'%Y-%m-%d')";
+        jdbcTemplate.update(sql);
+    }
+
     public void updateMinStudyHour(int UID, String minStudyHour){
         String sql = "UPDATE StudyGroup SET minStudyHour = TIME(?), updatedAt=now() WHERE UID = ?";
         jdbcTemplate.update(sql, minStudyHour, UID);

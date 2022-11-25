@@ -40,54 +40,65 @@ public class JdbcTemplateUserRepository implements UserRepository {
 
     @Override
     public void updateIsAuth(Boolean isAuth, Timestamp updatedAt, int uid){
-        String sql = "update User set isAuth=?, updatedAt=? " + " where UID=?";
+        String sql = "UPDATE User SET isAuth=?, updatedAt=? WHERE UID=?";
         jdbcTemplate.update(sql, isAuth, updatedAt, uid);
     }
 
     @Override
     public void updatePasswd(String passwd, Timestamp updatedAt, int uid) {
-        String sql = "update User set passwd=?, updatedAt=? " + " where UID=?";
+        String sql = "UPDATE User SET passwd=?, updatedAt=? WHERE UID=?";
         jdbcTemplate.update(sql, passwd, updatedAt, uid);
     }
 
     @Override
-    public void updateLevel(List<Integer> userUIDs) {
-        String inSql = String.join(",", Collections.nCopies(userUIDs.size(), "?"));
-        String query = String.format("UPDATE User SET LEVEL = LEVEL - 1 WHERE UID IN (%s) AND LEVEL >= 2", inSql);
-        jdbcTemplate.update(query, userUIDs.toArray());
+    public void removeExpiredUnauthenticatedUser() {
+        String sql = "DELETE FROM User WHERE isAuth = 0 AND TIMESTAMPDIFF(DAY, createdAt , NOW()) > 7";
+        jdbcTemplate.update(sql);
+    }
+
+    @Override
+    public void updateLevel(int uid, Timestamp updatedAt) {
+        String query = "UPDATE User SET level = level - 1 WHERE UID = ? AND level >= 2";
+        jdbcTemplate.update(query, uid);
+    }
+
+    @Override
+    public void updateDeviceToken(int uid, String deviceToken, Timestamp updatedAt) {
+        String sql = "UPDATE User SET deviceToken=?, updatedAt=? WHERE UID=?";
+        jdbcTemplate.update(sql, deviceToken, updatedAt, uid);
     }
 
     @Override
     public Optional<User> findByUID(int uid){
-        List<User> result = jdbcTemplate.query("select * from User where UID = ?", userRowMapper(), uid);
+        List<User> result = jdbcTemplate.query("SELECT * FROM User WHERE UID = ?", userRowMapper(), uid);
         return result.stream().findAny();
     };
 
     @Override
     public Optional<User> findByEmail(String email){
-        List<User> result = jdbcTemplate.query("select * from User where email = ?", userRowMapper(), email);
+        List<User> result = jdbcTemplate.query("SELECT * FROM User WHERE email = ?", userRowMapper(), email);
         return result.stream().findAny();
     }
     @Override
     public Optional<User> findByNickname(String nickname){
-        List<User> result = jdbcTemplate.query("select * from User where nickname = ?", userRowMapper(), nickname);
+        List<User> result = jdbcTemplate.query("SELECT * FROM User WHERE nickname = ?", userRowMapper(), nickname);
         return result.stream().findAny();
     }
 
     @Override
     public boolean isAuth(int uid) {
-        return jdbcTemplate.queryForObject("select isAuth from User where UID = ?", Boolean.class, uid);
+        return jdbcTemplate.queryForObject("SELECT isAuth FROM User WHERE UID = ?", Boolean.class, uid);
     }
 
     @Override
     public void updateNicknameAndImage(int uid, String nickname, String imgPath, Timestamp updatedAt){
-        String sql = "update User set nickname=?, imgPath=?, updatedAt=? " + " where UID=?";
+        String sql = "UPDATE User SET nickname=?, imgPath=?, updatedAt=? WHERE UID=?";
         jdbcTemplate.update(sql, nickname, imgPath, updatedAt, uid);
     }
 
     @Override
     public Optional<User> findByNicknameExceptUser(String nickname, int uid){
-        String query = "select * from User where nickname = ? and UID != ?";
+        String query = "SELECT * FROM User WHERE nickname = ? and UID != ?";
         List<User> result = jdbcTemplate.query(query, userRowMapper(), nickname, uid);
         return result.stream().findAny();
     }
