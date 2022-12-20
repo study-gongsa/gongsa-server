@@ -48,6 +48,7 @@ public class JdbcTemplateQuestionRepository implements QuestionRepository{
                 + "FROM Question a "
                 + "LEFT JOIN Answer b ON a.UID = b.questionUID "
                 + "WHERE a.userUID = ? "
+                + "GROUP BY a.UID "
                 + "ORDER BY a.createdAt DESC";
         return jdbcTemplate.query(sql, questionInfoRowMapper(), userUID);
     }
@@ -58,6 +59,7 @@ public class JdbcTemplateQuestionRepository implements QuestionRepository{
                 + "FROM Question a "
                 + "LEFT JOIN Answer b ON a.UID = b.questionUID "
                 + "WHERE a.groupUID = ? "
+                + "GROUP BY a.UID "
                 + "ORDER BY a.createdAt DESC";
         return jdbcTemplate.query(sql, questionInfoRowMapper(), groupUID);
     }
