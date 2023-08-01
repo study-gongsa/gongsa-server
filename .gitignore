@@ -40,3 +40,5 @@ out/
 
 **/resources/firebase/
 **/logs
+
+node_modules
