@@ -182,16 +182,11 @@ connections.on('connection', async socket => {
     // const router1 = rooms[roomName] && rooms[roomName].get('data').router || await createRoom(roomName, socket.id)
     const router1 = await createRoom(roomName, socket.id);
     socket.join(roomName);
-    console.log("joinRoom!!!!!!!!!!!");
-    console.log("groupUID: " + groupUID + ", userUID: " + userUID + ", roomName: " + roomName);
 
     let getSql = "select UID from GroupMember where userUID = ? and groupUID = ?";
     const getSqlData = [userUID, groupUID];
     const [getResult] = await con.query(getSql, getSqlData);
-    console.log(getResult);
     const groupMemberUID = getResult[0].UID;
-    console.log("-------------------------------------------------------");
-    console.log("groupMemberUID: " + groupMemberUID);
 
     let insertSql = "insert StudyMember(groupUID, groupMemberUID, userUID) values(?)";
     const insertSqlData = [groupUID, groupMemberUID, userUID];
@@ -220,7 +215,12 @@ connections.on('connection', async socket => {
     // call callback from the client and send back the rtpCapabilities
     callback({ rtpCapabilities });
 	  //callback({ rtpCapabilities, studyMemberUID })
-  })
+  });
+
+  socket.on('getStudyMemberUID', async (callback) => {
+    const { studyMemberUID } = peers[socket.io];
+    callback( {studyMemberUID} );
+  });
 
   const createRoom = async (roomName, socketId) => {
     // worker.createRouter(options)
