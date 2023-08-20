@@ -41,7 +41,7 @@ class AnswerControllerTest {
 
     private static String baseURL = "/api/answer";
 
-    private Integer userUID, leaderUserUID, memberUserUID;
+    private Integer userUID, leaderUID, memberUID, groupMemberUID;
     private Integer groupUID, questionUID, memberAnswerUID, userAnswerUID;
 
     private String accessToken;
@@ -101,7 +101,7 @@ class AnswerControllerTest {
                 .authCode("00000b")
                 .build();
         leader.setIsAuth(true);
-        leaderUserUID = userRepository.save(leader).intValue();
+        leaderUID = userRepository.save(leader).intValue();
         User member = User.builder()
                 .email("gong40sa04_2@gmail.com")
                 .passwd(passwordEncoder.encode("12345678"))
@@ -109,7 +109,7 @@ class AnswerControllerTest {
                 .authCode("00000c")
                 .build();
         member.setIsAuth(true);
-        memberUserUID = userRepository.save(member).intValue();
+        memberUID = userRepository.save(member).intValue();
 
         // 스터디 그룹 생성 및 멤버들 가입
         StudyGroup studyGroup = StudyGroup.builder()
@@ -127,12 +127,12 @@ class AnswerControllerTest {
         groupUID = studyGroupRepository.save(studyGroup).intValue();
 
         GroupMember groupLeader = GroupMember.builder()
-                .userUID(leaderUserUID)
+                .userUID(leaderUID)
                 .groupUID(groupUID)
                 .isLeader(true)
                 .build();
         GroupMember groupMember = GroupMember.builder()
-                .userUID(memberUserUID)
+                .userUID(memberUID)
                 .groupUID(groupUID)
                 .isLeader(false)
                 .build();
@@ -141,13 +141,14 @@ class AnswerControllerTest {
                 .groupUID(groupUID)
                 .isLeader(false)
                 .build();
-        groupMemberRepository.save(groupLeader);
-        groupMemberRepository.save(groupMember);
-        groupMemberRepository.save(userMember);
+        final int groupLeaderUID = groupMemberRepository.save(groupLeader).intValue();
+        groupMemberUID = groupMemberRepository.save(groupMember).intValue();
+        final int groupUserUID = groupMemberRepository.save(userMember).intValue();
 
         Question question = Question.builder()
                 .groupUID(groupUID)
-                .userUID(leaderUserUID)
+                .userUID(leaderUID)
+                .groupMemberUID(groupLeaderUID)
                 .title("통합 테스트 질문입니다.")
                 .content("통합 테스트 질문 상세내용입니다.")
                 .build();
@@ -155,12 +156,16 @@ class AnswerControllerTest {
 
         Answer memberAnswer = Answer.builder()
                 .questionUID(questionUID)
-                .userUID(memberUserUID)
+                .userUID(memberUID)
+                .groupUID(groupUID)
+                .groupMemberUID(groupMemberUID)
                 .answer("멤버가 작성한 통합 테스트 답변 내용입니다.")
                 .build();
         Answer userAnswer = Answer.builder()
                 .questionUID(questionUID)
                 .userUID(userUID)
+                .groupUID(groupUID)
+                .groupMemberUID(groupUserUID)
                 .answer("유저가 작성한 통합 테스트 답변 내용입니다.")
                 .build();
         memberAnswerUID = answerRepository.save(memberAnswer).intValue();
@@ -212,6 +217,8 @@ class AnswerControllerTest {
                 .andExpect(jsonPath("$.msg").value("존재하지 않는 질문입니다."));
     }
 
+    // db ver2에서는 가입하지 않은 그룹은 아예 접근할 수 없으므로 해당 테스트 케이스 주석 처리
+    /*
     @Test
     void 답변등록_실패_가입하지않은그룹() throws Exception {
         // given
@@ -230,15 +237,16 @@ class AnswerControllerTest {
         int groupUID = studyGroupRepository.save(studyGroup).intValue();
 
         GroupMember groupLeader = GroupMember.builder()
-                .userUID(leaderUserUID)
+                .userUID(leaderUID)
                 .groupUID(groupUID)
                 .isLeader(true)
                 .build();
-        groupMemberRepository.save(groupLeader);
+        groupMemberRepository.save(groupLeader).intValue();
 
         Question question = Question.builder()
                 .groupUID(groupUID)
-                .userUID(leaderUserUID)
+                .userUID(memberUID)
+                .groupMemberUID(groupMemberUID)
                 .title("통합 테스트 질문입니다.")
                 .content("통합 테스트 질문 상세내용입니다.")
                 .build();
@@ -263,6 +271,7 @@ class AnswerControllerTest {
                 .andExpect(jsonPath("$.location").value("groupUID"))
                 .andExpect(jsonPath("$.msg").value("가입되지 않은 그룹입니다."));
     }
+     */
 
 
     @Test

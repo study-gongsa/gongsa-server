@@ -14,6 +14,7 @@ public class AnswerInfo {
     private int UID;
     private int questionUID;
     private int userUID;
+    private int groupMemberUID;
     private String nickname;
     private String answer;
     private Timestamp createdAt;

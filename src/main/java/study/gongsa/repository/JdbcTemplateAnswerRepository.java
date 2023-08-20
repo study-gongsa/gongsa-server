@@ -97,10 +97,11 @@ public class JdbcTemplateAnswerRepository implements AnswerRepository{
         hashMap.put("UID",answer.getUID());
         hashMap.put("questionUID",answer.getQuestionUID());
         hashMap.put("userUID",answer.getUserUID());
+        hashMap.put("groupMemberUID",answer.getGroupMemberUID());
+        hashMap.put("groupUID",answer.getGroupUID());
         hashMap.put("answer",answer.getAnswer());
         hashMap.put("createdAt",answer.getCreatedAt());
         hashMap.put("updatedAt",answer.getUpdatedAt());
-
         return hashMap;
     }
 }
