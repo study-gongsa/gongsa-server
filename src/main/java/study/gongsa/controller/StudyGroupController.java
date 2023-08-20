@@ -1,7 +1,6 @@
 package study.gongsa.controller;
 
 import io.swagger.annotations.*;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,11 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import study.gongsa.domain.Category;
+import study.gongsa.domain.LastStudyTimeInfo;
 import study.gongsa.domain.StudyGroup;
 import study.gongsa.dto.*;
 import study.gongsa.service.CategoryService;
 import study.gongsa.service.GroupMemberService;
 import study.gongsa.service.StudyGroupService;
+import study.gongsa.service.StudyMemberService;
 import study.gongsa.support.exception.IllegalStateExceptionWithLocation;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +22,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -30,12 +32,14 @@ import java.util.List;
 public class StudyGroupController {
     private final StudyGroupService studyGroupService;
     private final GroupMemberService groupMemberService;
+    private final StudyMemberService studyMemberService;
     private final CategoryService categoryService;
 
     @Autowired
-    public StudyGroupController(StudyGroupService studyGroupService, GroupMemberService groupMemberService, CategoryService categoryService) {
+    public StudyGroupController(StudyGroupService studyGroupService, GroupMemberService groupMemberService, StudyMemberService studyMemberService, CategoryService categoryService) {
         this.studyGroupService = studyGroupService;
         this.groupMemberService = groupMemberService;
+        this.studyMemberService = studyMemberService;
         this.categoryService = categoryService;
     }
 
@@ -202,5 +206,19 @@ public class StudyGroupController {
         makeStudyGroupResponse.put("groupUID", groupUID);
         DefaultResponse response = new DefaultResponse(makeStudyGroupResponse);
         return new ResponseEntity(response, HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value="스터디 그룹 (현재) 공부 시간 및 정보 조회, 스터디 화면 정보 조회")
+    @ApiResponses({
+            @ApiResponse(code=200, message="스터디 화면 출력 정보 조회"),
+            @ApiResponse(code=401, message="로그인을 하지 않았을 경우(header에 Authorization이 없을 경우)"),
+            //@ApiResponse(code=403, message="가입되지 않은 그룹일 경우, 토큰 에러(토큰이 만료되었을 경우 등)")
+    })
+    @GetMapping("/{groupUID}/study-info")
+    public ResponseEntity findStudyInfo(@PathVariable("groupUID") int groupUID){
+        List<LastStudyTimeInfo> lastStudyTime = studyMemberService.findLastStudyTime(groupUID);
+        List<LastStudyTimeInfoDTO> lastStudyTimeInfoDTOS = lastStudyTime.stream().map(t -> LastStudyTimeInfoDTO.convertTo(t)).collect(Collectors.toList());
+        DefaultResponse response = new DefaultResponse(lastStudyTimeInfoDTOS);
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 }
