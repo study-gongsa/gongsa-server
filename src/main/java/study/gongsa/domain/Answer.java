@@ -15,6 +15,8 @@ public class Answer {
     private int UID;
     private int questionUID;
     private int userUID;
+    private int groupMemberUID;
+    private int groupUID;
     private String answer;
     @Builder.Default
     private Timestamp createdAt = new Timestamp(new Date().getTime());

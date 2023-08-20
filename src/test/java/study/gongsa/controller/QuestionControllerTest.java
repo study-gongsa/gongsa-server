@@ -37,8 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 public class QuestionControllerTest {
     private static String baseURL = "/api/question";
-    private Integer userUID, leaderUserUID, memberUserUID, questionUID, answerUID;
-    private Integer groupUID;
+    private Integer userUID, questionUID, groupUID;
     private String accessToken;
 
     @Autowired
@@ -81,10 +80,11 @@ public class QuestionControllerTest {
         user.setIsAuth(true);
         userUID = userRepository.save(user).intValue();
 
-        Integer userAuthUID = userAuthRepository.save(UserAuth.builder()
+        UserAuth userAuth = UserAuth.builder()
                 .userUID(userUID)
                 .refreshToken(jwtTokenProvider.makeRefreshToken(userUID))
-                .build()).intValue();
+                .build();
+        Integer userAuthUID = userAuthRepository.save(userAuth).intValue();
         accessToken = jwtTokenProvider.makeAccessToken(userUID, userAuthUID);
 
         // 스터디 그룹 멤버
@@ -95,7 +95,8 @@ public class QuestionControllerTest {
                 .authCode("00000b")
                 .build();
         leader.setIsAuth(true);
-        leaderUserUID = userRepository.save(leader).intValue();
+        final int leaderUID = userRepository.save(leader).intValue();
+
         User member = User.builder()
                 .email("gong40sa04_2@gmail.com")
                 .passwd(passwordEncoder.encode("12345678"))
@@ -103,7 +104,7 @@ public class QuestionControllerTest {
                 .authCode("00000c")
                 .build();
         member.setIsAuth(true);
-        memberUserUID = userRepository.save(member).intValue();
+        final int memberUID = userRepository.save(member).intValue();
 
         // 스터디 그룹 생성 및 멤버들 가입
         StudyGroup studyGroup = StudyGroup.builder()
@@ -123,40 +124,43 @@ public class QuestionControllerTest {
         GroupMember groupUser = GroupMember.builder()
                 .userUID(userUID)
                 .groupUID(groupUID)
-                .isLeader(true)
+                .isLeader(false)
                 .build();
         GroupMember groupLeader = GroupMember.builder()
-                .userUID(leaderUserUID)
+                .userUID(leaderUID)
                 .groupUID(groupUID)
                 .isLeader(true)
                 .build();
         GroupMember groupMember = GroupMember.builder()
-                .userUID(memberUserUID)
+                .userUID(memberUID)
                 .groupUID(groupUID)
                 .isLeader(false)
                 .build();
-        groupMemberRepository.save(groupUser);
-        groupMemberRepository.save(groupLeader);
-        groupMemberRepository.save(groupMember);
+        final int groupUserUID = groupMemberRepository.save(groupUser).intValue();
+        groupMemberRepository.save(groupLeader).intValue();
+        final int groupMemberUID = groupMemberRepository.save(groupMember).intValue();
 
         Question question = Question.builder()
                 .groupUID(groupUID)
                 .userUID(userUID)
+                .groupMemberUID(groupUserUID)
                 .title("통합 테스트 질문입니다.")
                 .content("통합 테스트 질문 상세내용입니다.")
                 .build();
         questionUID = questionRepository.save(question).intValue();
 
-        questionUID = questionRepository.save(question).intValue();
-
         Answer memberAnswer = Answer.builder()
                 .questionUID(questionUID)
-                .userUID(memberUserUID)
+                .userUID(memberUID)
+                .groupUID(groupUID)
+                .groupMemberUID(groupMemberUID)
                 .answer("멤버가 작성한 통합 테스트 답변 내용입니다.")
                 .build();
         Answer userAnswer = Answer.builder()
                 .questionUID(questionUID)
                 .userUID(userUID)
+                .groupUID(groupUID)
+                .groupMemberUID(groupUserUID)
                 .answer("유저가 작성한 통합 테스트 답변 내용입니다.")
                 .build();
         answerRepository.save(memberAnswer);

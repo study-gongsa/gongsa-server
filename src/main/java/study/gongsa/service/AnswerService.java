@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import study.gongsa.domain.Answer;
 import study.gongsa.domain.AnswerInfo;
+import study.gongsa.domain.GroupMember;
 import study.gongsa.domain.Question;
 import study.gongsa.repository.AnswerRepository;
 import study.gongsa.repository.QuestionRepository;
@@ -17,12 +18,14 @@ import java.util.Optional;
 @Slf4j
 public class AnswerService {
     private final AnswerRepository answerRepository;
+    private final GroupMemberService groupMemberService;
     private final QuestionRepository questionRepository;
     private final QuestionService questionService;
 
 
-    public AnswerService(AnswerRepository answerRepository, QuestionRepository questionRepository, QuestionService questionService) {
+    public AnswerService(AnswerRepository answerRepository, GroupMemberService groupMemberService, QuestionRepository questionRepository, QuestionService questionService) {
         this.answerRepository = answerRepository;
+        this.groupMemberService = groupMemberService;
         this.questionRepository = questionRepository;
         this.questionService = questionService;
     }
@@ -41,11 +44,14 @@ public class AnswerService {
 
     public void makeAnswer(int userUID, int questionUID, String content) {
         Question question = questionService.findOne(questionUID);
-        questionService.checkRegisteredGroup(question.getGroupUID(), userUID);
+        int groupUID = question.getGroupUID();
+        GroupMember groupMember = groupMemberService.findOne(groupUID, userUID);
 
         Answer answer = Answer.builder()
                 .userUID(userUID)
                 .questionUID(questionUID)
+                .groupUID(groupUID)
+                .groupMemberUID(groupMember.getUID())
                 .answer(content)
                 .build();
         answerRepository.save(answer);

@@ -15,6 +15,7 @@ public class Question {
     private int UID;
     private int groupUID;
     private int userUID;
+    private int groupMemberUID;
     private String title;
     private String content;
     @Builder.Default

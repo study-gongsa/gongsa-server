@@ -24,9 +24,7 @@ public class JdbcTemplateQuestionRepository implements QuestionRepository{
     @Autowired
     public JdbcTemplateQuestionRepository(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
-        this.insertIntoQuestion = new SimpleJdbcInsert(jdbcTemplate).withTableName("Question")
-                .usingColumns("createdAt", "title", "content", "groupUID", "userUID", "updatedAt")
-                .usingGeneratedKeyColumns("UID");
+        this.insertIntoQuestion = new SimpleJdbcInsert(jdbcTemplate).withTableName("Question").usingGeneratedKeyColumns("UID");
     }
 
     @Override
@@ -96,6 +94,7 @@ public class JdbcTemplateQuestionRepository implements QuestionRepository{
             question.setUID(rs.getInt("UID"));
             question.setGroupUID(rs.getInt("groupUID"));
             question.setUserUID(rs.getInt("userUID"));
+            question.setGroupMemberUID(rs.getInt("groupMemberUID"));
             question.setTitle(rs.getString("title"));
             question.setContent(rs.getString("content"));
             question.setCreatedAt(rs.getTimestamp("createdAt"));
@@ -108,6 +107,7 @@ public class JdbcTemplateQuestionRepository implements QuestionRepository{
         HashMap<String, Object> hashMap = new HashMap<String, Object>();
         hashMap.put("UID",question.getUID());
         hashMap.put("groupUID",question.getGroupUID());
+        hashMap.put("groupMemberUID", question.getGroupMemberUID());
         hashMap.put("userUID",question.getUserUID());
         hashMap.put("title",question.getTitle());
         hashMap.put("content",question.getContent());
