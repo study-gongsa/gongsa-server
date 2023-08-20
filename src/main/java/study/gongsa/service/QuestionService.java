@@ -3,7 +3,6 @@ package study.gongsa.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import study.gongsa.domain.*;
 import study.gongsa.repository.AnswerRepository;
 import study.gongsa.repository.GroupMemberRepository;
@@ -21,13 +20,15 @@ public class QuestionService {
     private final GroupMemberRepository groupMemberRepository;
     private final StudyGroupRepository studyGroupRepository;
     private final AnswerRepository answerRepository;
+    private final GroupMemberService groupMemberService;
 
     @Autowired
-    public QuestionService(QuestionRepository questionRepository, GroupMemberRepository groupMemberRepository, StudyGroupRepository studyGroupRepository, AnswerRepository answerRepository) {
+    public QuestionService(QuestionRepository questionRepository, GroupMemberRepository groupMemberRepository, StudyGroupRepository studyGroupRepository, AnswerRepository answerRepository, GroupMemberService groupMemberService) {
         this.questionRepository = questionRepository;
         this.groupMemberRepository = groupMemberRepository;
         this.studyGroupRepository = studyGroupRepository;
         this.answerRepository = answerRepository;
+        this.groupMemberService = groupMemberService;
     }
 
     public List<QuestionInfo> findMyQuestion(int userUID){
@@ -71,10 +72,11 @@ public class QuestionService {
     }
 
     public int makeQuestion(int userUID, int groupUID, String title, String content) {
-        checkRegisteredGroup(groupUID, userUID);
+        GroupMember groupMember = groupMemberService.findOne(groupUID, userUID);
         Question question = Question.builder()
                 .userUID(userUID)
                 .groupUID(groupUID)
+                .groupMemberUID(groupMember.getUID())
                 .title(title)
                 .content(content)
                 .build();
